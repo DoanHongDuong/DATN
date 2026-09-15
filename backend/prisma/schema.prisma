@@ -1,0 +1,252 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+enum Role {
+  USER
+  VOLUNTEER
+  ADMIN
+}
+
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum SessionStatus {
+  WAITING
+  ACTIVE
+  CLOSED
+}
+
+enum PriorityLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum SeverityLevel {
+  MINIMAL
+  MILD
+  MODERATE
+  MODERATELY_SEVERE
+  SEVERE
+}
+
+model User {
+  id                  String    @id @default(uuid())
+  role                Role      @default(USER)
+  fullName            String    @map("full_name")
+  email               String    @unique
+  passwordHash        String    @map("password_hash")
+  phone               String?
+  avatarUrl           String?   @map("avatar_url")
+  status              AccountStatus @default(ACTIVE)
+  resetTokenHash      String?   @map("reset_token_hash")
+  resetTokenExpiresAt DateTime? @map("reset_token_expires_at")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  volunteerProfile    VolunteerProfile?
+  journalEntries      JournalEntry[]
+  testResults         TestResult[]
+  sessionsAsUser      ChatSession[]      @relation("SessionRequester")
+  sessionsAsVolunteer ChatSession[]      @relation("SessionVolunteer")
+  chatMessages        ChatMessage[]
+  notifications       Notification[]
+  auditLogs           AuditLog[]         @relation("AuditActor")
+
+  @@map("users")
+}
+
+model VolunteerProfile {
+  id              String   @id @default(uuid())
+  userId          String   @unique @map("user_id")
+  specialization  String?
+  bio             String?
+  certificateUrl  String?  @map("certificate_url")
+  isVerified      Boolean  @default(false) @map("is_verified")
+  isOnline        Boolean  @default(false) @map("is_online")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  user            User     @relation(fields: [userId], references: [id])
+
+  @@map("volunteer_profiles")
+}
+
+model PsychologicalTest {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  name        String
+  description String?
+  maxScore    Int      @map("max_score")
+
+  questions   TestQuestion[]
+  results     TestResult[]
+
+  @@map("psychological_tests")
+}
+
+model TestQuestion {
+  id          String   @id @default(uuid())
+  testId      String   @map("test_id")
+  content     String
+  orderNumber Int      @map("order_number")
+
+  test        PsychologicalTest @relation(fields: [testId], references: [id])
+  options     TestOption[]
+  answers     TestAnswer[]
+
+  @@map("test_questions")
+}
+
+model TestOption {
+  id          String   @id @default(uuid())
+  questionId  String   @map("question_id")
+  content     String
+  scoreValue  Int      @map("score_value")
+
+  question    TestQuestion @relation(fields: [questionId], references: [id])
+  answers     TestAnswer[]
+
+  @@map("test_options")
+}
+
+model TestResult {
+  id            String        @id @default(uuid())
+  userId        String        @map("user_id")
+  testId        String        @map("test_id")
+  totalScore    Int           @map("total_score")
+  severityLevel SeverityLevel @map("severity_level")
+  takenAt       DateTime      @default(now()) @map("taken_at")
+
+  user          User              @relation(fields: [userId], references: [id])
+  test          PsychologicalTest @relation(fields: [testId], references: [id])
+  answers       TestAnswer[]
+
+  @@map("test_results")
+}
+
+model TestAnswer {
+  id         String @id @default(uuid())
+  resultId   String @map("result_id")
+  questionId String @map("question_id")
+  optionId   String @map("option_id")
+
+  result     TestResult   @relation(fields: [resultId], references: [id])
+  question   TestQuestion @relation(fields: [questionId], references: [id])
+  option     TestOption   @relation(fields: [optionId], references: [id])
+
+  @@map("test_answers")
+}
+
+model JournalEntry {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  content         String
+  moodEmoji       String?  @map("mood_emoji")
+  sentimentLabel  String?  @map("sentiment_label")
+  sentimentScore  Float?   @map("sentiment_score")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user            User     @relation(fields: [userId], references: [id])
+
+  @@map("journal_entries")
+}
+
+model RelaxationResource {
+  id              String   @id @default(uuid())
+  title           String
+  type            String
+  url             String
+  durationSeconds Int?     @map("duration_seconds")
+  category        String
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("relaxation_resources")
+}
+
+model ChatSession {
+  id            String         @id @default(uuid())
+  userId        String         @map("user_id")
+  volunteerId   String?        @map("volunteer_id")
+  status        SessionStatus  @default(WAITING)
+  priorityLevel PriorityLevel  @default(MEDIUM) @map("priority_level")
+  queuedAt      DateTime       @default(now()) @map("queued_at")
+  startedAt     DateTime?      @map("started_at")
+  endedAt       DateTime?      @map("ended_at")
+
+  user          User           @relation("SessionRequester", fields: [userId], references: [id])
+  volunteer     User?          @relation("SessionVolunteer", fields: [volunteerId], references: [id])
+  messages      ChatMessage[]
+  feedback      SessionFeedback?
+
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id        String      @id @default(uuid())
+  sessionId String      @map("session_id")
+  senderId  String      @map("sender_id")
+  content   String
+  sentAt    DateTime    @default(now()) @map("sent_at")
+  isRead    Boolean     @default(false) @map("is_read")
+
+  session   ChatSession @relation(fields: [sessionId], references: [id])
+  sender    User        @relation(fields: [senderId], references: [id])
+
+  @@map("chat_messages")
+}
+
+model SessionFeedback {
+  id        String      @id @default(uuid())
+  sessionId String      @unique @map("session_id")
+  rating    Int
+  comment   String?
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  session   ChatSession @relation(fields: [sessionId], references: [id])
+
+  @@map("session_feedback")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  title     String
+  content   String
+  type      String
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  actorId     String   @map("actor_id")
+  action      String
+  targetId    String?  @map("target_id")
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  actor       User     @relation("AuditActor", fields: [actorId], references: [id])
+
+  @@map("audit_logs")
+}

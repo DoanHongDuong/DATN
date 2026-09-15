@@ -1,0 +1,18 @@
+{
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.5.0"
+  },
+  "scripts": {
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "backend/**/*.ts": "npm run lint --workspace=backend",
+    "frontend/**/*.{ts,tsx}": "npm run lint --workspace=frontend"
+  }
+}
