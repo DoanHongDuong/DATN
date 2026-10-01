@@ -1,0 +1,37 @@
+$kind: http-request
+name: http://localhost:3000/assessments/59fb49a4-3712-4f4f-9d3a-67b4ab704c54/submit
+description: ""
+url: http://localhost:3000/assessments/59fb49a4-3712-4f4f-9d3a-67b4ab704c54/submit
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"answers\": [\r
+
+    \    { \"questionId\": \"188a76a2-0008-42a3-b773-9d66764d98d6\", \"optionId\": \"da8398ec-ab03-457a-8984-a6c538e03323\" },\r
+
+    \    { \"questionId\": \"6757759f-a0fe-4dff-a0ae-b6274387d6fa\", \"optionId\": \"ca0d3729-8555-4453-ba71-152b19b5ad5a\" },\r
+
+    \    { \"questionId\": \"691053f4-ea1d-47cf-9362-11da9a4cb4dd\", \"optionId\": \"fa6d35cb-bd9e-4342-bd71-86551964e80c\" },\r
+
+    \    { \"questionId\": \"02aa5d3d-4298-4e7d-b446-562b0190041b\", \"optionId\": \"9112584d-7b9a-4b9d-bd26-b2385ec0ede8\" },\r
+
+    \    { \"questionId\": \"f13b9b55-6a0c-4ed0-839b-2ee94bbc032e\", \"optionId\": \"33c386cd-7683-4af3-aae6-d75a25db034a\" },\r
+
+    \    { \"questionId\": \"22e2b01e-01f6-4d34-a030-2782d6c9d855\", \"optionId\": \"164613ce-abe1-4aa1-8a9d-792fe84f7a71\" },\r
+
+    \    { \"questionId\": \"0f96518d-d184-406c-b9a5-484f4ce7d62a\", \"optionId\": \"41d86407-1a49-4105-b733-4b28a54a1b11\" },\r
+
+    \    { \"questionId\": \"e660247a-fb69-41ff-a2da-eb956f184d73\", \"optionId\": \"819aed71-d08f-48a3-9528-c71b1048b815\" },\r
+
+    \    { \"questionId\": \"2a81d9ef-4581-4887-96d0-b3ea558dad9f\", \"optionId\": \"a722d362-8e0e-4277-aa6a-8800716ad567\" }\r
+
+    \  ]\r
+
+    }"
+auth:
+  type: bearer
+  credentials:
+    token: "{{json_web_token_0z9c}}"
+order: 1790830519776

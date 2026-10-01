@@ -10,14 +10,17 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
+const prisma_module_1 = require("./infrastructure/prisma/prisma.module");
 const auth_module_1 = require("./modules/auth/infrastructure/auth.module");
 const assessment_module_1 = require("./modules/assessment/infrastructure/assessment.module");
+const journal_module_1 = require("./modules/journal/infrastructure/journal.module");
+const chat_module_1 = require("./modules/chat/infrastructure/chat.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [auth_module_1.AuthModule, assessment_module_1.AssessmentModule],
+        imports: [prisma_module_1.PrismaModule, auth_module_1.AuthModule, assessment_module_1.AssessmentModule, journal_module_1.JournalModule, chat_module_1.ChatModule],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })

@@ -8,7 +8,6 @@ import { RegisterUserUseCase } from '../application/use-cases/register-user.use-
 import { LoginUserUseCase } from '../application/use-cases/login-user.use-case';
 import { RequestPasswordResetUseCase } from '../application/use-cases/request-password-reset.use-case';
 import { UserPrismaRepository } from './persistence/user.prisma.repository';
-import { PrismaService } from './prisma/prisma.service';
 import { USER_REPOSITORY } from '../domain/repositories/user.repository.interface';
 
 @Module({
@@ -29,7 +28,6 @@ import { USER_REPOSITORY } from '../domain/repositories/user.repository.interfac
   ],
   controllers: [AuthController],
   providers: [
-    PrismaService,
     {
       provide: USER_REPOSITORY,
       useClass: UserPrismaRepository,

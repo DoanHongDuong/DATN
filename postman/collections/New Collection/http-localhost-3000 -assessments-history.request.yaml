@@ -1,0 +1,14 @@
+$kind: http-request
+name: http://localhost:3000 /assessments/history
+description: ""
+url: http://localhost:3000 /assessments/history
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{json_web_token_06uh}}"
+scripts:
+  - type: afterResponse
+    code: ""
+    language: text/javascript
+order: 1392589551163950

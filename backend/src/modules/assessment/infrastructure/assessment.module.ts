@@ -7,7 +7,6 @@ import { GetTestQuestionsUseCase } from '../application/use-cases/get-test-quest
 import { SubmitTestUseCase } from '../application/use-cases/submit-test.use-case';
 import { GetTestHistoryUseCase } from '../application/use-cases/get-test-history.use-case';
 import { AuthModule } from '../../auth/infrastructure/auth.module';
-import { PrismaService } from '../../auth/infrastructure/prisma/prisma.service';
 
 @Module({
   imports: [
@@ -24,7 +23,6 @@ import { PrismaService } from '../../auth/infrastructure/prisma/prisma.service';
     GetTestQuestionsUseCase,
     SubmitTestUseCase,
     GetTestHistoryUseCase,
-    PrismaService,
   ],
 })
 export class AssessmentModule {}

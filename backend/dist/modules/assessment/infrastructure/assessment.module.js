@@ -16,7 +16,6 @@ const get_test_questions_use_case_1 = require("../application/use-cases/get-test
 const submit_test_use_case_1 = require("../application/use-cases/submit-test.use-case");
 const get_test_history_use_case_1 = require("../application/use-cases/get-test-history.use-case");
 const auth_module_1 = require("../../auth/infrastructure/auth.module");
-const prisma_service_1 = require("../../auth/infrastructure/prisma/prisma.service");
 let AssessmentModule = class AssessmentModule {
 };
 exports.AssessmentModule = AssessmentModule;
@@ -36,7 +35,6 @@ exports.AssessmentModule = AssessmentModule = __decorate([
             get_test_questions_use_case_1.GetTestQuestionsUseCase,
             submit_test_use_case_1.SubmitTestUseCase,
             get_test_history_use_case_1.GetTestHistoryUseCase,
-            prisma_service_1.PrismaService,
         ],
     })
 ], AssessmentModule);

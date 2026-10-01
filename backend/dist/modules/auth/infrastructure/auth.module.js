@@ -16,7 +16,6 @@ const register_user_use_case_1 = require("../application/use-cases/register-user
 const login_user_use_case_1 = require("../application/use-cases/login-user.use-case");
 const request_password_reset_use_case_1 = require("../application/use-cases/request-password-reset.use-case");
 const user_prisma_repository_1 = require("./persistence/user.prisma.repository");
-const prisma_service_1 = require("./prisma/prisma.service");
 const user_repository_interface_1 = require("../domain/repositories/user.repository.interface");
 let AuthModule = class AuthModule {
 };
@@ -40,7 +39,6 @@ exports.AuthModule = AuthModule = __decorate([
         ],
         controllers: [auth_controller_1.AuthController],
         providers: [
-            prisma_service_1.PrismaService,
             {
                 provide: user_repository_interface_1.USER_REPOSITORY,
                 useClass: user_prisma_repository_1.UserPrismaRepository,

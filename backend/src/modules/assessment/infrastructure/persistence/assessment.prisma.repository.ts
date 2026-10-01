@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../../modules/auth/infrastructure/prisma/prisma.service'; // Wait, let's just create a shared prisma.service or import from auth if it's there? Wait, the PrismaService was in src/modules/auth/infrastructure/prisma/prisma.service.ts. I should use that one or make a generic one. Let me import it from there for now, or just assume there's one. Wait, let me adjust the import path later if needed.
+import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
 import { PsychologicalTest, TestResult } from '@prisma/client';
 import { IAssessmentRepository, QuestionWithOptions, TestSubmissionData } from '../../domain/repositories/assessment.repository.interface';
 
