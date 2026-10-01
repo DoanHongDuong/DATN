@@ -49,7 +49,7 @@ Frontend: http://localhost:5173
 ## Tài liệu
 
 Toàn bộ tài liệu thiết kế (SRS, Use Case Specification, ERD, Product Backlog) nằm trong
-thư mục `docs/` (hoặc đường dẫn bạn lưu file .docx đã xuất).
+thư mục `docs/`.
 
 ## Quy tắc phát triển
 
