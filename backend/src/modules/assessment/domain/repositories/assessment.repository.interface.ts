@@ -1,4 +1,4 @@
-import { PsychologicalTest, TestQuestion, TestOption, TestResult, TestAnswer, SeverityLevel } from '@prisma/client';
+import { PsychologicalTest, TestQuestion, TestOption, TestResult, SeverityLevel } from '@prisma/client';
 
 export type QuestionWithOptions = TestQuestion & {
   options: TestOption[];

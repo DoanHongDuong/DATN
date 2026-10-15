@@ -72,9 +72,15 @@ async function seedTest(
 
 async function seedRelaxationResources() {
     const resources = [
-        { title: 'Thở sâu 4-7-8', type: 'BREATHING', url: 'https://example.com/breathing-478', durationSeconds: 300, category: 'breathing' },
-        { title: 'Âm thanh mưa rơi', type: 'AUDIO', url: 'https://example.com/rain-sound', durationSeconds: 600, category: 'calm_audio' },
-        { title: 'Nhạc lofi thư giãn', type: 'AUDIO', url: 'https://example.com/lofi', durationSeconds: 900, category: 'calm_audio' },
+        { title: 'Kỹ thuật thở sâu 4-7-8', type: 'BREATHING', url: '4-7-8', durationSeconds: 300, category: 'breathing' },
+        { title: 'Thở hộp Box Breathing (4-4-4-4)', type: 'BREATHING', url: 'box-breathing', durationSeconds: 240, category: 'breathing' },
+        { title: 'Thở cơ hoành thả lỏng lồng ngực', type: 'BREATHING', url: 'diaphragmatic', durationSeconds: 300, category: 'breathing' },
+        { title: 'Âm thanh mưa rơi êm dịu', type: 'AUDIO', url: 'https://actions.google.com/sounds/v1/weather/rain_heavy.ogg', durationSeconds: 600, category: 'calm_audio' },
+        { title: 'Tiếng sóng biển tĩnh lặng', type: 'AUDIO', url: 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rocks_close.ogg', durationSeconds: 900, category: 'calm_audio' },
+        { title: 'Tiếng suối chảy rừng sâu', type: 'AUDIO', url: 'https://actions.google.com/sounds/v1/water/stream_water.ogg', durationSeconds: 600, category: 'calm_audio' },
+        { title: 'Không gian tĩnh tâm góc quán trà', type: 'AUDIO', url: 'https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg', durationSeconds: 900, category: 'calm_audio' },
+        { title: 'Kỹ thuật tiếp đất 5-4-3-2-1 ngắt cơn lo âu', type: 'ARTICLE', url: 'grounding-54321', durationSeconds: 300, category: 'mindfulness' },
+        { title: 'Kỹ thuật thư giãn cơ tiến triển (PMR)', type: 'ARTICLE', url: 'pmr-guide', durationSeconds: 600, category: 'mindfulness' },
     ];
 
     for (const r of resources) {

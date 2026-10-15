@@ -142,6 +142,17 @@ let ChatPrismaRepository = class ChatPrismaRepository {
         }
         return position;
     }
+    async findWaitingSessions() {
+        return this.prisma.chatSession.findMany({
+            where: {
+                status: client_1.SessionStatus.WAITING,
+                volunteerId: null,
+            },
+            orderBy: [
+                { queuedAt: 'asc' },
+            ],
+        });
+    }
 };
 exports.ChatPrismaRepository = ChatPrismaRepository;
 exports.ChatPrismaRepository = ChatPrismaRepository = __decorate([

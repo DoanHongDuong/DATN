@@ -47,6 +47,7 @@ let SubmitTestUseCase = class SubmitTestUseCase {
             totalScore += option.scoreValue;
         }
         const severityLevel = (0, severity_thresholds_constant_1.getSeverityLevel)(test.code, totalScore);
+        const recommendation = (0, severity_thresholds_constant_1.getRecommendation)(test.code, severityLevel);
         const result = await this.repository.saveTestResult({
             userId,
             testId,
@@ -55,8 +56,13 @@ let SubmitTestUseCase = class SubmitTestUseCase {
             answers: dto.answers,
         });
         return {
-            result,
+            ...result,
+            id: result.id,
+            testId: result.testId,
+            totalScore,
             severityLevel,
+            recommendation,
+            takenAt: result.takenAt,
         };
     }
 };

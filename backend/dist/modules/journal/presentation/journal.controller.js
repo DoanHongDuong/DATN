@@ -14,12 +14,14 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JournalController = void 0;
 const common_1 = require("@nestjs/common");
+const swagger_1 = require("@nestjs/swagger");
 const jwt_auth_guard_1 = require("../../auth/presentation/guards/jwt-auth.guard");
 const create_journal_entry_use_case_1 = require("../application/use-cases/create-journal-entry.use-case");
 const get_journal_entries_use_case_1 = require("../application/use-cases/get-journal-entries.use-case");
 const update_journal_entry_use_case_1 = require("../application/use-cases/update-journal-entry.use-case");
 const delete_journal_entry_use_case_1 = require("../application/use-cases/delete-journal-entry.use-case");
 const suggest_resources_use_case_1 = require("../application/use-cases/suggest-resources.use-case");
+const get_all_relaxation_resources_use_case_1 = require("../application/use-cases/get-all-relaxation-resources.use-case");
 const create_journal_entry_dto_1 = require("../application/dto/create-journal-entry.dto");
 const update_journal_entry_dto_1 = require("../application/dto/update-journal-entry.dto");
 let JournalController = class JournalController {
@@ -28,12 +30,14 @@ let JournalController = class JournalController {
     updateJournalEntryUseCase;
     deleteJournalEntryUseCase;
     suggestResourcesUseCase;
-    constructor(createJournalEntryUseCase, getJournalEntriesUseCase, updateJournalEntryUseCase, deleteJournalEntryUseCase, suggestResourcesUseCase) {
+    getAllRelaxationResourcesUseCase;
+    constructor(createJournalEntryUseCase, getJournalEntriesUseCase, updateJournalEntryUseCase, deleteJournalEntryUseCase, suggestResourcesUseCase, getAllRelaxationResourcesUseCase) {
         this.createJournalEntryUseCase = createJournalEntryUseCase;
         this.getJournalEntriesUseCase = getJournalEntriesUseCase;
         this.updateJournalEntryUseCase = updateJournalEntryUseCase;
         this.deleteJournalEntryUseCase = deleteJournalEntryUseCase;
         this.suggestResourcesUseCase = suggestResourcesUseCase;
+        this.getAllRelaxationResourcesUseCase = getAllRelaxationResourcesUseCase;
     }
     async create(req, dto) {
         return this.createJournalEntryUseCase.execute(req.user.userId, dto);
@@ -47,6 +51,9 @@ let JournalController = class JournalController {
     getResources(category) {
         return this.suggestResourcesUseCase.execute(category);
     }
+    getAllResources(category) {
+        return this.getAllRelaxationResourcesUseCase.execute(category);
+    }
     async update(req, id, dto) {
         return this.updateJournalEntryUseCase.execute(req.user.userId, id, dto);
     }
@@ -56,6 +63,7 @@ let JournalController = class JournalController {
 };
 exports.JournalController = JournalController;
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Tạo nhật ký cá nhân mới (được phân tích AI & mã hóa)' }),
     (0, common_1.Post)(),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
@@ -64,6 +72,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], JournalController.prototype, "create", null);
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Lấy danh sách nhật ký cá nhân có phân trang' }),
     (0, common_1.Get)(),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Query)('page', new common_1.DefaultValuePipe(1), common_1.ParseIntPipe)),
@@ -73,6 +82,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], JournalController.prototype, "findAll", null);
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Lấy lịch sử nhật ký cá nhân' }),
     (0, common_1.Get)('history'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Query)('page', new common_1.DefaultValuePipe(1), common_1.ParseIntPipe)),
@@ -82,7 +92,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], JournalController.prototype, "getHistory", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'Gợi ý tài nguyên thư giãn theo danh mục' }),
+    (0, swagger_1.ApiQuery)({ name: 'category', required: false, description: 'Danh mục tài nguyên (ví dụ: breathing, calm_audio)' }),
     (0, common_1.Get)('resources'),
     __param(0, (0, common_1.Query)('category')),
     __metadata("design:type", Function),
@@ -90,6 +101,16 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], JournalController.prototype, "getResources", null);
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Lấy toàn bộ danh sách tài nguyên thư giãn' }),
+    (0, swagger_1.ApiQuery)({ name: 'category', required: false, description: 'Danh mục tài nguyên (ví dụ: breathing, calm_audio, mindfulness)' }),
+    (0, common_1.Get)('resources/all'),
+    __param(0, (0, common_1.Query)('category')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], JournalController.prototype, "getAllResources", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Cập nhật một bài nhật ký' }),
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('id')),
@@ -99,6 +120,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], JournalController.prototype, "update", null);
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Xóa một bài nhật ký' }),
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('id')),
@@ -107,12 +129,15 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], JournalController.prototype, "remove", null);
 exports.JournalController = JournalController = __decorate([
+    (0, swagger_1.ApiTags)('Journal'),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Controller)('journal'),
     __metadata("design:paramtypes", [create_journal_entry_use_case_1.CreateJournalEntryUseCase,
         get_journal_entries_use_case_1.GetJournalEntriesUseCase,
         update_journal_entry_use_case_1.UpdateJournalEntryUseCase,
         delete_journal_entry_use_case_1.DeleteJournalEntryUseCase,
-        suggest_resources_use_case_1.SuggestResourcesUseCase])
+        suggest_resources_use_case_1.SuggestResourcesUseCase,
+        get_all_relaxation_resources_use_case_1.GetAllRelaxationResourcesUseCase])
 ], JournalController);
 //# sourceMappingURL=journal.controller.js.map

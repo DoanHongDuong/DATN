@@ -28,11 +28,22 @@ export class RegisterUserUseCase {
         phone: dto.phone,
         role: Role.USER,
         status: AccountStatus.ACTIVE,
+        emailVerified: true,
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { passwordHash: _ph, resetTokenHash: _rth, resetTokenExpiresAt: _rtea, ...result } = user;
-      return result;
+      const {
+        passwordHash: _ph,
+        resetTokenHash: _rth,
+        resetTokenExpiresAt: _rtea,
+        emailVerifyTokenHash: _evth,
+        emailVerifyTokenExpiresAt: _evtea,
+        ...result
+      } = user;
+
+      return {
+        ...result,
+        message: 'Đăng ký tài khoản thành công',
+      };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError && error.code === 'P2002') {
         throw new BadRequestException('Email đã được sử dụng');
@@ -41,3 +52,4 @@ export class RegisterUserUseCase {
     }
   }
 }
+

@@ -1,7 +1,7 @@
 import { Inject, Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { IAssessmentRepository } from '../../domain/repositories/assessment.repository.interface';
 import { SubmitTestDto } from '../dto/submit-test.dto';
-import { getSeverityLevel } from '../../infrastructure/constants/severity-thresholds.constant';
+import { getSeverityLevel, getRecommendation } from '../../infrastructure/constants/severity-thresholds.constant';
 
 @Injectable()
 export class SubmitTestUseCase {
@@ -46,6 +46,7 @@ export class SubmitTestUseCase {
     }
 
     const severityLevel = getSeverityLevel(test.code, totalScore);
+    const recommendation = getRecommendation(test.code, severityLevel);
 
     const result = await this.repository.saveTestResult({
       userId,
@@ -56,8 +57,13 @@ export class SubmitTestUseCase {
     });
 
     return {
-      result,
+      ...result,
+      id: result.id,
+      testId: result.testId,
+      totalScore,
       severityLevel,
+      recommendation,
+      takenAt: result.takenAt,
     };
   }
 }

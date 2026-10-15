@@ -31,6 +31,14 @@ export class LoginUserUseCase {
     const payload = { sub: user.id, role: user.role };
     const accessToken = await this.jwtService.signAsync(payload, { expiresIn: '7d' });
 
-    return { accessToken };
+    return {
+      accessToken,
+      user: {
+        id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        role: user.role,
+      },
+    };
   }
 }

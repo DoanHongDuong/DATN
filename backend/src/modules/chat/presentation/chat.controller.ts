@@ -8,6 +8,7 @@ import {
   Inject,
   ForbiddenException,
 } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard';
 import { RequestSupportUseCase } from '../application/use-cases/request-support.use-case';
@@ -24,6 +25,8 @@ interface AuthenticatedRequest extends Request {
   user: { userId: string; role: string };
 }
 
+@ApiTags('Chat')
+@ApiBearerAuth()
 @Controller('chat')
 @UseGuards(JwtAuthGuard)
 export class ChatController {
@@ -40,6 +43,7 @@ export class ChatController {
    * POST /chat/request-support
    * UC-06: User yêu cầu hỗ trợ tâm lý
    */
+  @ApiOperation({ summary: 'Yêu cầu tư vấn hỗ trợ tâm lý' })
   @Post('request-support')
   async requestSupport(@Req() req: AuthenticatedRequest) {
     return this.requestSupportUseCase.execute(req.user.userId);
@@ -49,6 +53,7 @@ export class ChatController {
    * POST /chat/:id/accept
    * UC-07: TNV nhận phiên hỗ trợ
    */
+  @ApiOperation({ summary: 'Tình nguyện viên chấp nhận phiên hỗ trợ' })
   @Post(':id/accept')
   async acceptSession(
     @Param('id') sessionId: string,
@@ -73,6 +78,7 @@ export class ChatController {
    * GET /chat/:id/queue-position
    * PB-20: Lấy vị trí trong hàng đợi
    */
+  @ApiOperation({ summary: 'Lấy vị trí của phiên chat trong hàng đợi' })
   @Get(':id/queue-position')
   async getQueuePosition(
     @Param('id') sessionId: string,
@@ -85,6 +91,7 @@ export class ChatController {
    * GET /chat/:id/messages
    * Lấy lịch sử tin nhắn khi mới join (trước khi nhận tin real-time)
    */
+  @ApiOperation({ summary: 'Lấy lịch sử tin nhắn của phiên chat' })
   @Get(':id/messages')
   async getMessages(
     @Param('id') sessionId: string,
@@ -103,5 +110,18 @@ export class ChatController {
     }
 
     return this.chatRepository.findMessagesBySessionId(sessionId);
+  }
+
+  /**
+   * GET /chat/waiting-sessions
+   * TNV lấy danh sách các phiên đang chờ trong hàng đợi
+   */
+  @ApiOperation({ summary: 'Lấy danh sách các phiên đang chờ TNV nhận' })
+  @Get('waiting-sessions')
+  async getWaitingSessions(@Req() req: AuthenticatedRequest) {
+    if (req.user.role !== Role.VOLUNTEER && req.user.role !== Role.ADMIN) {
+      throw new ForbiddenException('Chỉ tình nguyện viên mới có thể xem danh sách hàng đợi');
+    }
+    return this.chatRepository.findWaitingSessions();
   }
 }

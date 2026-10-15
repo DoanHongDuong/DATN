@@ -11,17 +11,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SendMessageDto = void 0;
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 class SendMessageDto {
     sessionId;
     content;
 }
 exports.SendMessageDto = SendMessageDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'ID của phiên chat', example: '123e4567-e89b-12d3-a456-426614174000' }),
     (0, class_validator_1.IsUUID)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], SendMessageDto.prototype, "sessionId", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Nội dung tin nhắn', example: 'Xin chào, tôi cần tư vấn tâm lý' }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.MaxLength)(5000),

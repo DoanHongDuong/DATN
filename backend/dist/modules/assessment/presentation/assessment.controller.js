@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AssessmentController = void 0;
 const common_1 = require("@nestjs/common");
+const swagger_1 = require("@nestjs/swagger");
 const jwt_auth_guard_1 = require("../../auth/presentation/guards/jwt-auth.guard");
 const list_tests_use_case_1 = require("../application/use-cases/list-tests.use-case");
 const get_test_questions_use_case_1 = require("../application/use-cases/get-test-questions.use-case");
@@ -46,12 +47,14 @@ let AssessmentController = class AssessmentController {
 };
 exports.AssessmentController = AssessmentController;
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Lấy danh sách bài đánh giá tâm lý (PHQ-9, GAD-7)' }),
     (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], AssessmentController.prototype, "listTests", null);
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Lấy lịch sử làm bài đánh giá của người dùng' }),
     (0, common_1.Get)('history'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Query)('page', new common_1.DefaultValuePipe(1), common_1.ParseIntPipe)),
@@ -61,6 +64,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AssessmentController.prototype, "getHistory", null);
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Lấy danh sách câu hỏi của một bài đánh giá' }),
     (0, common_1.Get)(':id/questions'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
@@ -68,6 +72,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AssessmentController.prototype, "getQuestions", null);
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Nộp bài đánh giá tâm lý và nhận kết quả' }),
     (0, common_1.Post)(':id/submit'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('id')),
@@ -77,6 +82,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AssessmentController.prototype, "submitTest", null);
 exports.AssessmentController = AssessmentController = __decorate([
+    (0, swagger_1.ApiTags)('Assessments'),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Controller)('assessments'),
     __metadata("design:paramtypes", [list_tests_use_case_1.ListTestsUseCase,

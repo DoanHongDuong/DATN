@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatController = void 0;
 const common_1 = require("@nestjs/common");
+const swagger_1 = require("@nestjs/swagger");
 const jwt_auth_guard_1 = require("../../auth/presentation/guards/jwt-auth.guard");
 const request_support_use_case_1 = require("../application/use-cases/request-support.use-case");
 const accept_session_use_case_1 = require("../application/use-cases/accept-session.use-case");
@@ -59,9 +60,16 @@ let ChatController = class ChatController {
         }
         return this.chatRepository.findMessagesBySessionId(sessionId);
     }
+    async getWaitingSessions(req) {
+        if (req.user.role !== client_1.Role.VOLUNTEER && req.user.role !== client_1.Role.ADMIN) {
+            throw new common_1.ForbiddenException('Chỉ tình nguyện viên mới có thể xem danh sách hàng đợi');
+        }
+        return this.chatRepository.findWaitingSessions();
+    }
 };
 exports.ChatController = ChatController;
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Yêu cầu tư vấn hỗ trợ tâm lý' }),
     (0, common_1.Post)('request-support'),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
@@ -69,6 +77,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ChatController.prototype, "requestSupport", null);
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Tình nguyện viên chấp nhận phiên hỗ trợ' }),
     (0, common_1.Post)(':id/accept'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Req)()),
@@ -77,6 +86,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ChatController.prototype, "acceptSession", null);
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Lấy vị trí của phiên chat trong hàng đợi' }),
     (0, common_1.Get)(':id/queue-position'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Req)()),
@@ -85,6 +95,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ChatController.prototype, "getQueuePosition", null);
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Lấy lịch sử tin nhắn của phiên chat' }),
     (0, common_1.Get)(':id/messages'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Req)()),
@@ -92,7 +103,17 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], ChatController.prototype, "getMessages", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Lấy danh sách các phiên đang chờ TNV nhận' }),
+    (0, common_1.Get)('waiting-sessions'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], ChatController.prototype, "getWaitingSessions", null);
 exports.ChatController = ChatController = __decorate([
+    (0, swagger_1.ApiTags)('Chat'),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Controller)('chat'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __param(3, (0, common_1.Inject)(chat_repository_interface_1.CHAT_REPOSITORY)),

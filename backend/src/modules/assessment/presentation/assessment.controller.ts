@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Body, Param, Query, UseGuards, Req, ParseIntPipe, DefaultValuePipe } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard';
 import { ListTestsUseCase } from '../application/use-cases/list-tests.use-case';
@@ -14,6 +15,8 @@ interface AuthenticatedRequest extends Request {
   };
 }
 
+@ApiTags('Assessments')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('assessments')
 export class AssessmentController {
@@ -24,11 +27,13 @@ export class AssessmentController {
     private readonly getTestHistoryUseCase: GetTestHistoryUseCase,
   ) {}
 
+  @ApiOperation({ summary: 'Lấy danh sách bài đánh giá tâm lý (PHQ-9, GAD-7)' })
   @Get()
   async listTests() {
     return this.listTestsUseCase.execute();
   }
 
+  @ApiOperation({ summary: 'Lấy lịch sử làm bài đánh giá của người dùng' })
   @Get('history')
   async getHistory(
     @Req() req: AuthenticatedRequest,
@@ -38,11 +43,13 @@ export class AssessmentController {
     return this.getTestHistoryUseCase.execute(req.user.userId, page, limit);
   }
 
+  @ApiOperation({ summary: 'Lấy danh sách câu hỏi của một bài đánh giá' })
   @Get(':id/questions')
   async getQuestions(@Param('id') id: string) {
     return this.getTestQuestionsUseCase.execute(id);
   }
 
+  @ApiOperation({ summary: 'Nộp bài đánh giá tâm lý và nhận kết quả' })
   @Post(':id/submit')
   async submitTest(
     @Req() req: AuthenticatedRequest,

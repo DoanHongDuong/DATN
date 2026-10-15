@@ -191,4 +191,16 @@ export class ChatPrismaRepository implements IChatRepository {
 
     return position;
   }
+
+  async findWaitingSessions(): Promise<ChatSession[]> {
+    return this.prisma.chatSession.findMany({
+      where: {
+        status: SessionStatus.WAITING,
+        volunteerId: null,
+      },
+      orderBy: [
+        { queuedAt: 'asc' },
+      ],
+    });
+  }
 }

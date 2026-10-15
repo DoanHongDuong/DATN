@@ -20,6 +20,7 @@ const get_journal_entries_use_case_1 = require("../application/use-cases/get-jou
 const update_journal_entry_use_case_1 = require("../application/use-cases/update-journal-entry.use-case");
 const delete_journal_entry_use_case_1 = require("../application/use-cases/delete-journal-entry.use-case");
 const suggest_resources_use_case_1 = require("../application/use-cases/suggest-resources.use-case");
+const get_all_relaxation_resources_use_case_1 = require("../application/use-cases/get-all-relaxation-resources.use-case");
 const encryption_service_1 = require("./ai/encryption.service");
 const encryption_service_interface_1 = require("../domain/services/encryption.service.interface");
 let JournalModule = class JournalModule {
@@ -51,6 +52,7 @@ exports.JournalModule = JournalModule = __decorate([
             update_journal_entry_use_case_1.UpdateJournalEntryUseCase,
             delete_journal_entry_use_case_1.DeleteJournalEntryUseCase,
             suggest_resources_use_case_1.SuggestResourcesUseCase,
+            get_all_relaxation_resources_use_case_1.GetAllRelaxationResourcesUseCase,
         ],
         exports: [encryption_service_1.EncryptionService],
     })

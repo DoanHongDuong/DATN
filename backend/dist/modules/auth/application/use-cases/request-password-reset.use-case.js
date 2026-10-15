@@ -48,12 +48,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RequestPasswordResetUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const user_repository_interface_1 = require("../../domain/repositories/user.repository.interface");
+const mail_service_1 = require("../../../../infrastructure/mail/mail.service");
 const bcrypt = __importStar(require("bcrypt"));
 const crypto = __importStar(require("crypto"));
 let RequestPasswordResetUseCase = class RequestPasswordResetUseCase {
     userRepository;
-    constructor(userRepository) {
+    mailService;
+    constructor(userRepository, mailService) {
         this.userRepository = userRepository;
+        this.mailService = mailService;
     }
     async execute(dto) {
         const user = await this.userRepository.findByEmail(dto.email);
@@ -66,7 +69,8 @@ let RequestPasswordResetUseCase = class RequestPasswordResetUseCase {
                 resetTokenHash,
                 resetTokenExpiresAt: expiresAt,
             });
-            console.log(`[DEV] Password reset token for ${user.email}: ${resetToken}`);
+            this.mailService.sendPasswordResetEmail(user.email, user.fullName, resetToken).catch(() => {
+            });
         }
         return { message: 'Nếu email tồn tại, hướng dẫn đặt lại mật khẩu đã được gửi' };
     }
@@ -75,6 +79,7 @@ exports.RequestPasswordResetUseCase = RequestPasswordResetUseCase;
 exports.RequestPasswordResetUseCase = RequestPasswordResetUseCase = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(user_repository_interface_1.USER_REPOSITORY)),
-    __metadata("design:paramtypes", [Object])
+    __param(1, (0, common_1.Inject)(mail_service_1.MAIL_SERVICE)),
+    __metadata("design:paramtypes", [Object, Object])
 ], RequestPasswordResetUseCase);
 //# sourceMappingURL=request-password-reset.use-case.js.map

@@ -19,6 +19,8 @@ describe('Journal Use Cases with Encryption', () => {
       countByUserId: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      findRelaxationResourcesByCategory: jest.fn(),
+      findAllRelaxationResources: jest.fn(),
     };
 
     aiService = {

@@ -70,9 +70,13 @@ let RegisterUserUseCase = class RegisterUserUseCase {
                 phone: dto.phone,
                 role: client_1.Role.USER,
                 status: client_1.AccountStatus.ACTIVE,
+                emailVerified: true,
             });
-            const { passwordHash: _ph, resetTokenHash: _rth, resetTokenExpiresAt: _rtea, ...result } = user;
-            return result;
+            const { passwordHash: _ph, resetTokenHash: _rth, resetTokenExpiresAt: _rtea, emailVerifyTokenHash: _evth, emailVerifyTokenExpiresAt: _evtea, ...result } = user;
+            return {
+                ...result,
+                message: 'Đăng ký tài khoản thành công',
+            };
         }
         catch (error) {
             if (error instanceof library_1.PrismaClientKnownRequestError && error.code === 'P2002') {

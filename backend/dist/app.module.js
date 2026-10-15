@@ -8,19 +8,33 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
+const config_1 = require("@nestjs/config");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const prisma_module_1 = require("./infrastructure/prisma/prisma.module");
+const mail_module_1 = require("./infrastructure/mail/mail.module");
 const auth_module_1 = require("./modules/auth/infrastructure/auth.module");
 const assessment_module_1 = require("./modules/assessment/infrastructure/assessment.module");
 const journal_module_1 = require("./modules/journal/infrastructure/journal.module");
 const chat_module_1 = require("./modules/chat/infrastructure/chat.module");
+const volunteer_module_1 = require("./modules/volunteer/infrastructure/volunteer.module");
+const admin_module_1 = require("./modules/admin/infrastructure/admin.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, auth_module_1.AuthModule, assessment_module_1.AssessmentModule, journal_module_1.JournalModule, chat_module_1.ChatModule],
+        imports: [
+            config_1.ConfigModule.forRoot({ isGlobal: true }),
+            prisma_module_1.PrismaModule,
+            mail_module_1.MailModule,
+            auth_module_1.AuthModule,
+            assessment_module_1.AssessmentModule,
+            journal_module_1.JournalModule,
+            chat_module_1.ChatModule,
+            volunteer_module_1.VolunteerModule,
+            admin_module_1.AdminModule,
+        ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })

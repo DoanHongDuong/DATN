@@ -11,18 +11,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateJournalEntryDto = void 0;
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 class UpdateJournalEntryDto {
     content;
     moodEmoji;
 }
 exports.UpdateJournalEntryDto = UpdateJournalEntryDto;
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Nội dung nhật ký cập nhật', example: 'Hôm nay tôi thấy khá hơn' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MaxLength)(5000),
     __metadata("design:type", String)
 ], UpdateJournalEntryDto.prototype, "content", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Emoji biểu thị tâm trạng cập nhật', example: '😄' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MaxLength)(10),

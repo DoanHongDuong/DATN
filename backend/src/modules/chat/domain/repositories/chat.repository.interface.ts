@@ -69,4 +69,10 @@ export interface IChatRepository {
    * VÀ được tạo trước session hiện tại (queuedAt) → vị trí trong hàng đợi
    */
   getQueuePosition(sessionId: string): Promise<number>;
+
+  /**
+   * Lấy danh sách các phiên WAITING chưa có volunteer nhận
+   */
+  findWaitingSessions(): Promise<ChatSession[]>;
 }
+

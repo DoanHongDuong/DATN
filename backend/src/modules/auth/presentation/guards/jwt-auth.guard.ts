@@ -1,6 +1,8 @@
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { AccountStatus } from '@prisma/client';
+import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
 
 interface JwtPayload {
   sub: string;
@@ -12,6 +14,7 @@ export class JwtAuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService,
+    private prisma: PrismaService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -24,7 +27,17 @@ export class JwtAuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
         secret: this.configService.get<string>('JWT_SECRET'),
       });
-      request['user'] = { userId: payload.sub, role: payload.role };
+
+      const user = await this.prisma.user.findUnique({
+        where: { id: payload.sub },
+        select: { id: true, role: true, status: true },
+      });
+
+      if (!user || user.status !== AccountStatus.ACTIVE) {
+        throw new UnauthorizedException('Tài khoản không tồn tại hoặc đã bị khóa');
+      }
+
+      request['user'] = { userId: user.id, role: user.role };
     } catch {
       throw new UnauthorizedException();
     }
@@ -36,3 +49,4 @@ export class JwtAuthGuard implements CanActivate {
     return type === 'Bearer' ? token : undefined;
   }
 }
+

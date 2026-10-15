@@ -11,6 +11,7 @@ import { GetJournalEntriesUseCase } from '../application/use-cases/get-journal-e
 import { UpdateJournalEntryUseCase } from '../application/use-cases/update-journal-entry.use-case';
 import { DeleteJournalEntryUseCase } from '../application/use-cases/delete-journal-entry.use-case';
 import { SuggestResourcesUseCase } from '../application/use-cases/suggest-resources.use-case';
+import { GetAllRelaxationResourcesUseCase } from '../application/use-cases/get-all-relaxation-resources.use-case';
 
 import { EncryptionService } from './ai/encryption.service';
 import { ENCRYPTION_SERVICE } from '../domain/services/encryption.service.interface';
@@ -40,6 +41,7 @@ import { ENCRYPTION_SERVICE } from '../domain/services/encryption.service.interf
     UpdateJournalEntryUseCase,
     DeleteJournalEntryUseCase,
     SuggestResourcesUseCase,
+    GetAllRelaxationResourcesUseCase,
   ],
   exports: [EncryptionService],
 })

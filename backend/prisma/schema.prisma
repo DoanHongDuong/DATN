@@ -46,18 +46,21 @@ enum SeverityLevel {
 }
 
 model User {
-  id                  String    @id @default(uuid())
-  role                Role      @default(USER)
-  fullName            String    @map("full_name")
-  email               String    @unique
-  passwordHash        String    @map("password_hash")
-  phone               String?
-  avatarUrl           String?   @map("avatar_url")
-  status              AccountStatus @default(ACTIVE)
-  resetTokenHash      String?   @map("reset_token_hash")
-  resetTokenExpiresAt DateTime? @map("reset_token_expires_at")
-  createdAt           DateTime  @default(now()) @map("created_at")
-  updatedAt           DateTime  @updatedAt @map("updated_at")
+  id                          String    @id @default(uuid())
+  role                        Role      @default(USER)
+  fullName                    String    @map("full_name")
+  email                       String    @unique
+  passwordHash                String    @map("password_hash")
+  phone                       String?
+  avatarUrl                   String?   @map("avatar_url")
+  status                      AccountStatus @default(ACTIVE)
+  emailVerified               Boolean   @default(false) @map("email_verified")
+  emailVerifyTokenHash        String?   @map("email_verify_token_hash")
+  emailVerifyTokenExpiresAt   DateTime? @map("email_verify_token_expires_at")
+  resetTokenHash              String?   @map("reset_token_hash")
+  resetTokenExpiresAt         DateTime? @map("reset_token_expires_at")
+  createdAt                   DateTime  @default(now()) @map("created_at")
+  updatedAt                   DateTime  @updatedAt @map("updated_at")
 
   volunteerProfile    VolunteerProfile?
   journalEntries      JournalEntry[]

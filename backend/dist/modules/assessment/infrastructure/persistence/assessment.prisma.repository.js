@@ -31,7 +31,11 @@ let AssessmentPrismaRepository = class AssessmentPrismaRepository {
         return this.prisma.testQuestion.findMany({
             where: { testId },
             include: {
-                options: true,
+                options: {
+                    orderBy: {
+                        scoreValue: 'asc',
+                    },
+                },
             },
             orderBy: {
                 orderNumber: 'asc',

@@ -12,17 +12,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SubmitTestDto = exports.AnswerDto = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
+const swagger_1 = require("@nestjs/swagger");
 class AnswerDto {
     questionId;
     optionId;
 }
 exports.AnswerDto = AnswerDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'ID của câu hỏi', example: 'q1' }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], AnswerDto.prototype, "questionId", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'ID của lựa chọn đáp án', example: 'opt1' }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
@@ -32,6 +35,7 @@ class SubmitTestDto {
 }
 exports.SubmitTestDto = SubmitTestDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ type: [AnswerDto], description: 'Danh sách đáp án người dùng trả lời' }),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.ValidateNested)({ each: true }),
     (0, class_transformer_1.Type)(() => AnswerDto),
