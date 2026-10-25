@@ -9,6 +9,11 @@ import { ApproveVolunteerUseCase } from '../application/use-cases/approve-volunt
 import { RejectVolunteerUseCase } from '../application/use-cases/reject-volunteer.use-case';
 import { GetUsersUseCase } from '../application/use-cases/get-users.use-case';
 import { UpdateUserStatusUseCase } from '../application/use-cases/update-user-status.use-case';
+import { GetAdminResourcesUseCase } from '../application/use-cases/get-admin-resources.use-case';
+import { CreateResourceUseCase } from '../application/use-cases/create-resource.use-case';
+import { UpdateResourceUseCase } from '../application/use-cases/update-resource.use-case';
+import { DeleteResourceUseCase } from '../application/use-cases/delete-resource.use-case';
+import { GetAuditLogsUseCase } from '../application/use-cases/get-audit-logs.use-case';
 
 @Module({
   imports: [ConfigModule, AuthModule],
@@ -23,6 +28,11 @@ import { UpdateUserStatusUseCase } from '../application/use-cases/update-user-st
     RejectVolunteerUseCase,
     GetUsersUseCase,
     UpdateUserStatusUseCase,
+    GetAdminResourcesUseCase,
+    CreateResourceUseCase,
+    UpdateResourceUseCase,
+    DeleteResourceUseCase,
+    GetAuditLogsUseCase,
   ],
 })
 export class AdminModule {}

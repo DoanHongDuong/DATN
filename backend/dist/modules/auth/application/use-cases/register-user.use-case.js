@@ -47,14 +47,17 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RegisterUserUseCase = void 0;
 const common_1 = require("@nestjs/common");
+const jwt_1 = require("@nestjs/jwt");
 const user_repository_interface_1 = require("../../domain/repositories/user.repository.interface");
 const bcrypt = __importStar(require("bcrypt"));
 const client_1 = require("@prisma/client");
 const library_1 = require("@prisma/client/runtime/library");
 let RegisterUserUseCase = class RegisterUserUseCase {
     userRepository;
-    constructor(userRepository) {
+    jwtService;
+    constructor(userRepository, jwtService) {
         this.userRepository = userRepository;
+        this.jwtService = jwtService;
     }
     async execute(dto) {
         if (dto.password !== dto.confirmPassword) {
@@ -72,9 +75,16 @@ let RegisterUserUseCase = class RegisterUserUseCase {
                 status: client_1.AccountStatus.ACTIVE,
                 emailVerified: true,
             });
-            const { passwordHash: _ph, resetTokenHash: _rth, resetTokenExpiresAt: _rtea, emailVerifyTokenHash: _evth, emailVerifyTokenExpiresAt: _evtea, ...result } = user;
+            const payload = { sub: user.id, role: user.role };
+            const accessToken = await this.jwtService.signAsync(payload, { expiresIn: '7d' });
             return {
-                ...result,
+                accessToken,
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    fullName: user.fullName,
+                    role: user.role,
+                },
                 message: 'Đăng ký tài khoản thành công',
             };
         }
@@ -90,6 +100,6 @@ exports.RegisterUserUseCase = RegisterUserUseCase;
 exports.RegisterUserUseCase = RegisterUserUseCase = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(user_repository_interface_1.USER_REPOSITORY)),
-    __metadata("design:paramtypes", [Object])
+    __metadata("design:paramtypes", [Object, jwt_1.JwtService])
 ], RegisterUserUseCase);
 //# sourceMappingURL=register-user.use-case.js.map

@@ -7,6 +7,10 @@ import { IUserRepository } from '../../domain/repositories/user.repository.inter
 export class UserPrismaRepository implements IUserRepository {
   constructor(private readonly prisma: PrismaService) { }
 
+  async findById(id: string): Promise<User | null> {
+    return this.prisma.user.findUnique({ where: { id } });
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     return this.prisma.user.findUnique({ where: { email } });
   }

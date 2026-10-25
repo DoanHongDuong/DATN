@@ -26,6 +26,8 @@ const login_dto_1 = require("../application/dto/login.dto");
 const forgot_password_dto_1 = require("../application/dto/forgot-password.dto");
 const verify_email_dto_1 = require("../application/dto/verify-email.dto");
 const reset_password_dto_1 = require("../application/dto/reset-password.dto");
+const change_password_dto_1 = require("../application/dto/change-password.dto");
+const change_password_use_case_1 = require("../application/use-cases/change-password.use-case");
 const throttler_1 = require("@nestjs/throttler");
 const jwt_auth_guard_1 = require("./guards/jwt-auth.guard");
 let AuthController = class AuthController {
@@ -35,13 +37,15 @@ let AuthController = class AuthController {
     resetPasswordUseCase;
     verifyEmailUseCase;
     resendVerificationEmailUseCase;
-    constructor(registerUserUseCase, loginUserUseCase, requestPasswordResetUseCase, resetPasswordUseCase, verifyEmailUseCase, resendVerificationEmailUseCase) {
+    changePasswordUseCase;
+    constructor(registerUserUseCase, loginUserUseCase, requestPasswordResetUseCase, resetPasswordUseCase, verifyEmailUseCase, resendVerificationEmailUseCase, changePasswordUseCase) {
         this.registerUserUseCase = registerUserUseCase;
         this.loginUserUseCase = loginUserUseCase;
         this.requestPasswordResetUseCase = requestPasswordResetUseCase;
         this.resetPasswordUseCase = resetPasswordUseCase;
         this.verifyEmailUseCase = verifyEmailUseCase;
         this.resendVerificationEmailUseCase = resendVerificationEmailUseCase;
+        this.changePasswordUseCase = changePasswordUseCase;
     }
     register(dto) {
         return this.registerUserUseCase.execute(dto);
@@ -60,6 +64,9 @@ let AuthController = class AuthController {
     }
     resetPassword(dto) {
         return this.resetPasswordUseCase.execute(dto);
+    }
+    changePassword(req, dto) {
+        return this.changePasswordUseCase.execute(req.user.userId, dto);
     }
     getProfile(req) {
         return req.user;
@@ -117,6 +124,18 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "resetPassword", null);
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Đổi mật khẩu tài khoản' }),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, throttler_1.ThrottlerGuard),
+    (0, throttler_1.Throttle)({ default: { limit: 5, ttl: 900000 } }),
+    (0, common_1.Post)('change-password'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, change_password_dto_1.ChangePasswordDto]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "changePassword", null);
+__decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Lấy thông tin tài khoản hiện tại' }),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
@@ -134,6 +153,7 @@ exports.AuthController = AuthController = __decorate([
         request_password_reset_use_case_1.RequestPasswordResetUseCase,
         reset_password_use_case_1.ResetPasswordUseCase,
         verify_email_use_case_1.VerifyEmailUseCase,
-        resend_verification_email_use_case_1.ResendVerificationEmailUseCase])
+        resend_verification_email_use_case_1.ResendVerificationEmailUseCase,
+        change_password_use_case_1.ChangePasswordUseCase])
 ], AuthController);
 //# sourceMappingURL=auth.controller.js.map

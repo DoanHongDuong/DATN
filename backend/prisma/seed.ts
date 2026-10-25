@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 const LIKERT_OPTIONS = [
     { content: 'Không hề', scoreValue: 0 },
     { content: 'Vài ngày', scoreValue: 1 },
-    { content: 'Hơn nửa số ngày', scoreValue: 2 },
+    { content: 'Hơn nửa số ngày trong tuần', scoreValue: 2 },
     { content: 'Gần như mỗi ngày', scoreValue: 3 },
 ];
 
@@ -111,6 +111,10 @@ async function seedAdminAccount() {
 }
 
 async function main() {
+    await prisma.testOption.updateMany({
+        where: { content: 'Hơn nửa số ngày' },
+        data: { content: 'Hơn nửa số ngày trong tuần' },
+    });
     await seedTest('PHQ9', 'PHQ-9', 'Thang đo sàng lọc mức độ trầm cảm, gồm 9 câu hỏi chuẩn hoá.', PHQ9_QUESTIONS);
     await seedTest('GAD7', 'GAD-7', 'Thang đo sàng lọc mức độ lo âu, gồm 7 câu hỏi chuẩn hoá.', GAD7_QUESTIONS);
     await seedRelaxationResources();

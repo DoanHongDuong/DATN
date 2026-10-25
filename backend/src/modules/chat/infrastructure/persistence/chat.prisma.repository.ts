@@ -28,6 +28,17 @@ export class ChatPrismaRepository implements IChatRepository {
     });
   }
 
+  async findActiveSessionByVolunteerId(
+    volunteerId: string,
+  ): Promise<ChatSession | null> {
+    return this.prisma.chatSession.findFirst({
+      where: {
+        volunteerId,
+        status: SessionStatus.ACTIVE,
+      },
+    });
+  }
+
   async findLatestSeverityByUserId(
     userId: string,
   ): Promise<SeverityLevel | null> {
@@ -47,6 +58,14 @@ export class ChatPrismaRepository implements IChatRepository {
       },
     });
     return count > 0;
+  }
+
+  async isVolunteerVerified(volunteerId: string): Promise<boolean> {
+    const profile = await this.prisma.volunteerProfile.findUnique({
+      where: { userId: volunteerId },
+      select: { isVerified: true },
+    });
+    return profile?.isVerified === true;
   }
 
   async createSession(data: {

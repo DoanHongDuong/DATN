@@ -5,14 +5,21 @@ import { assessmentApi, type TestResultResponse } from '../api/assessment.api';
 import { journalApi, type JournalEntry } from '../api/journal.api';
 import { HeartPulse, BookOpen, MessageSquare, ShieldAlert, HeartHandshake } from 'lucide-react';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { VolunteerDashboard } from './volunteer/VolunteerDashboard';
 
 export const DashboardPage: React.FC = () => {
   const { user } = useAuth();
+  const isVolunteer = user?.role === 'VOLUNTEER';
+
   const [recentTests, setRecentTests] = useState<TestResultResponse[]>([]);
   const [recentJournals, setRecentJournals] = useState<JournalEntry[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    if (isVolunteer) {
+      return;
+    }
+
     const fetchData = async () => {
       try {
         const [testsData, journalsData] = await Promise.all([
@@ -29,7 +36,12 @@ export const DashboardPage: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [isVolunteer]);
+
+  // Nếu người dùng là Tình nguyện viên (VOLUNTEER), hiển thị Bàn trực riêng của TNV
+  if (isVolunteer) {
+    return <VolunteerDashboard />;
+  }
 
   if (loading) {
     return <LoadingSpinner message="Đang tải dữ liệu trang tổng quan..." />;

@@ -8,9 +8,13 @@ export const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const isAuthPage = ['/login', '/register', '/forgot-password', '/reset-password'].includes(
+    location.pathname,
+  );
+
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/login', { replace: true });
   };
 
   const navItems = [
@@ -60,7 +64,7 @@ export const Navbar: React.FC = () => {
         <span>MindCare</span>
       </Link>
 
-      {isAuthenticated && (
+      {!isAuthPage && isAuthenticated && (
         <nav style={{ display: 'flex', gap: '8px' }}>
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -92,20 +96,58 @@ export const Navbar: React.FC = () => {
       )}
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        {isAuthenticated ? (
+        {isAuthPage ? (
+          location.pathname === '/login' ? (
+            <Link
+              to="/register"
+              style={{
+                padding: '8px 18px',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                background: 'var(--accent)',
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: '14px'
+              }}
+            >
+              Đăng ký
+            </Link>
+          ) : (
+            <Link
+              to="/login"
+              style={{
+                padding: '8px 16px',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                color: 'var(--text-h)',
+                fontWeight: 500,
+                fontSize: '14px'
+              }}
+            >
+              Đăng nhập
+            </Link>
+          )
+        ) : isAuthenticated ? (
           <>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '6px 12px',
-              borderRadius: '20px',
-              background: 'var(--code-bg)',
-              fontSize: '14px',
-              color: 'var(--text-h)'
-            }}>
+            <Link
+              to="/profile"
+              title="Hồ sơ cá nhân & Đổi mật khẩu"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '6px 12px',
+                borderRadius: '20px',
+                background: location.pathname === '/profile' ? 'var(--accent-bg, #f3e8ff)' : 'var(--code-bg)',
+                border: location.pathname === '/profile' ? '1px solid var(--accent, #9333ea)' : '1px solid transparent',
+                fontSize: '14px',
+                color: location.pathname === '/profile' ? 'var(--accent, #9333ea)' : 'var(--text-h)',
+                textDecoration: 'none',
+                transition: 'all 0.2s ease',
+              }}
+            >
               <UserIcon size={16} />
-              <span>{user?.fullName}</span>
+              <span style={{ fontWeight: 500 }}>{user?.fullName}</span>
               <span style={{
                 fontSize: '11px',
                 padding: '2px 6px',
@@ -121,7 +163,7 @@ export const Navbar: React.FC = () => {
               }}>
                 {user?.role === 'ADMIN' ? 'Admin' : user?.role === 'VOLUNTEER' ? 'TNV' : 'User'}
               </span>
-            </div>
+            </Link>
             <button
               onClick={handleLogout}
               style={{

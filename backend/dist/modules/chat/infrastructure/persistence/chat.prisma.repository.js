@@ -26,6 +26,14 @@ let ChatPrismaRepository = class ChatPrismaRepository {
             },
         });
     }
+    async findActiveSessionByVolunteerId(volunteerId) {
+        return this.prisma.chatSession.findFirst({
+            where: {
+                volunteerId,
+                status: client_1.SessionStatus.ACTIVE,
+            },
+        });
+    }
     async findLatestSeverityByUserId(userId) {
         const result = await this.prisma.testResult.findFirst({
             where: { userId },
@@ -42,6 +50,13 @@ let ChatPrismaRepository = class ChatPrismaRepository {
             },
         });
         return count > 0;
+    }
+    async isVolunteerVerified(volunteerId) {
+        const profile = await this.prisma.volunteerProfile.findUnique({
+            where: { userId: volunteerId },
+            select: { isVerified: true },
+        });
+        return profile?.isVerified === true;
     }
     async createSession(data) {
         return this.prisma.chatSession.create({

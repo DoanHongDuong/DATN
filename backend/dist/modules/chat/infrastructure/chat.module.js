@@ -16,6 +16,8 @@ const accept_session_use_case_1 = require("../application/use-cases/accept-sessi
 const send_message_use_case_1 = require("../application/use-cases/send-message.use-case");
 const end_session_use_case_1 = require("../application/use-cases/end-session.use-case");
 const get_queue_position_use_case_1 = require("../application/use-cases/get-queue-position.use-case");
+const get_my_active_session_use_case_1 = require("../application/use-cases/get-my-active-session.use-case");
+const cancel_session_use_case_1 = require("../application/use-cases/cancel-session.use-case");
 const chat_prisma_repository_1 = require("./persistence/chat.prisma.repository");
 const chat_repository_interface_1 = require("../domain/repositories/chat.repository.interface");
 const auth_module_1 = require("../../auth/infrastructure/auth.module");
@@ -39,6 +41,8 @@ exports.ChatModule = ChatModule = __decorate([
             send_message_use_case_1.SendMessageUseCase,
             end_session_use_case_1.EndSessionUseCase,
             get_queue_position_use_case_1.GetQueuePositionUseCase,
+            get_my_active_session_use_case_1.GetMyActiveSessionUseCase,
+            cancel_session_use_case_1.CancelSessionUseCase,
             chat_gateway_1.ChatGateway,
         ],
         exports: [chat_gateway_1.ChatGateway],

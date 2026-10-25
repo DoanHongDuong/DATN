@@ -24,6 +24,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('user', JSON.stringify(data.user));
   }, []);
 
+  const updateUser = useCallback((updatedFields: Partial<User>) => {
+    setUser((prev) => {
+      if (!prev) return null;
+      const updated = { ...prev, ...updatedFields };
+      localStorage.setItem('user', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
   useEffect(() => {
     let isMounted = true;
     const initAuth = async () => {
@@ -49,6 +58,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             logout();
           }
         }
+      } else {
+        if (isMounted) {
+          setUser(null);
+          setToken(null);
+        }
       }
       if (isMounted) {
         setIsLoading(false);
@@ -56,8 +70,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     initAuth();
+
+    // Đồng bộ trạng thái khi bấm return / back (bfcache), đổi tab, hoặc 401
+    const syncAuthFromStorage = () => {
+      const currentToken = localStorage.getItem('token');
+      const currentUserJson = localStorage.getItem('user');
+      if (!currentToken || !currentUserJson) {
+        logout();
+      }
+    };
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'token' || e.key === 'user') {
+        syncAuthFromStorage();
+      }
+    };
+
+    const handlePageShow = () => {
+      syncAuthFromStorage();
+    };
+
+    const handlePopState = () => {
+      syncAuthFromStorage();
+    };
+
+    const handleCustomLogout = () => {
+      logout();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('pageshow', handlePageShow);
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('auth:logout', handleCustomLogout);
+
     return () => {
       isMounted = false;
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('pageshow', handlePageShow);
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('auth:logout', handleCustomLogout);
     };
   }, [logout]);
 
@@ -76,11 +127,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         user,
         token,
-        isAuthenticated: !!token,
+        isAuthenticated: Boolean(token && user),
         isLoading,
         login,
         register,
         setAuthData,
+        updateUser,
         logout,
       }}
     >

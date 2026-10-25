@@ -26,18 +26,36 @@ const get_users_use_case_1 = require("../application/use-cases/get-users.use-cas
 const update_user_status_use_case_1 = require("../application/use-cases/update-user-status.use-case");
 const update_user_status_dto_1 = require("../application/dto/update-user-status.dto");
 const get_users_query_dto_1 = require("../application/dto/get-users-query.dto");
+const get_admin_resources_use_case_1 = require("../application/use-cases/get-admin-resources.use-case");
+const create_resource_use_case_1 = require("../application/use-cases/create-resource.use-case");
+const update_resource_use_case_1 = require("../application/use-cases/update-resource.use-case");
+const delete_resource_use_case_1 = require("../application/use-cases/delete-resource.use-case");
+const create_resource_dto_1 = require("../application/dto/create-resource.dto");
+const update_resource_dto_1 = require("../application/dto/update-resource.dto");
+const get_audit_logs_use_case_1 = require("../application/use-cases/get-audit-logs.use-case");
+const get_audit_logs_query_dto_1 = require("../application/dto/get-audit-logs-query.dto");
 let AdminController = class AdminController {
     getPendingVolunteersUseCase;
     approveVolunteerUseCase;
     rejectVolunteerUseCase;
     getUsersUseCase;
     updateUserStatusUseCase;
-    constructor(getPendingVolunteersUseCase, approveVolunteerUseCase, rejectVolunteerUseCase, getUsersUseCase, updateUserStatusUseCase) {
+    getAdminResourcesUseCase;
+    createResourceUseCase;
+    updateResourceUseCase;
+    deleteResourceUseCase;
+    getAuditLogsUseCase;
+    constructor(getPendingVolunteersUseCase, approveVolunteerUseCase, rejectVolunteerUseCase, getUsersUseCase, updateUserStatusUseCase, getAdminResourcesUseCase, createResourceUseCase, updateResourceUseCase, deleteResourceUseCase, getAuditLogsUseCase) {
         this.getPendingVolunteersUseCase = getPendingVolunteersUseCase;
         this.approveVolunteerUseCase = approveVolunteerUseCase;
         this.rejectVolunteerUseCase = rejectVolunteerUseCase;
         this.getUsersUseCase = getUsersUseCase;
         this.updateUserStatusUseCase = updateUserStatusUseCase;
+        this.getAdminResourcesUseCase = getAdminResourcesUseCase;
+        this.createResourceUseCase = createResourceUseCase;
+        this.updateResourceUseCase = updateResourceUseCase;
+        this.deleteResourceUseCase = deleteResourceUseCase;
+        this.getAuditLogsUseCase = getAuditLogsUseCase;
     }
     async getPendingVolunteers() {
         return this.getPendingVolunteersUseCase.execute();
@@ -53,6 +71,21 @@ let AdminController = class AdminController {
     }
     async updateUserStatus(req, id, dto) {
         return this.updateUserStatusUseCase.execute(req.user.userId, id, dto.status);
+    }
+    async getResources(category) {
+        return this.getAdminResourcesUseCase.execute(category);
+    }
+    async createResource(req, dto) {
+        return this.createResourceUseCase.execute(req.user.userId, dto);
+    }
+    async updateResource(req, id, dto) {
+        return this.updateResourceUseCase.execute(req.user.userId, id, dto);
+    }
+    async deleteResource(req, id) {
+        return this.deleteResourceUseCase.execute(req.user.userId, id);
+    }
+    async getAuditLogs(query) {
+        return this.getAuditLogsUseCase.execute(query);
     }
 };
 exports.AdminController = AdminController;
@@ -99,6 +132,51 @@ __decorate([
     __metadata("design:paramtypes", [Object, String, update_user_status_dto_1.UpdateUserStatusDto]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "updateUserStatus", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Lấy danh sách toàn bộ tài nguyên thư giãn cho Admin' }),
+    (0, swagger_1.ApiQuery)({ name: 'category', required: false, description: 'Lọc theo danh mục' }),
+    (0, common_1.Get)('resources'),
+    __param(0, (0, common_1.Query)('category')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "getResources", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Thêm tài nguyên thư giãn mới' }),
+    (0, common_1.Post)('resources'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, create_resource_dto_1.CreateResourceDto]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "createResource", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Cập nhật tài nguyên thư giãn' }),
+    (0, common_1.Put)('resources/:id'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, update_resource_dto_1.UpdateResourceDto]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "updateResource", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Xoá tài nguyên thư giãn' }),
+    (0, common_1.Delete)('resources/:id'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "deleteResource", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Lấy danh sách nhật ký kiểm toán (Audit Logs) có phân trang và lọc' }),
+    (0, common_1.Get)('audit-logs'),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [get_audit_logs_query_dto_1.GetAuditLogsQueryDto]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "getAuditLogs", null);
 exports.AdminController = AdminController = __decorate([
     (0, swagger_1.ApiTags)('Admin'),
     (0, swagger_1.ApiBearerAuth)(),
@@ -109,6 +187,11 @@ exports.AdminController = AdminController = __decorate([
         approve_volunteer_use_case_1.ApproveVolunteerUseCase,
         reject_volunteer_use_case_1.RejectVolunteerUseCase,
         get_users_use_case_1.GetUsersUseCase,
-        update_user_status_use_case_1.UpdateUserStatusUseCase])
+        update_user_status_use_case_1.UpdateUserStatusUseCase,
+        get_admin_resources_use_case_1.GetAdminResourcesUseCase,
+        create_resource_use_case_1.CreateResourceUseCase,
+        update_resource_use_case_1.UpdateResourceUseCase,
+        delete_resource_use_case_1.DeleteResourceUseCase,
+        get_audit_logs_use_case_1.GetAuditLogsUseCase])
 ], AdminController);
 //# sourceMappingURL=admin.controller.js.map

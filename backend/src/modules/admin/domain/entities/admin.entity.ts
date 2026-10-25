@@ -33,3 +33,36 @@ export interface PaginatedUsersResult {
   limit: number;
   totalPages: number;
 }
+
+export interface AdminRelaxationResourceEntity {
+  id: string;
+  title: string;
+  type: string;
+  url: string;
+  durationSeconds: number | null;
+  category: string;
+  createdAt: Date;
+}
+
+export interface AuditLogEntity {
+  id: string;
+  actorId: string;
+  action: string;
+  targetId: string | null;
+  description: string | null;
+  createdAt: Date;
+  actor: {
+    fullName: string;
+    email: string;
+  };
+}
+
+export interface PaginatedAuditLogsResult {
+  data: AuditLogEntity[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}

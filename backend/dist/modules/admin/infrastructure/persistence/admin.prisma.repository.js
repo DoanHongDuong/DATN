@@ -193,6 +193,137 @@ let AdminPrismaRepository = class AdminPrismaRepository {
             };
         });
     }
+    async getAllResources(category) {
+        const where = category ? { category } : {};
+        return this.prisma.relaxationResource.findMany({
+            where,
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+    async findResourceById(id) {
+        return this.prisma.relaxationResource.findUnique({
+            where: { id },
+        });
+    }
+    async createResource(actorId, data) {
+        return this.prisma.$transaction(async (tx) => {
+            const resource = await tx.relaxationResource.create({
+                data: {
+                    title: data.title,
+                    type: data.type,
+                    url: data.url,
+                    durationSeconds: data.durationSeconds ?? null,
+                    category: data.category,
+                },
+            });
+            await tx.auditLog.create({
+                data: {
+                    actorId,
+                    action: 'CREATE_RESOURCE',
+                    targetId: resource.id,
+                    description: `Tạo tài nguyên thư giãn mới: "${resource.title}" (${resource.category})`,
+                },
+            });
+            return resource;
+        });
+    }
+    async updateResource(actorId, id, data) {
+        return this.prisma.$transaction(async (tx) => {
+            const updated = await tx.relaxationResource.update({
+                where: { id },
+                data: {
+                    ...(data.title !== undefined && { title: data.title }),
+                    ...(data.type !== undefined && { type: data.type }),
+                    ...(data.url !== undefined && { url: data.url }),
+                    ...(data.durationSeconds !== undefined && { durationSeconds: data.durationSeconds }),
+                    ...(data.category !== undefined && { category: data.category }),
+                },
+            });
+            await tx.auditLog.create({
+                data: {
+                    actorId,
+                    action: 'UPDATE_RESOURCE',
+                    targetId: id,
+                    description: `Cập nhật tài nguyên thư giãn: "${updated.title}"`,
+                },
+            });
+            return updated;
+        });
+    }
+    async deleteResource(actorId, id) {
+        await this.prisma.$transaction(async (tx) => {
+            const resource = await tx.relaxationResource.findUnique({ where: { id } });
+            await tx.relaxationResource.delete({
+                where: { id },
+            });
+            await tx.auditLog.create({
+                data: {
+                    actorId,
+                    action: 'DELETE_RESOURCE',
+                    targetId: id,
+                    description: `Xoá tài nguyên thư giãn: "${resource?.title || id}"`,
+                },
+            });
+        });
+    }
+    async getAuditLogs(params) {
+        const { page, limit, action, from, to } = params;
+        const skip = (page - 1) * limit;
+        const where = {};
+        if (action) {
+            where.action = { equals: action, mode: 'insensitive' };
+        }
+        if (from || to) {
+            where.createdAt = {};
+            if (from) {
+                where.createdAt.gte = new Date(from);
+            }
+            if (to) {
+                const toDate = new Date(to);
+                if (to.length === 10) {
+                    toDate.setHours(23, 59, 59, 999);
+                }
+                where.createdAt.lte = toDate;
+            }
+        }
+        const [total, items] = await Promise.all([
+            this.prisma.auditLog.count({ where }),
+            this.prisma.auditLog.findMany({
+                where,
+                skip,
+                take: limit,
+                orderBy: { createdAt: 'desc' },
+                include: {
+                    actor: {
+                        select: {
+                            fullName: true,
+                            email: true,
+                        },
+                    },
+                },
+            }),
+        ]);
+        return {
+            data: items.map((item) => ({
+                id: item.id,
+                actorId: item.actorId,
+                action: item.action,
+                targetId: item.targetId,
+                description: item.description,
+                createdAt: item.createdAt,
+                actor: {
+                    fullName: item.actor.fullName,
+                    email: item.actor.email,
+                },
+            })),
+            meta: {
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(total / limit) || 1,
+            },
+        };
+    }
 };
 exports.AdminPrismaRepository = AdminPrismaRepository;
 exports.AdminPrismaRepository = AdminPrismaRepository = __decorate([

@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateJournalEntryUseCase = exports.AI_SENTIMENT_SERVICE = void 0;
 const common_1 = require("@nestjs/common");
+const config_1 = require("@nestjs/config");
 const journal_repository_interface_1 = require("../../domain/repositories/journal.repository.interface");
 const encryption_service_1 = require("../../infrastructure/ai/encryption.service");
 exports.AI_SENTIMENT_SERVICE = 'IAiSentimentService';
@@ -21,10 +22,12 @@ let CreateJournalEntryUseCase = class CreateJournalEntryUseCase {
     journalRepository;
     aiSentimentService;
     encryptionService;
-    constructor(journalRepository, aiSentimentService, encryptionService) {
+    configService;
+    constructor(journalRepository, aiSentimentService, encryptionService, configService) {
         this.journalRepository = journalRepository;
         this.aiSentimentService = aiSentimentService;
         this.encryptionService = encryptionService;
+        this.configService = configService;
     }
     async execute(userId, dto) {
         const sentiment = await this.aiSentimentService.analyze(dto.content);
@@ -36,11 +39,16 @@ let CreateJournalEntryUseCase = class CreateJournalEntryUseCase {
             sentimentLabel: sentiment.sentimentLabel,
             sentimentScore: sentiment.sentimentScore,
         });
-        return {
+        const response = {
             ...entry,
             content: dto.content,
             suggestedResourceCategory: sentiment.suggestedResourceCategory,
         };
+        if (sentiment.sentimentLabel === 'crisis') {
+            response.emergencyHotline =
+                this.configService.get('EMERGENCY_HOTLINE') ?? null;
+        }
+        return response;
     }
 };
 exports.CreateJournalEntryUseCase = CreateJournalEntryUseCase;
@@ -48,6 +56,7 @@ exports.CreateJournalEntryUseCase = CreateJournalEntryUseCase = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(journal_repository_interface_1.JOURNAL_REPOSITORY)),
     __param(1, (0, common_1.Inject)(exports.AI_SENTIMENT_SERVICE)),
-    __metadata("design:paramtypes", [Object, Object, encryption_service_1.EncryptionService])
+    __metadata("design:paramtypes", [Object, Object, encryption_service_1.EncryptionService,
+        config_1.ConfigService])
 ], CreateJournalEntryUseCase);
 //# sourceMappingURL=create-journal-entry.use-case.js.map

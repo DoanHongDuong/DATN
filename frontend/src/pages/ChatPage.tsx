@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Table, Button, Tag, Card, Alert, Space, message, Typography, Switch } from 'antd';
+import { Table, Button, Tag, Card, Alert, Space, message, Typography, Switch, Popconfirm } from 'antd';
 import {
   MessageSquare,
   Clock,
@@ -93,6 +93,7 @@ export const ChatPage: React.FC = () => {
   // State cho User (yêu cầu hỗ trợ)
   const [queuePosition, setQueuePosition] = useState<number | null>(null);
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
+  const [cancellingSession, setCancellingSession] = useState<boolean>(false);
   const [noVolunteerInfo, setNoVolunteerInfo] = useState<{
     noVolunteer: boolean;
     hotline?: string;
@@ -117,6 +118,55 @@ export const ChatPage: React.FC = () => {
       console.error('Failed to get queue position:', err);
     }
   }, []);
+
+  // Khôi phục phiên chat hiện tại nếu user hoặc TNV đang có phiên WAITING hoặc ACTIVE
+  useEffect(() => {
+    let isMounted = true;
+    const fetchCurrentSession = async () => {
+      try {
+        const session = await chatApi.getMyActiveSession();
+        if (isMounted && session) {
+          setActiveSession(session);
+          if (session.status === 'WAITING') {
+            fetchQueuePosition(session.id);
+          } else if (session.status === 'ACTIVE') {
+            loadMessages(session.id);
+            if (socket) {
+              socket.emit('join_session', { sessionId: session.id });
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to restore active session:', err);
+      }
+    };
+
+    fetchCurrentSession();
+    return () => {
+      isMounted = false;
+    };
+  }, [fetchQueuePosition, loadMessages, socket]);
+
+  // Xử lý User: Huỷ yêu cầu hỗ trợ khi đang trong hàng đợi
+  const handleCancelSession = async () => {
+    if (!activeSession) return;
+    setCancellingSession(true);
+    try {
+      await chatApi.cancelSession(activeSession.id);
+      setActiveSession(null);
+      setQueuePosition(null);
+      message.success('Đã huỷ yêu cầu tư vấn thành công.');
+    } catch (err: unknown) {
+      let msg = 'Không thể huỷ yêu cầu hỗ trợ.';
+      if (axios.isAxiosError(err)) {
+        const axiosErr = err as AxiosError<{ message?: string }>;
+        msg = axiosErr.response?.data?.message || msg;
+      }
+      message.error(msg);
+    } finally {
+      setCancellingSession(false);
+    }
+  };
 
   // Lấy danh sách hàng đợi (cho Volunteer)
   const fetchWaitingSessions = useCallback(async () => {
@@ -275,6 +325,28 @@ export const ChatPage: React.FC = () => {
       if (axios.isAxiosError(err)) {
         const axiosErr = err as AxiosError<{ message?: string }>;
         msg = axiosErr.response?.data?.message || msg;
+
+        // Nếu đã có phiên chưa kết thúc (409 Conflict), tự động khôi phục phiên đó
+        if (axiosErr.response?.status === 409) {
+          try {
+            const currentSession = await chatApi.getMyActiveSession();
+            if (currentSession) {
+              setActiveSession(currentSession);
+              if (currentSession.status === 'WAITING') {
+                fetchQueuePosition(currentSession.id);
+              } else if (currentSession.status === 'ACTIVE') {
+                loadMessages(currentSession.id);
+                if (socket) {
+                  socket.emit('join_session', { sessionId: currentSession.id });
+                }
+              }
+              message.info('Đã khôi phục phiên hỗ trợ hiện tại của bạn.');
+              return;
+            }
+          } catch (restoreErr) {
+            console.error('Failed to auto-restore session:', restoreErr);
+          }
+        }
       }
       message.error(msg);
     } finally {
@@ -621,6 +693,21 @@ export const ChatPage: React.FC = () => {
           <strong style={{ color: isConnected ? '#10b981' : '#ef4444' }}>
             {isConnected ? 'Đã kết nối Socket' : 'Đang kết nối lại...'}
           </strong>
+        </div>
+
+        <div style={{ marginTop: '24px' }}>
+          <Popconfirm
+            title="Huỷ yêu cầu tư vấn"
+            description="Bạn có chắc chắn muốn huỷ yêu cầu và rời khỏi hàng đợi?"
+            onConfirm={handleCancelSession}
+            okText="Huỷ yêu cầu"
+            cancelText="Tiếp tục đợi"
+            okButtonProps={{ danger: true }}
+          >
+            <Button danger loading={cancellingSession}>
+              Huỷ yêu cầu tư vấn
+            </Button>
+          </Popconfirm>
         </div>
       </div>
     );

@@ -17,6 +17,7 @@ export interface AuthContextType {
   register: (payload: RegisterPayload) => Promise<void>;
   /** Set auth state from an already-fetched API response (used by React Query mutations) */
   setAuthData: (data: AuthResponse) => void;
+  updateUser: (updatedFields: Partial<User>) => void;
   logout: () => void;
 }
 

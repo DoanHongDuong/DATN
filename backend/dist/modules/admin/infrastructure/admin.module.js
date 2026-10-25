@@ -18,6 +18,11 @@ const approve_volunteer_use_case_1 = require("../application/use-cases/approve-v
 const reject_volunteer_use_case_1 = require("../application/use-cases/reject-volunteer.use-case");
 const get_users_use_case_1 = require("../application/use-cases/get-users.use-case");
 const update_user_status_use_case_1 = require("../application/use-cases/update-user-status.use-case");
+const get_admin_resources_use_case_1 = require("../application/use-cases/get-admin-resources.use-case");
+const create_resource_use_case_1 = require("../application/use-cases/create-resource.use-case");
+const update_resource_use_case_1 = require("../application/use-cases/update-resource.use-case");
+const delete_resource_use_case_1 = require("../application/use-cases/delete-resource.use-case");
+const get_audit_logs_use_case_1 = require("../application/use-cases/get-audit-logs.use-case");
 let AdminModule = class AdminModule {
 };
 exports.AdminModule = AdminModule;
@@ -35,6 +40,11 @@ exports.AdminModule = AdminModule = __decorate([
             reject_volunteer_use_case_1.RejectVolunteerUseCase,
             get_users_use_case_1.GetUsersUseCase,
             update_user_status_use_case_1.UpdateUserStatusUseCase,
+            get_admin_resources_use_case_1.GetAdminResourcesUseCase,
+            create_resource_use_case_1.CreateResourceUseCase,
+            update_resource_use_case_1.UpdateResourceUseCase,
+            delete_resource_use_case_1.DeleteResourceUseCase,
+            get_audit_logs_use_case_1.GetAuditLogsUseCase,
         ],
     })
 ], AdminModule);

@@ -20,6 +20,7 @@ export interface JournalEntry {
   createdAt: string;
   updatedAt: string;
   suggestedResourceCategory?: string | null;
+  emergencyHotline?: string | null;
 }
 
 export interface RelaxationResource {

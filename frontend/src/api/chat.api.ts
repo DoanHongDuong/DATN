@@ -56,4 +56,14 @@ export const chatApi = {
     const res = await apiClient.get(`/chat/${sessionId}/messages`);
     return res.data;
   },
+
+  getMyActiveSession: async (): Promise<ChatSession | null> => {
+    const res = await apiClient.get<ChatSession | null>('/chat/my-active-session');
+    return res.data;
+  },
+
+  cancelSession: async (sessionId: string): Promise<ChatSession> => {
+    const res = await apiClient.post<ChatSession>(`/chat/${sessionId}/cancel`);
+    return res.data;
+  },
 };

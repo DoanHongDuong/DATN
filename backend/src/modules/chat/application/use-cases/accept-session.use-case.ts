@@ -3,6 +3,7 @@ import {
   Inject,
   ConflictException,
   NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 import {
   CHAT_REPOSITORY,
@@ -13,10 +14,11 @@ import {
  * UC-07 — TNV nhận phiên hỗ trợ (REST)
  *
  * Flow:
- * 1. Dùng Prisma transaction (trong repository) kiểm tra session vẫn WAITING
+ * 1. Kiểm tra TNV đã được xác thực (isVerified = true) — AGENTS.md
+ * 2. Dùng Prisma transaction (trong repository) kiểm tra session vẫn WAITING
  *    VÀ volunteer_id vẫn NULL trước khi update → tránh race condition
- * 2. Update status=ACTIVE, volunteer_id, started_at
- * 3. Trả về session đã cập nhật để controller/gateway có thể emit sự kiện
+ * 3. Update status=ACTIVE, volunteer_id, started_at
+ * 4. Trả về session đã cập nhật để controller/gateway có thể emit sự kiện
  */
 @Injectable()
 export class AcceptSessionUseCase {
@@ -26,6 +28,12 @@ export class AcceptSessionUseCase {
   ) {}
 
   async execute(volunteerId: string, sessionId: string) {
+    // Kiểm tra TNV đã được xác thực chính thức chưa (AGENTS.md)
+    const isVerified = await this.chatRepository.isVolunteerVerified(volunteerId);
+    if (!isVerified) {
+      throw new ForbiddenException('Tài khoản tình nguyện viên chưa được duyệt hồ sơ xác thực');
+    }
+
     // Kiểm tra session tồn tại
     const session = await this.chatRepository.findSessionById(sessionId);
     if (!session) {

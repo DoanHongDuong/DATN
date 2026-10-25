@@ -12,6 +12,8 @@ import { LoginDto } from '../application/dto/login.dto';
 import { ForgotPasswordDto } from '../application/dto/forgot-password.dto';
 import { VerifyEmailDto } from '../application/dto/verify-email.dto';
 import { ResetPasswordDto } from '../application/dto/reset-password.dto';
+import { ChangePasswordDto } from '../application/dto/change-password.dto';
+import { ChangePasswordUseCase } from '../application/use-cases/change-password.use-case';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
@@ -29,6 +31,7 @@ export class AuthController {
     private readonly resetPasswordUseCase: ResetPasswordUseCase,
     private readonly verifyEmailUseCase: VerifyEmailUseCase,
     private readonly resendVerificationEmailUseCase: ResendVerificationEmailUseCase,
+    private readonly changePasswordUseCase: ChangePasswordUseCase,
   ) { }
 
   @ApiOperation({ summary: 'Đăng ký tài khoản mới' })
@@ -67,6 +70,18 @@ export class AuthController {
   @Post('reset-password')
   resetPassword(@Body() dto: ResetPasswordDto) {
     return this.resetPasswordUseCase.execute(dto);
+  }
+
+  @ApiOperation({ summary: 'Đổi mật khẩu tài khoản' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, ThrottlerGuard)
+  @Throttle({ default: { limit: 5, ttl: 900000 } })
+  @Post('change-password')
+  changePassword(
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return this.changePasswordUseCase.execute(req.user.userId, dto);
   }
 
   @ApiOperation({ summary: 'Lấy thông tin tài khoản hiện tại' })

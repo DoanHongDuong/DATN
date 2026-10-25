@@ -36,6 +36,32 @@ export interface PaginatedUsers {
   totalPages: number;
 }
 
+export interface AdminRelaxationResource {
+  id: string;
+  title: string;
+  type: string;
+  url: string;
+  durationSeconds: number | null;
+  category: string;
+  createdAt: string;
+}
+
+export interface CreateResourcePayload {
+  title: string;
+  type: string;
+  url: string;
+  durationSeconds?: number | null;
+  category: string;
+}
+
+export interface UpdateResourcePayload {
+  title?: string;
+  type?: string;
+  url?: string;
+  durationSeconds?: number | null;
+  category?: string;
+}
+
 export const adminApi = {
   getPendingVolunteers: async (): Promise<PendingVolunteer[]> => {
     const res = await apiClient.get<PendingVolunteer[]>('/admin/volunteers/pending');
@@ -61,4 +87,62 @@ export const adminApi = {
     const res = await apiClient.patch<AdminUser>(`/admin/users/${id}/status`, { status });
     return res.data;
   },
+
+  getResources: async (category?: string): Promise<AdminRelaxationResource[]> => {
+    const res = await apiClient.get<AdminRelaxationResource[]>('/admin/resources', {
+      params: category && category !== 'all' ? { category } : undefined,
+    });
+    return res.data;
+  },
+
+  createResource: async (payload: CreateResourcePayload): Promise<AdminRelaxationResource> => {
+    const res = await apiClient.post<AdminRelaxationResource>('/admin/resources', payload);
+    return res.data;
+  },
+
+  updateResource: async (id: string, payload: UpdateResourcePayload): Promise<AdminRelaxationResource> => {
+    const res = await apiClient.put<AdminRelaxationResource>(`/admin/resources/${id}`, payload);
+    return res.data;
+  },
+
+  deleteResource: async (id: string): Promise<{ message?: string }> => {
+    const res = await apiClient.delete<{ message?: string }>(`/admin/resources/${id}`);
+    return res.data;
+  },
+
+  getAuditLogs: async (params?: GetAuditLogsParams): Promise<PaginatedAuditLogs> => {
+    const res = await apiClient.get<PaginatedAuditLogs>('/admin/audit-logs', { params });
+    return res.data;
+  },
 };
+
+export interface AuditLog {
+  id: string;
+  actorId: string;
+  action: string;
+  targetId: string | null;
+  description: string | null;
+  createdAt: string;
+  actor: {
+    fullName: string;
+    email: string;
+  };
+}
+
+export interface PaginatedAuditLogs {
+  data: AuditLog[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface GetAuditLogsParams {
+  page?: number;
+  limit?: number;
+  action?: string;
+  from?: string;
+  to?: string;
+}

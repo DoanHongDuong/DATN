@@ -24,10 +24,13 @@ export interface AuthResponse {
 }
 
 export interface RegisterResponse {
-  id: string;
-  email: string;
-  fullName: string;
-  role: string;
+  accessToken: string;
+  user: {
+    id: string;
+    email: string;
+    fullName: string;
+    role: string;
+  };
   message: string;
 }
 
@@ -44,6 +47,12 @@ export interface VerifyEmailPayload {
 export interface ResetPasswordPayload {
   email: string;
   token: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
+
+export interface ChangePasswordPayload {
+  currentPassword: string;
   newPassword: string;
   confirmNewPassword: string;
 }
@@ -76,6 +85,11 @@ export const authApi = {
 
   resetPassword: async (payload: ResetPasswordPayload): Promise<{ message: string }> => {
     const res = await apiClient.post('/auth/reset-password', payload);
+    return res.data;
+  },
+
+  changePassword: async (payload: ChangePasswordPayload): Promise<{ message: string }> => {
+    const res = await apiClient.post('/auth/change-password', payload);
     return res.data;
   },
 

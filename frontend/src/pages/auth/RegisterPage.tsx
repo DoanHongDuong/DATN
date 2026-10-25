@@ -5,6 +5,7 @@ import { UserOutlined, MailOutlined, LockOutlined, PhoneOutlined } from '@ant-de
 import { useMutation } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 import { authApi, type RegisterPayload } from '../../api/auth.api';
+import { useAuth } from '../../hooks/useAuth';
 import './auth.css';
 
 interface ApiErrorResponse {
@@ -14,6 +15,7 @@ interface ApiErrorResponse {
 }
 
 export const RegisterPage: React.FC = () => {
+  const { setAuthData } = useAuth();
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
@@ -29,9 +31,15 @@ export const RegisterPage: React.FC = () => {
       };
       return authApi.register(cleanPayload);
     },
-    onSuccess: (_data, variables) => {
-      message.success('Đăng ký tài khoản thành công! Vui lòng đăng nhập.');
-      navigate('/login', { state: { email: variables.email.trim() } });
+    onSuccess: (data) => {
+      if (data.accessToken && data.user) {
+        setAuthData(data);
+        message.success('Đăng ký tài khoản thành công!');
+        navigate('/dashboard', { replace: true });
+      } else {
+        message.success('Đăng ký tài khoản thành công! Vui lòng đăng nhập.');
+        navigate('/login', { replace: true });
+      }
     },
     onError: (error: unknown) => {
       let errorMsg = 'Đăng ký thất bại. Vui lòng kiểm tra lại thông tin.';

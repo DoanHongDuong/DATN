@@ -10,6 +10,7 @@ import { RequestPasswordResetUseCase } from '../application/use-cases/request-pa
 import { ResetPasswordUseCase } from '../application/use-cases/reset-password.use-case';
 import { VerifyEmailUseCase } from '../application/use-cases/verify-email.use-case';
 import { ResendVerificationEmailUseCase } from '../application/use-cases/resend-verification-email.use-case';
+import { ChangePasswordUseCase } from '../application/use-cases/change-password.use-case';
 import { UserPrismaRepository } from './persistence/user.prisma.repository';
 import { USER_REPOSITORY } from '../domain/repositories/user.repository.interface';
 
@@ -41,6 +42,7 @@ import { USER_REPOSITORY } from '../domain/repositories/user.repository.interfac
     ResetPasswordUseCase,
     VerifyEmailUseCase,
     ResendVerificationEmailUseCase,
+    ChangePasswordUseCase,
   ],
   exports: [JwtModule],
 })

@@ -14,6 +14,8 @@ import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard';
 import { RequestSupportUseCase } from '../application/use-cases/request-support.use-case';
 import { AcceptSessionUseCase } from '../application/use-cases/accept-session.use-case';
 import { GetQueuePositionUseCase } from '../application/use-cases/get-queue-position.use-case';
+import { GetMyActiveSessionUseCase } from '../application/use-cases/get-my-active-session.use-case';
+import { CancelSessionUseCase } from '../application/use-cases/cancel-session.use-case';
 import {
   CHAT_REPOSITORY,
   IChatRepository,
@@ -34,10 +36,39 @@ export class ChatController {
     private readonly requestSupportUseCase: RequestSupportUseCase,
     private readonly acceptSessionUseCase: AcceptSessionUseCase,
     private readonly getQueuePositionUseCase: GetQueuePositionUseCase,
+    private readonly getMyActiveSessionUseCase: GetMyActiveSessionUseCase,
+    private readonly cancelSessionUseCase: CancelSessionUseCase,
     @Inject(CHAT_REPOSITORY)
     private readonly chatRepository: IChatRepository,
     private readonly chatGateway: ChatGateway,
   ) { }
+
+  /**
+   * GET /chat/my-active-session
+   * Lấy phiên chat hiện tại (đang đợi hoặc đang chat) của user / tình nguyện viên
+   */
+  @ApiOperation({ summary: 'Lấy phiên chat hiện tại của người dùng hoặc TNV' })
+  @Get('my-active-session')
+  async getMyActiveSession(@Req() req: AuthenticatedRequest) {
+    return this.getMyActiveSessionUseCase.execute(req.user.userId, req.user.role);
+  }
+
+  /**
+   * POST /chat/:id/cancel
+   * User hủy yêu cầu hỗ trợ hoặc thoát khỏi hàng đợi
+   */
+  @ApiOperation({ summary: 'Huỷ yêu cầu hỗ trợ hoặc kết thúc phiên từ phía người dùng' })
+  @Post(':id/cancel')
+  async cancelSession(
+    @Param('id') sessionId: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    const session = await this.cancelSessionUseCase.execute(req.user.userId, sessionId);
+    this.chatGateway.server
+      .to(`session:${sessionId}`)
+      .emit('session_ended', session);
+    return session;
+  }
 
   /**
    * POST /chat/request-support

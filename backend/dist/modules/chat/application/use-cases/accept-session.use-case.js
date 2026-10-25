@@ -21,6 +21,10 @@ let AcceptSessionUseCase = class AcceptSessionUseCase {
         this.chatRepository = chatRepository;
     }
     async execute(volunteerId, sessionId) {
+        const isVerified = await this.chatRepository.isVolunteerVerified(volunteerId);
+        if (!isVerified) {
+            throw new common_1.ForbiddenException('Tài khoản tình nguyện viên chưa được duyệt hồ sơ xác thực');
+        }
         const session = await this.chatRepository.findSessionById(sessionId);
         if (!session) {
             throw new common_1.NotFoundException('Không tìm thấy phiên hỗ trợ');

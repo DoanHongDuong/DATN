@@ -15,6 +15,11 @@ export interface IChatRepository {
   findActiveOrWaitingSessionByUserId(userId: string): Promise<ChatSession | null>;
 
   /**
+   * Tìm phiên đang ACTIVE của tình nguyện viên
+   */
+  findActiveSessionByVolunteerId(volunteerId: string): Promise<ChatSession | null>;
+
+  /**
    * Lấy severity_level gần nhất từ test_results của user
    */
   findLatestSeverityByUserId(userId: string): Promise<SeverityLevel | null>;
@@ -23,6 +28,11 @@ export interface IChatRepository {
    * Kiểm tra có TNV nào is_online = true VÀ is_verified = true không
    */
   hasAvailableVolunteer(): Promise<boolean>;
+
+  /**
+   * Kiểm tra tình nguyện viên cụ thể đã được xác thực (is_verified = true) hay chưa
+   */
+  isVolunteerVerified(volunteerId: string): Promise<boolean>;
 
   /**
    * Tạo chat session mới

@@ -19,6 +19,8 @@ const jwt_auth_guard_1 = require("../../auth/presentation/guards/jwt-auth.guard"
 const request_support_use_case_1 = require("../application/use-cases/request-support.use-case");
 const accept_session_use_case_1 = require("../application/use-cases/accept-session.use-case");
 const get_queue_position_use_case_1 = require("../application/use-cases/get-queue-position.use-case");
+const get_my_active_session_use_case_1 = require("../application/use-cases/get-my-active-session.use-case");
+const cancel_session_use_case_1 = require("../application/use-cases/cancel-session.use-case");
 const chat_repository_interface_1 = require("../domain/repositories/chat.repository.interface");
 const chat_gateway_1 = require("./chat.gateway");
 const client_1 = require("@prisma/client");
@@ -26,14 +28,28 @@ let ChatController = class ChatController {
     requestSupportUseCase;
     acceptSessionUseCase;
     getQueuePositionUseCase;
+    getMyActiveSessionUseCase;
+    cancelSessionUseCase;
     chatRepository;
     chatGateway;
-    constructor(requestSupportUseCase, acceptSessionUseCase, getQueuePositionUseCase, chatRepository, chatGateway) {
+    constructor(requestSupportUseCase, acceptSessionUseCase, getQueuePositionUseCase, getMyActiveSessionUseCase, cancelSessionUseCase, chatRepository, chatGateway) {
         this.requestSupportUseCase = requestSupportUseCase;
         this.acceptSessionUseCase = acceptSessionUseCase;
         this.getQueuePositionUseCase = getQueuePositionUseCase;
+        this.getMyActiveSessionUseCase = getMyActiveSessionUseCase;
+        this.cancelSessionUseCase = cancelSessionUseCase;
         this.chatRepository = chatRepository;
         this.chatGateway = chatGateway;
+    }
+    async getMyActiveSession(req) {
+        return this.getMyActiveSessionUseCase.execute(req.user.userId, req.user.role);
+    }
+    async cancelSession(sessionId, req) {
+        const session = await this.cancelSessionUseCase.execute(req.user.userId, sessionId);
+        this.chatGateway.server
+            .to(`session:${sessionId}`)
+            .emit('session_ended', session);
+        return session;
     }
     async requestSupport(req) {
         return this.requestSupportUseCase.execute(req.user.userId);
@@ -68,6 +84,23 @@ let ChatController = class ChatController {
     }
 };
 exports.ChatController = ChatController;
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Lấy phiên chat hiện tại của người dùng hoặc TNV' }),
+    (0, common_1.Get)('my-active-session'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], ChatController.prototype, "getMyActiveSession", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Huỷ yêu cầu hỗ trợ hoặc kết thúc phiên từ phía người dùng' }),
+    (0, common_1.Post)(':id/cancel'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ChatController.prototype, "cancelSession", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Yêu cầu tư vấn hỗ trợ tâm lý' }),
     (0, common_1.Post)('request-support'),
@@ -116,9 +149,11 @@ exports.ChatController = ChatController = __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Controller)('chat'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    __param(3, (0, common_1.Inject)(chat_repository_interface_1.CHAT_REPOSITORY)),
+    __param(5, (0, common_1.Inject)(chat_repository_interface_1.CHAT_REPOSITORY)),
     __metadata("design:paramtypes", [request_support_use_case_1.RequestSupportUseCase,
         accept_session_use_case_1.AcceptSessionUseCase,
-        get_queue_position_use_case_1.GetQueuePositionUseCase, Object, chat_gateway_1.ChatGateway])
+        get_queue_position_use_case_1.GetQueuePositionUseCase,
+        get_my_active_session_use_case_1.GetMyActiveSessionUseCase,
+        cancel_session_use_case_1.CancelSessionUseCase, Object, chat_gateway_1.ChatGateway])
 ], ChatController);
 //# sourceMappingURL=chat.controller.js.map

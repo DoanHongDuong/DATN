@@ -10,6 +10,7 @@ import { JournalModule } from './modules/journal/infrastructure/journal.module';
 import { ChatModule } from './modules/chat/infrastructure/chat.module';
 import { VolunteerModule } from './modules/volunteer/infrastructure/volunteer.module';
 import { AdminModule } from './modules/admin/infrastructure/admin.module';
+import { UsersModule } from './modules/users/infrastructure/users.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AdminModule } from './modules/admin/infrastructure/admin.module';
     ChatModule,
     VolunteerModule,
     AdminModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

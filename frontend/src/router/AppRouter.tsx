@@ -2,16 +2,20 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '../components/layout/MainLayout';
 import { ProtectedRoute } from '../components/common/ProtectedRoute';
+import { PublicOnlyRoute } from '../components/common/PublicOnlyRoute';
 import { HomePage } from '../pages/HomePage';
-import { LoginPage, RegisterPage, ForgotPasswordPage, VerifyEmailPage, ResetPasswordPage } from '../pages/auth';
+import { LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage } from '../pages/auth';
 import { DashboardPage } from '../pages/DashboardPage';
 import { AssessmentPage } from '../pages/AssessmentPage';
 import { JournalPage } from '../pages/JournalPage';
 import { ChatPage } from '../pages/ChatPage';
 import { ResourcesPage } from '../pages/ResourcesPage';
 import { VolunteerApplyPage } from '../pages/volunteer/VolunteerApplyPage';
+import { ProfilePage } from '../pages/ProfilePage';
 import { AdminVolunteersPage } from '../pages/admin/AdminVolunteersPage';
 import { AdminUsersPage } from '../pages/admin/AdminUsersPage';
+import { AdminResourcesPage } from '../pages/admin/AdminResourcesPage';
+import { AdminAuditLogsPage } from '../pages/admin/AdminAuditLogsPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 
 export const AppRouter: React.FC = () => {
@@ -19,13 +23,17 @@ export const AppRouter: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route element={<MainLayout />}>
-          {/* Public Routes */}
+          {/* Public General Routes */}
           <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/verify-email" element={<VerifyEmailPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/verify-email" element={<Navigate to="/login" replace />} />
+
+          {/* Guest-only Routes (Redirect to app if already authenticated) */}
+          <Route element={<PublicOnlyRoute />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+          </Route>
 
           {/* Protected Routes (Authentication Required) */}
           <Route element={<ProtectedRoute />}>
@@ -35,6 +43,7 @@ export const AppRouter: React.FC = () => {
             <Route path="/resources" element={<ResourcesPage />} />
             <Route path="/chat" element={<ChatPage />} />
             <Route path="/volunteer/apply" element={<VolunteerApplyPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
           </Route>
 
           {/* Admin Protected Routes (Role ADMIN Required) */}
@@ -42,6 +51,8 @@ export const AppRouter: React.FC = () => {
             <Route path="/admin" element={<Navigate to="/admin/volunteers" replace />} />
             <Route path="/admin/volunteers" element={<AdminVolunteersPage />} />
             <Route path="/admin/users" element={<AdminUsersPage />} />
+            <Route path="/admin/resources" element={<AdminResourcesPage />} />
+            <Route path="/admin/audit-logs" element={<AdminAuditLogsPage />} />
           </Route>
 
           {/* Fallback Route */}

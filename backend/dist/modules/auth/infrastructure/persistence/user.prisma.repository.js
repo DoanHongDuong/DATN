@@ -17,6 +17,9 @@ let UserPrismaRepository = class UserPrismaRepository {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    async findById(id) {
+        return this.prisma.user.findUnique({ where: { id } });
+    }
     async findByEmail(email) {
         return this.prisma.user.findUnique({ where: { email } });
     }

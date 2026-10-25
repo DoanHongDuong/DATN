@@ -59,7 +59,7 @@ export const VolunteerApplyPage: React.FC = () => {
 
   const handleLogoutAndReLogin = () => {
     logout();
-    navigate('/login');
+    navigate('/login', { replace: true });
   };
 
   if (loading) {

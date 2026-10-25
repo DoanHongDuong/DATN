@@ -28,11 +28,19 @@ describe('Journal Use Cases with Encryption', () => {
     };
 
     const mockConfigService = {
-      get: jest.fn().mockReturnValue('test-secret-encryption-key-32b!'),
+      get: jest.fn().mockImplementation((key: string) => {
+        if (key === 'EMERGENCY_HOTLINE') return '1900 1234';
+        return 'test-secret-encryption-key-32b!';
+      }),
     };
     encryptionService = new EncryptionService(mockConfigService as any);
 
-    createUseCase = new CreateJournalEntryUseCase(repository, aiService, encryptionService);
+    createUseCase = new CreateJournalEntryUseCase(
+      repository,
+      aiService,
+      encryptionService,
+      mockConfigService as any,
+    );
     getUseCase = new GetJournalEntriesUseCase(repository, encryptionService);
   });
 
@@ -76,6 +84,35 @@ describe('Journal Use Cases with Encryption', () => {
     // 3. Response returned to client has the decrypted readable content
     expect(result.content).toBe(rawContent);
     expect(result.suggestedResourceCategory).toBe('calm_audio');
+    expect(result.emergencyHotline).toBeUndefined();
+  });
+
+  it('CreateJournalEntryUseCase should include emergencyHotline when sentimentLabel is crisis', async () => {
+    const rawContent = 'Tôi không muốn sống nữa, tôi cảm thấy hoàn toàn bế tắc';
+    aiService.analyze.mockResolvedValue({
+      sentimentLabel: 'crisis',
+      sentimentScore: -1.0,
+      suggestedResourceCategory: null,
+    });
+
+    repository.create.mockImplementation(async (data) => ({
+      id: 'journal-crisis-1',
+      userId: data.userId,
+      content: data.content,
+      moodEmoji: data.moodEmoji ?? null,
+      sentimentLabel: data.sentimentLabel ?? null,
+      sentimentScore: data.sentimentScore ?? null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }));
+
+    const result = await createUseCase.execute('user-1', {
+      content: rawContent,
+      moodEmoji: '😢',
+    });
+
+    expect(result.sentimentLabel).toBe('crisis');
+    expect(result.emergencyHotline).toBe('1900 1234');
   });
 
   it('GetJournalEntriesUseCase should decrypt encrypted content before returning', async () => {

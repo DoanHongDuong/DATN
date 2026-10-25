@@ -18,6 +18,7 @@ const request_password_reset_use_case_1 = require("../application/use-cases/requ
 const reset_password_use_case_1 = require("../application/use-cases/reset-password.use-case");
 const verify_email_use_case_1 = require("../application/use-cases/verify-email.use-case");
 const resend_verification_email_use_case_1 = require("../application/use-cases/resend-verification-email.use-case");
+const change_password_use_case_1 = require("../application/use-cases/change-password.use-case");
 const user_prisma_repository_1 = require("./persistence/user.prisma.repository");
 const user_repository_interface_1 = require("../domain/repositories/user.repository.interface");
 let AuthModule = class AuthModule {
@@ -52,6 +53,7 @@ exports.AuthModule = AuthModule = __decorate([
             reset_password_use_case_1.ResetPasswordUseCase,
             verify_email_use_case_1.VerifyEmailUseCase,
             resend_verification_email_use_case_1.ResendVerificationEmailUseCase,
+            change_password_use_case_1.ChangePasswordUseCase,
         ],
         exports: [jwt_1.JwtModule],
     })

@@ -63,7 +63,7 @@ export const VerifyEmailPage: React.FC = () => {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          navigate('/login');
+          navigate('/login', { replace: true });
           return 0;
         }
         return prev - 1;
@@ -118,7 +118,7 @@ export const VerifyEmailPage: React.FC = () => {
               type="primary"
               size="large"
               block
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/login', { replace: true })}
             >
               Đăng nhập ngay ({countdown}s)
             </Button>

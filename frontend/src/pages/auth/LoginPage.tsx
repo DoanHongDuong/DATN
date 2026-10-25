@@ -13,10 +13,17 @@ interface ApiErrorResponse {
 }
 
 export const LoginPage: React.FC = () => {
-  const { setAuthData } = useAuth();
+  const { setAuthData, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [form] = Form.useForm<LoginPayload>();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const redirectPath = user?.role === 'ADMIN' ? '/admin' : '/dashboard';
+      navigate(redirectPath, { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
 
   useEffect(() => {
     if (location.state?.email) {
@@ -30,9 +37,9 @@ export const LoginPage: React.FC = () => {
       setAuthData(data);
       message.success('Đăng nhập thành công!');
       if (data.user?.role === 'ADMIN') {
-        navigate('/admin');
+        navigate('/admin', { replace: true });
       } else {
-        navigate('/dashboard');
+        navigate('/dashboard', { replace: true });
       }
     },
     onError: (error: unknown) => {

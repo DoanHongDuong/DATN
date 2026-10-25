@@ -1,4 +1,5 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { USER_REPOSITORY, IUserRepository } from '../../domain/repositories/user.repository.interface';
 import { RegisterDto } from '../dto/register.dto';
 import * as bcrypt from 'bcrypt';
@@ -10,6 +11,7 @@ export class RegisterUserUseCase {
   constructor(
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
+    private readonly jwtService: JwtService,
   ) {}
 
   async execute(dto: RegisterDto) {
@@ -31,17 +33,17 @@ export class RegisterUserUseCase {
         emailVerified: true,
       });
 
-      const {
-        passwordHash: _ph,
-        resetTokenHash: _rth,
-        resetTokenExpiresAt: _rtea,
-        emailVerifyTokenHash: _evth,
-        emailVerifyTokenExpiresAt: _evtea,
-        ...result
-      } = user;
+      const payload = { sub: user.id, role: user.role };
+      const accessToken = await this.jwtService.signAsync(payload, { expiresIn: '7d' });
 
       return {
-        ...result,
+        accessToken,
+        user: {
+          id: user.id,
+          email: user.email,
+          fullName: user.fullName,
+          role: user.role,
+        },
         message: 'Đăng ký tài khoản thành công',
       };
     } catch (error) {

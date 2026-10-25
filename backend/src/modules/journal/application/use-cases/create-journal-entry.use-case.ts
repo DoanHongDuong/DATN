@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   JOURNAL_REPOSITORY,
   IJournalRepository,
@@ -17,6 +18,7 @@ export class CreateJournalEntryUseCase {
     @Inject(AI_SENTIMENT_SERVICE)
     private readonly aiSentimentService: IAiSentimentService,
     private readonly encryptionService: EncryptionService,
+    private readonly configService: ConfigService,
   ) {}
 
   async execute(userId: string, dto: CreateJournalEntryDto) {
@@ -36,10 +38,28 @@ export class CreateJournalEntryUseCase {
     });
 
     // 4. Trả về response cho client với content gốc đã giải mã
-    return {
+    const response: {
+      id: string;
+      userId: string;
+      content: string;
+      moodEmoji: string | null;
+      sentimentLabel: string | null;
+      sentimentScore: number | null;
+      createdAt: Date;
+      updatedAt: Date;
+      suggestedResourceCategory?: string | null;
+      emergencyHotline?: string | null;
+    } = {
       ...entry,
       content: dto.content,
       suggestedResourceCategory: sentiment.suggestedResourceCategory,
     };
+
+    if (sentiment.sentimentLabel === 'crisis') {
+      response.emergencyHotline =
+        this.configService.get<string>('EMERGENCY_HOTLINE') ?? null;
+    }
+
+    return response;
   }
 }
