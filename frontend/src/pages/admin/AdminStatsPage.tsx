@@ -84,7 +84,7 @@ export const AdminStatsPage: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div>
           <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--text-h)' }}>
-            Thống kê & Giám sát Hoạt động Toàn hệ thống (PB-35)
+            Thống kê & Giám sát Hoạt động Toàn hệ thống
           </h3>
           <p style={{ margin: 0, fontSize: '13px', color: 'var(--text)' }}>
             Dữ liệu tổng hợp thời gian thực từ cơ sở dữ liệu MindCare

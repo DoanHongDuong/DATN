@@ -183,7 +183,7 @@ export const MoodTrendChart: React.FC<MoodTrendChartProps> = ({ className }) => 
             </div>
             <div>
               <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--text-h)' }}>
-                Biểu đồ Xu hướng Cảm xúc (PB-11)
+                Biểu đồ Xu hướng Cảm xúc
               </h3>
               <p style={{ margin: 0, fontSize: '13px', color: 'var(--text)' }}>
                 Theo dõi biến thiên tâm trạng & chỉ số cảm xúc qua nhật ký AI

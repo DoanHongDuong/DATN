@@ -861,7 +861,7 @@ export const ChatPage: React.FC = () => {
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Heart size={20} color="#e11d48" />
-          <span>Đánh giá phiên hỗ trợ tâm lý (PB-27)</span>
+          <span>Đánh giá phiên hỗ trợ tâm lý</span>
         </div>
       }
       open={isFeedbackModalOpen}
