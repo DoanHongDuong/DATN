@@ -66,3 +66,52 @@ export interface PaginatedAuditLogsResult {
     totalPages: number;
   };
 }
+
+export interface SystemStatsEntity {
+  users: {
+    total: number;
+    members: number;
+    volunteers: number;
+    admins: number;
+    active: number;
+    blocked: number;
+    onlineVolunteers: number;
+    pendingVolunteers: number;
+  };
+  sessions: {
+    total: number;
+    waiting: number;
+    active: number;
+    closed: number;
+    totalFeedbacks: number;
+    averageRating: number;
+  };
+  assessments: {
+    total: number;
+    severityDistribution: {
+      minimal: number;
+      mild: number;
+      moderate: number;
+      moderatelySevere: number;
+      severe: number;
+    };
+  };
+  journals: {
+    total: number;
+    sentimentDistribution: {
+      positive: number;
+      neutral: number;
+      negative: number;
+      crisis: number;
+    };
+  };
+  resources: {
+    total: number;
+  };
+  recentActivity: Array<{
+    date: string;
+    sessions: number;
+    assessments: number;
+    journals: number;
+  }>;
+}

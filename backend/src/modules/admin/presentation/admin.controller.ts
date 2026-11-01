@@ -32,6 +32,7 @@ import { CreateResourceDto } from '../application/dto/create-resource.dto';
 import { UpdateResourceDto } from '../application/dto/update-resource.dto';
 import { GetAuditLogsUseCase } from '../application/use-cases/get-audit-logs.use-case';
 import { GetAuditLogsQueryDto } from '../application/dto/get-audit-logs-query.dto';
+import { GetSystemStatsUseCase } from '../application/use-cases/get-system-stats.use-case';
 
 interface AuthenticatedRequest extends Request {
   user: {
@@ -57,7 +58,14 @@ export class AdminController {
     private readonly updateResourceUseCase: UpdateResourceUseCase,
     private readonly deleteResourceUseCase: DeleteResourceUseCase,
     private readonly getAuditLogsUseCase: GetAuditLogsUseCase,
+    private readonly getSystemStatsUseCase: GetSystemStatsUseCase,
   ) {}
+
+  @ApiOperation({ summary: 'Thống kê tổng quan hệ thống cho Admin (PB-35)' })
+  @Get('stats')
+  async getSystemStats() {
+    return this.getSystemStatsUseCase.execute();
+  }
 
   @ApiOperation({ summary: 'Lấy danh sách hồ sơ tình nguyện viên đang chờ duyệt' })
   @Get('volunteers/pending')

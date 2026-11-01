@@ -38,6 +38,16 @@ export class JournalPrismaRepository implements IJournalRepository {
     });
   }
 
+  async findByUserIdSince(userId: string, since: Date): Promise<JournalEntry[]> {
+    return this.prisma.journalEntry.findMany({
+      where: {
+        userId,
+        createdAt: { gte: since },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+  }
+
   async countByUserId(userId: string): Promise<number> {
     return this.prisma.journalEntry.count({
       where: { userId },
@@ -63,6 +73,20 @@ export class JournalPrismaRepository implements IJournalRepository {
   }
 
   async findRelaxationResourcesByCategory(category: string) {
+    if (category === 'music' || category === 'calm_audio') {
+      return this.prisma.relaxationResource.findMany({
+        where: {
+          category: { in: ['music', 'calm_audio'] },
+        },
+      });
+    }
+    if (category === 'meditation' || category === 'mindfulness') {
+      return this.prisma.relaxationResource.findMany({
+        where: {
+          category: { in: ['meditation', 'mindfulness'] },
+        },
+      });
+    }
     return this.prisma.relaxationResource.findMany({
       where: { category },
     });

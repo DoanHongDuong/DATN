@@ -8,8 +8,10 @@ import { Roles } from '../../auth/presentation/decorators/roles.decorator';
 import { ApplyVolunteerUseCase } from '../application/use-cases/apply-volunteer.use-case';
 import { GetMyVolunteerProfileUseCase } from '../application/use-cases/get-my-volunteer-profile.use-case';
 import { UpdateVolunteerOnlineUseCase } from '../application/use-cases/update-volunteer-online.use-case';
+import { UpdateVolunteerProfileUseCase } from '../application/use-cases/update-volunteer-profile.use-case';
 import { ApplyVolunteerDto } from '../application/dto/apply-volunteer.dto';
 import { UpdateOnlineStatusDto } from '../application/dto/update-online-status.dto';
+import { UpdateVolunteerProfileDto } from '../application/dto/update-volunteer-profile.dto';
 
 interface AuthenticatedRequest extends Request {
   user: {
@@ -26,6 +28,7 @@ export class VolunteerController {
     private readonly applyVolunteerUseCase: ApplyVolunteerUseCase,
     private readonly getMyVolunteerProfileUseCase: GetMyVolunteerProfileUseCase,
     private readonly updateVolunteerOnlineUseCase: UpdateVolunteerOnlineUseCase,
+    private readonly updateVolunteerProfileUseCase: UpdateVolunteerProfileUseCase,
   ) {}
 
   @ApiOperation({ summary: 'Nộp hồ sơ đăng ký làm tình nguyện viên' })
@@ -49,5 +52,13 @@ export class VolunteerController {
   @Patch('me/online')
   async updateOnline(@Req() req: AuthenticatedRequest, @Body() dto: UpdateOnlineStatusDto) {
     return this.updateVolunteerOnlineUseCase.execute(req.user.userId, dto.isOnline);
+  }
+
+  @ApiOperation({ summary: 'Cập nhật thông tin hồ sơ tình nguyện viên (PB-28)' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.VOLUNTEER)
+  @Patch('me')
+  async updateProfile(@Req() req: AuthenticatedRequest, @Body() dto: UpdateVolunteerProfileDto) {
+    return this.updateVolunteerProfileUseCase.execute(req.user.userId, dto);
   }
 }

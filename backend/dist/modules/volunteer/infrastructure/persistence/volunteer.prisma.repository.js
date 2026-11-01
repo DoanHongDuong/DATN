@@ -40,6 +40,18 @@ let VolunteerPrismaRepository = class VolunteerPrismaRepository {
             data: { isOnline },
         });
     }
+    async updateProfile(userId, data) {
+        return this.prisma.volunteerProfile.update({
+            where: { userId },
+            data: {
+                ...(data.specialization !== undefined && { specialization: data.specialization }),
+                ...(data.bio !== undefined && { bio: data.bio }),
+                ...(data.certificateUrl !== undefined && { certificateUrl: data.certificateUrl }),
+                ...(data.isVerified !== undefined && { isVerified: data.isVerified }),
+                ...(data.isOnline !== undefined && { isOnline: data.isOnline }),
+            },
+        });
+    }
 };
 exports.VolunteerPrismaRepository = VolunteerPrismaRepository;
 exports.VolunteerPrismaRepository = VolunteerPrismaRepository = __decorate([

@@ -16,6 +16,7 @@ const volunteer_repository_interface_1 = require("../domain/repositories/volunte
 const apply_volunteer_use_case_1 = require("../application/use-cases/apply-volunteer.use-case");
 const get_my_volunteer_profile_use_case_1 = require("../application/use-cases/get-my-volunteer-profile.use-case");
 const update_volunteer_online_use_case_1 = require("../application/use-cases/update-volunteer-online.use-case");
+const update_volunteer_profile_use_case_1 = require("../application/use-cases/update-volunteer-profile.use-case");
 let VolunteerModule = class VolunteerModule {
 };
 exports.VolunteerModule = VolunteerModule;
@@ -31,6 +32,7 @@ exports.VolunteerModule = VolunteerModule = __decorate([
             apply_volunteer_use_case_1.ApplyVolunteerUseCase,
             get_my_volunteer_profile_use_case_1.GetMyVolunteerProfileUseCase,
             update_volunteer_online_use_case_1.UpdateVolunteerOnlineUseCase,
+            update_volunteer_profile_use_case_1.UpdateVolunteerProfileUseCase,
         ],
         exports: [get_my_volunteer_profile_use_case_1.GetMyVolunteerProfileUseCase],
     })

@@ -58,11 +58,16 @@ export const ResetPasswordPage: React.FC = () => {
       });
       setSuccess(true);
     } catch (err: unknown) {
-      const errorMsg =
-        err && typeof err === 'object' && 'response' in err
-          ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
-          : 'Không thể đặt lại mật khẩu. Token có thể đã hết hạn hoặc không hợp lệ.';
-      setError(errorMsg || 'Không thể đặt lại mật khẩu.');
+      let errorMsg = 'Không thể đặt lại mật khẩu. Token có thể đã hết hạn hoặc không hợp lệ.';
+      if (err && typeof err === 'object' && 'response' in err) {
+        const respData = (err as { response?: { data?: { message?: string | string[] } } }).response?.data;
+        if (respData?.message) {
+          errorMsg = Array.isArray(respData.message)
+            ? respData.message.join('. ')
+            : respData.message;
+        }
+      }
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -132,12 +137,17 @@ export const ResetPasswordPage: React.FC = () => {
               name="newPassword"
               rules={[
                 { required: true, message: 'Vui lòng nhập mật khẩu mới' },
-                { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự' },
+                { min: 8, message: 'Mật khẩu phải có ít nhất 8 ký tự' },
+                {
+                  pattern: /^(?=.*[a-zA-Z])(?=.*\d).+$/,
+                  message: 'Mật khẩu phải chứa cả chữ cái và chữ số',
+                },
               ]}
+              hasFeedback
             >
               <Input.Password
                 prefix={<LockOutlined style={{ color: 'var(--text)', opacity: 0.5 }} />}
-                placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
+                placeholder="Ít nhất 8 ký tự (gồm cả chữ và số)"
               />
             </Form.Item>
 

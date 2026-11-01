@@ -324,6 +324,139 @@ let AdminPrismaRepository = class AdminPrismaRepository {
             },
         };
     }
+    async getSystemStats() {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+        sevenDaysAgo.setHours(0, 0, 0, 0);
+        const [totalUsers, members, volunteers, admins, activeUsers, blockedUsers, onlineVolunteers, pendingVolunteers, totalSessions, waitingSessions, activeSessions, closedSessions, totalFeedbacks, feedbackAvg, totalAssessments, assessmentsBySeverity, totalJournals, journalsBySentiment, totalResources, recentSessions, recentAssessments, recentJournals,] = await Promise.all([
+            this.prisma.user.count(),
+            this.prisma.user.count({ where: { role: client_1.Role.USER } }),
+            this.prisma.user.count({ where: { role: client_1.Role.VOLUNTEER } }),
+            this.prisma.user.count({ where: { role: client_1.Role.ADMIN } }),
+            this.prisma.user.count({ where: { status: client_1.AccountStatus.ACTIVE } }),
+            this.prisma.user.count({ where: { status: client_1.AccountStatus.SUSPENDED } }),
+            this.prisma.volunteerProfile.count({ where: { isOnline: true } }),
+            this.prisma.volunteerProfile.count({ where: { isVerified: false } }),
+            this.prisma.chatSession.count(),
+            this.prisma.chatSession.count({ where: { status: client_1.SessionStatus.WAITING } }),
+            this.prisma.chatSession.count({ where: { status: client_1.SessionStatus.ACTIVE } }),
+            this.prisma.chatSession.count({ where: { status: client_1.SessionStatus.CLOSED } }),
+            this.prisma.sessionFeedback.count(),
+            this.prisma.sessionFeedback.aggregate({ _avg: { rating: true } }),
+            this.prisma.testResult.count(),
+            this.prisma.testResult.groupBy({
+                by: ['severityLevel'],
+                _count: { severityLevel: true },
+            }),
+            this.prisma.journalEntry.count(),
+            this.prisma.journalEntry.groupBy({
+                by: ['sentimentLabel'],
+                _count: { sentimentLabel: true },
+            }),
+            this.prisma.relaxationResource.count(),
+            this.prisma.chatSession.findMany({
+                where: { queuedAt: { gte: sevenDaysAgo } },
+                select: { queuedAt: true },
+            }),
+            this.prisma.testResult.findMany({
+                where: { takenAt: { gte: sevenDaysAgo } },
+                select: { takenAt: true },
+            }),
+            this.prisma.journalEntry.findMany({
+                where: { createdAt: { gte: sevenDaysAgo } },
+                select: { createdAt: true },
+            }),
+        ]);
+        const severityMap = {
+            minimal: 0,
+            mild: 0,
+            moderate: 0,
+            moderatelySevere: 0,
+            severe: 0,
+        };
+        for (const item of assessmentsBySeverity) {
+            if (item.severityLevel === client_1.SeverityLevel.MINIMAL)
+                severityMap.minimal = item._count.severityLevel;
+            else if (item.severityLevel === client_1.SeverityLevel.MILD)
+                severityMap.mild = item._count.severityLevel;
+            else if (item.severityLevel === client_1.SeverityLevel.MODERATE)
+                severityMap.moderate = item._count.severityLevel;
+            else if (item.severityLevel === client_1.SeverityLevel.MODERATELY_SEVERE)
+                severityMap.moderatelySevere = item._count.severityLevel;
+            else if (item.severityLevel === client_1.SeverityLevel.SEVERE)
+                severityMap.severe = item._count.severityLevel;
+        }
+        const sentimentMap = {
+            positive: 0,
+            neutral: 0,
+            negative: 0,
+            crisis: 0,
+        };
+        for (const item of journalsBySentiment) {
+            const label = item.sentimentLabel?.toLowerCase();
+            if (label && label in sentimentMap) {
+                sentimentMap[label] = item._count.sentimentLabel;
+            }
+        }
+        const recentActivity = [];
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(sevenDaysAgo);
+            d.setDate(d.getDate() + i);
+            const dateStr = d.toISOString().split('T')[0];
+            const sCount = recentSessions.filter((s) => new Date(s.queuedAt).toISOString().split('T')[0] === dateStr).length;
+            const aCount = recentAssessments.filter((a) => new Date(a.takenAt).toISOString().split('T')[0] === dateStr).length;
+            const jCount = recentJournals.filter((j) => new Date(j.createdAt).toISOString().split('T')[0] === dateStr).length;
+            recentActivity.push({
+                date: dateStr,
+                sessions: sCount,
+                assessments: aCount,
+                journals: jCount,
+            });
+        }
+        return {
+            users: {
+                total: totalUsers,
+                members,
+                volunteers,
+                admins,
+                active: activeUsers,
+                blocked: blockedUsers,
+                onlineVolunteers,
+                pendingVolunteers,
+            },
+            sessions: {
+                total: totalSessions,
+                waiting: waitingSessions,
+                active: activeSessions,
+                closed: closedSessions,
+                totalFeedbacks,
+                averageRating: Number((feedbackAvg._avg.rating || 0).toFixed(1)),
+            },
+            assessments: {
+                total: totalAssessments,
+                severityDistribution: {
+                    minimal: severityMap.minimal,
+                    mild: severityMap.mild,
+                    moderate: severityMap.moderate,
+                    moderatelySevere: severityMap.moderatelySevere,
+                    severe: severityMap.severe,
+                },
+            },
+            journals: {
+                total: totalJournals,
+                sentimentDistribution: {
+                    positive: sentimentMap.positive,
+                    neutral: sentimentMap.neutral,
+                    negative: sentimentMap.negative,
+                    crisis: sentimentMap.crisis,
+                },
+            },
+            resources: {
+                total: totalResources,
+            },
+            recentActivity,
+        };
+    }
 };
 exports.AdminPrismaRepository = AdminPrismaRepository;
 exports.AdminPrismaRepository = AdminPrismaRepository = __decorate([

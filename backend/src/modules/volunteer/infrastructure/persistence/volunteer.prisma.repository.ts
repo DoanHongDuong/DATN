@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
-import { IVolunteerRepository, CreateVolunteerProfileData } from '../../domain/repositories/volunteer.repository.interface';
+import {
+  IVolunteerRepository,
+  CreateVolunteerProfileData,
+  UpdateVolunteerProfileData,
+} from '../../domain/repositories/volunteer.repository.interface';
 import { VolunteerProfileEntity } from '../../domain/entities/volunteer-profile.entity';
 
 @Injectable()
@@ -30,6 +34,19 @@ export class VolunteerPrismaRepository implements IVolunteerRepository {
     return this.prisma.volunteerProfile.update({
       where: { userId },
       data: { isOnline },
+    });
+  }
+
+  async updateProfile(userId: string, data: UpdateVolunteerProfileData): Promise<VolunteerProfileEntity> {
+    return this.prisma.volunteerProfile.update({
+      where: { userId },
+      data: {
+        ...(data.specialization !== undefined && { specialization: data.specialization }),
+        ...(data.bio !== undefined && { bio: data.bio }),
+        ...(data.certificateUrl !== undefined && { certificateUrl: data.certificateUrl }),
+        ...(data.isVerified !== undefined && { isVerified: data.isVerified }),
+        ...(data.isOnline !== undefined && { isOnline: data.isOnline }),
+      },
     });
   }
 }

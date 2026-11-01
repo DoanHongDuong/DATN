@@ -34,6 +34,7 @@ const create_resource_dto_1 = require("../application/dto/create-resource.dto");
 const update_resource_dto_1 = require("../application/dto/update-resource.dto");
 const get_audit_logs_use_case_1 = require("../application/use-cases/get-audit-logs.use-case");
 const get_audit_logs_query_dto_1 = require("../application/dto/get-audit-logs-query.dto");
+const get_system_stats_use_case_1 = require("../application/use-cases/get-system-stats.use-case");
 let AdminController = class AdminController {
     getPendingVolunteersUseCase;
     approveVolunteerUseCase;
@@ -45,7 +46,8 @@ let AdminController = class AdminController {
     updateResourceUseCase;
     deleteResourceUseCase;
     getAuditLogsUseCase;
-    constructor(getPendingVolunteersUseCase, approveVolunteerUseCase, rejectVolunteerUseCase, getUsersUseCase, updateUserStatusUseCase, getAdminResourcesUseCase, createResourceUseCase, updateResourceUseCase, deleteResourceUseCase, getAuditLogsUseCase) {
+    getSystemStatsUseCase;
+    constructor(getPendingVolunteersUseCase, approveVolunteerUseCase, rejectVolunteerUseCase, getUsersUseCase, updateUserStatusUseCase, getAdminResourcesUseCase, createResourceUseCase, updateResourceUseCase, deleteResourceUseCase, getAuditLogsUseCase, getSystemStatsUseCase) {
         this.getPendingVolunteersUseCase = getPendingVolunteersUseCase;
         this.approveVolunteerUseCase = approveVolunteerUseCase;
         this.rejectVolunteerUseCase = rejectVolunteerUseCase;
@@ -56,6 +58,10 @@ let AdminController = class AdminController {
         this.updateResourceUseCase = updateResourceUseCase;
         this.deleteResourceUseCase = deleteResourceUseCase;
         this.getAuditLogsUseCase = getAuditLogsUseCase;
+        this.getSystemStatsUseCase = getSystemStatsUseCase;
+    }
+    async getSystemStats() {
+        return this.getSystemStatsUseCase.execute();
     }
     async getPendingVolunteers() {
         return this.getPendingVolunteersUseCase.execute();
@@ -89,6 +95,13 @@ let AdminController = class AdminController {
     }
 };
 exports.AdminController = AdminController;
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Thống kê tổng quan hệ thống cho Admin (PB-35)' }),
+    (0, common_1.Get)('stats'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "getSystemStats", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Lấy danh sách hồ sơ tình nguyện viên đang chờ duyệt' }),
     (0, common_1.Get)('volunteers/pending'),
@@ -192,6 +205,7 @@ exports.AdminController = AdminController = __decorate([
         create_resource_use_case_1.CreateResourceUseCase,
         update_resource_use_case_1.UpdateResourceUseCase,
         delete_resource_use_case_1.DeleteResourceUseCase,
-        get_audit_logs_use_case_1.GetAuditLogsUseCase])
+        get_audit_logs_use_case_1.GetAuditLogsUseCase,
+        get_system_stats_use_case_1.GetSystemStatsUseCase])
 ], AdminController);
 //# sourceMappingURL=admin.controller.js.map

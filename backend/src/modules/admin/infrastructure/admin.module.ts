@@ -14,6 +14,7 @@ import { CreateResourceUseCase } from '../application/use-cases/create-resource.
 import { UpdateResourceUseCase } from '../application/use-cases/update-resource.use-case';
 import { DeleteResourceUseCase } from '../application/use-cases/delete-resource.use-case';
 import { GetAuditLogsUseCase } from '../application/use-cases/get-audit-logs.use-case';
+import { GetSystemStatsUseCase } from '../application/use-cases/get-system-stats.use-case';
 
 @Module({
   imports: [ConfigModule, AuthModule],
@@ -33,6 +34,7 @@ import { GetAuditLogsUseCase } from '../application/use-cases/get-audit-logs.use
     UpdateResourceUseCase,
     DeleteResourceUseCase,
     GetAuditLogsUseCase,
+    GetSystemStatsUseCase,
   ],
 })
 export class AdminModule {}

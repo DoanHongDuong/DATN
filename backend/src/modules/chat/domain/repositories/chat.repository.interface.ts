@@ -5,6 +5,7 @@ import {
   PriorityLevel,
   SeverityLevel,
 } from '@prisma/client';
+import { SessionFeedbackEntity } from '../entities/session-feedback.entity';
 
 export const CHAT_REPOSITORY = Symbol('CHAT_REPOSITORY');
 
@@ -84,5 +85,19 @@ export interface IChatRepository {
    * Lấy danh sách các phiên WAITING chưa có volunteer nhận
    */
   findWaitingSessions(): Promise<ChatSession[]>;
+
+  /**
+   * Tạo đánh giá cho phiên hỗ trợ (PB-27)
+   */
+  createFeedback(data: {
+    sessionId: string;
+    rating: number;
+    comment?: string | null;
+  }): Promise<SessionFeedbackEntity>;
+
+  /**
+   * Tìm đánh giá theo ID phiên hỗ trợ
+   */
+  findFeedbackBySessionId(sessionId: string): Promise<SessionFeedbackEntity | null>;
 }
 

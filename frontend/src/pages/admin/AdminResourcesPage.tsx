@@ -42,11 +42,13 @@ const CATEGORY_MAP: Record<string, { label: string; color: string }> = {
   breathing: { label: 'Bài tập thở', color: 'blue' },
   meditation: { label: 'Thiền định', color: 'purple' },
   music: { label: 'Nhạc thư giãn', color: 'green' },
+  calm_audio: { label: 'Âm thanh thiên nhiên', color: 'green' },
   mindfulness: { label: 'Chánh niệm', color: 'gold' },
 };
 
 const TYPE_MAP: Record<string, { label: string; icon: React.FC<{ size?: number }> }> = {
   exercise: { label: 'Bài tập', icon: Wind },
+  breathing: { label: 'Bài tập thở', icon: Wind },
   audio: { label: 'Âm thanh', icon: Music },
   video: { label: 'Video', icon: Video },
   article: { label: 'Bài viết', icon: FileText },
@@ -249,7 +251,8 @@ export const AdminResourcesPage: React.FC = () => {
       dataIndex: 'type',
       key: 'type',
       render: (type: string) => {
-        const typeInfo = TYPE_MAP[type] || { label: type };
+        const normalized = (type || '').toLowerCase();
+        const typeInfo = TYPE_MAP[normalized] || { label: type };
         return <Tag>{typeInfo.label}</Tag>;
       },
     },

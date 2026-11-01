@@ -32,6 +32,30 @@ export interface RelaxationResource {
   category: string;
 }
 
+export interface MoodTrendPoint {
+  date: string;
+  avgScore: number;
+  dominantSentiment: string;
+  moodEmojis: string[];
+  entryCount: number;
+}
+
+export interface MoodTrendSummary {
+  totalEntries: number;
+  avgScore: number;
+  positiveCount: number;
+  neutralCount: number;
+  negativeCount: number;
+  crisisCount: number;
+  trend: 'improving' | 'stable' | 'declining' | 'insufficient_data';
+}
+
+export interface MoodTrendResponse {
+  days: number;
+  points: MoodTrendPoint[];
+  summary: MoodTrendSummary;
+}
+
 export const journalApi = {
   create: async (payload: CreateJournalPayload): Promise<JournalEntry> => {
     const res = await apiClient.post('/journal', payload);
@@ -40,6 +64,11 @@ export const journalApi = {
 
   findAll: async (page = 1, limit = 10): Promise<{ data: JournalEntry[]; total: number }> => {
     const res = await apiClient.get('/journal', { params: { page, limit } });
+    return res.data;
+  },
+
+  getMoodTrend: async (days = 14): Promise<MoodTrendResponse> => {
+    const res = await apiClient.get('/journal/mood-trend', { params: { days } });
     return res.data;
   },
 

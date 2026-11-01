@@ -21,6 +21,7 @@ import { UpdateJournalEntryUseCase } from '../application/use-cases/update-journ
 import { DeleteJournalEntryUseCase } from '../application/use-cases/delete-journal-entry.use-case';
 import { SuggestResourcesUseCase } from '../application/use-cases/suggest-resources.use-case';
 import { GetAllRelaxationResourcesUseCase } from '../application/use-cases/get-all-relaxation-resources.use-case';
+import { GetMoodTrendUseCase } from '../application/use-cases/get-mood-trend.use-case';
 import { CreateJournalEntryDto } from '../application/dto/create-journal-entry.dto';
 import { UpdateJournalEntryDto } from '../application/dto/update-journal-entry.dto';
 
@@ -43,7 +44,18 @@ export class JournalController {
     private readonly deleteJournalEntryUseCase: DeleteJournalEntryUseCase,
     private readonly suggestResourcesUseCase: SuggestResourcesUseCase,
     private readonly getAllRelaxationResourcesUseCase: GetAllRelaxationResourcesUseCase,
+    private readonly getMoodTrendUseCase: GetMoodTrendUseCase,
   ) {}
+
+  @ApiOperation({ summary: 'Lấy dữ liệu biểu đồ xu hướng cảm xúc (PB-11)' })
+  @ApiQuery({ name: 'days', required: false, description: 'Số ngày phân tích (mặc định 14)' })
+  @Get('mood-trend')
+  async getMoodTrend(
+    @Req() req: AuthenticatedRequest,
+    @Query('days', new DefaultValuePipe(14), ParseIntPipe) days: number,
+  ) {
+    return this.getMoodTrendUseCase.execute(req.user.userId, days);
+  }
 
   @ApiOperation({ summary: 'Tạo nhật ký cá nhân mới (được phân tích AI & mã hóa)' })
   @Post()

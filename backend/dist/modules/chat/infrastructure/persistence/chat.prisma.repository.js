@@ -168,6 +168,20 @@ let ChatPrismaRepository = class ChatPrismaRepository {
             ],
         });
     }
+    async createFeedback(data) {
+        return this.prisma.sessionFeedback.create({
+            data: {
+                sessionId: data.sessionId,
+                rating: data.rating,
+                comment: data.comment ?? null,
+            },
+        });
+    }
+    async findFeedbackBySessionId(sessionId) {
+        return this.prisma.sessionFeedback.findUnique({
+            where: { sessionId },
+        });
+    }
 };
 exports.ChatPrismaRepository = ChatPrismaRepository;
 exports.ChatPrismaRepository = ChatPrismaRepository = __decorate([

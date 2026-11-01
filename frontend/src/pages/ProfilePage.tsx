@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import { Card, Form, Input, Button, message, Tag, Typography, Divider, Space } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined, SafetyCertificateOutlined, CalendarOutlined } from '@ant-design/icons';
 import { userApi, type UserDetail } from '../api/user.api';
@@ -150,10 +151,15 @@ export const ProfilePage: React.FC = () => {
             </Form.Item>
 
             <Form.Item label="Vai trò tài khoản">
-              <div style={{ display: 'flex', alignItems: 'center', height: '32px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', height: '32px', gap: '10px' }}>
                 <Tag color={roleTagConfig.color} icon={<SafetyCertificateOutlined />}>
                   {roleTagConfig.label}
                 </Tag>
+                {profile?.role === 'VOLUNTEER' && (
+                  <Link to="/dashboard" style={{ fontSize: '13px', color: 'var(--accent)', fontWeight: 500 }}>
+                    Hồ sơ chuyên môn & Bàn trực →
+                  </Link>
+                )}
               </div>
             </Form.Item>
           </div>

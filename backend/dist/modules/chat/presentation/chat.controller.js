@@ -21,6 +21,9 @@ const accept_session_use_case_1 = require("../application/use-cases/accept-sessi
 const get_queue_position_use_case_1 = require("../application/use-cases/get-queue-position.use-case");
 const get_my_active_session_use_case_1 = require("../application/use-cases/get-my-active-session.use-case");
 const cancel_session_use_case_1 = require("../application/use-cases/cancel-session.use-case");
+const submit_session_feedback_use_case_1 = require("../application/use-cases/submit-session-feedback.use-case");
+const get_session_feedback_use_case_1 = require("../application/use-cases/get-session-feedback.use-case");
+const create_feedback_dto_1 = require("../application/dto/create-feedback.dto");
 const chat_repository_interface_1 = require("../domain/repositories/chat.repository.interface");
 const chat_gateway_1 = require("./chat.gateway");
 const client_1 = require("@prisma/client");
@@ -30,14 +33,18 @@ let ChatController = class ChatController {
     getQueuePositionUseCase;
     getMyActiveSessionUseCase;
     cancelSessionUseCase;
+    submitSessionFeedbackUseCase;
+    getSessionFeedbackUseCase;
     chatRepository;
     chatGateway;
-    constructor(requestSupportUseCase, acceptSessionUseCase, getQueuePositionUseCase, getMyActiveSessionUseCase, cancelSessionUseCase, chatRepository, chatGateway) {
+    constructor(requestSupportUseCase, acceptSessionUseCase, getQueuePositionUseCase, getMyActiveSessionUseCase, cancelSessionUseCase, submitSessionFeedbackUseCase, getSessionFeedbackUseCase, chatRepository, chatGateway) {
         this.requestSupportUseCase = requestSupportUseCase;
         this.acceptSessionUseCase = acceptSessionUseCase;
         this.getQueuePositionUseCase = getQueuePositionUseCase;
         this.getMyActiveSessionUseCase = getMyActiveSessionUseCase;
         this.cancelSessionUseCase = cancelSessionUseCase;
+        this.submitSessionFeedbackUseCase = submitSessionFeedbackUseCase;
+        this.getSessionFeedbackUseCase = getSessionFeedbackUseCase;
         this.chatRepository = chatRepository;
         this.chatGateway = chatGateway;
     }
@@ -81,6 +88,12 @@ let ChatController = class ChatController {
             throw new common_1.ForbiddenException('Chỉ tình nguyện viên mới có thể xem danh sách hàng đợi');
         }
         return this.chatRepository.findWaitingSessions();
+    }
+    async submitFeedback(sessionId, dto, req) {
+        return this.submitSessionFeedbackUseCase.execute(req.user.userId, sessionId, dto);
+    }
+    async getFeedback(sessionId, req) {
+        return this.getSessionFeedbackUseCase.execute(req.user.userId, sessionId);
     }
 };
 exports.ChatController = ChatController;
@@ -144,16 +157,37 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], ChatController.prototype, "getWaitingSessions", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Gửi đánh giá chất lượng phiên hỗ trợ (PB-27)' }),
+    (0, common_1.Post)(':id/feedback'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, create_feedback_dto_1.CreateFeedbackDto, Object]),
+    __metadata("design:returntype", Promise)
+], ChatController.prototype, "submitFeedback", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Xem đánh giá của phiên hỗ trợ' }),
+    (0, common_1.Get)(':id/feedback'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ChatController.prototype, "getFeedback", null);
 exports.ChatController = ChatController = __decorate([
     (0, swagger_1.ApiTags)('Chat'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Controller)('chat'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    __param(5, (0, common_1.Inject)(chat_repository_interface_1.CHAT_REPOSITORY)),
+    __param(7, (0, common_1.Inject)(chat_repository_interface_1.CHAT_REPOSITORY)),
     __metadata("design:paramtypes", [request_support_use_case_1.RequestSupportUseCase,
         accept_session_use_case_1.AcceptSessionUseCase,
         get_queue_position_use_case_1.GetQueuePositionUseCase,
         get_my_active_session_use_case_1.GetMyActiveSessionUseCase,
-        cancel_session_use_case_1.CancelSessionUseCase, Object, chat_gateway_1.ChatGateway])
+        cancel_session_use_case_1.CancelSessionUseCase,
+        submit_session_feedback_use_case_1.SubmitSessionFeedbackUseCase,
+        get_session_feedback_use_case_1.GetSessionFeedbackUseCase, Object, chat_gateway_1.ChatGateway])
 ], ChatController);
 //# sourceMappingURL=chat.controller.js.map

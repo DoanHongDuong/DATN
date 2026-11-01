@@ -4,6 +4,7 @@ import {
   PaginatedUsersResult,
   AdminRelaxationResourceEntity,
   PaginatedAuditLogsResult,
+  SystemStatsEntity,
 } from '../entities/admin.entity';
 
 export const ADMIN_REPOSITORY = Symbol('ADMIN_REPOSITORY');
@@ -52,4 +53,5 @@ export interface IAdminRepository {
   updateResource(actorId: string, id: string, data: UpdateRelaxationResourceData): Promise<AdminRelaxationResourceEntity>;
   deleteResource(actorId: string, id: string): Promise<void>;
   getAuditLogs(params: GetAuditLogsParams): Promise<PaginatedAuditLogsResult>;
+  getSystemStats(): Promise<SystemStatsEntity>;
 }

@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Table, Button, Tag, Card, Alert, Space, message, Typography, Switch, Popconfirm } from 'antd';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { Table, Button, Tag, Card, Alert, Space, message, Typography, Switch, Popconfirm, Modal, Rate, Input } from 'antd';
 import {
   MessageSquare,
   Clock,
@@ -8,6 +8,8 @@ import {
   PhoneCall,
   RefreshCw,
   LogOut,
+  Star,
+  Heart,
 } from 'lucide-react';
 import axios, { AxiosError } from 'axios';
 import {
@@ -36,6 +38,14 @@ const PRIORITY_LABEL_MAP: Record<PriorityLevel, string> = {
   MEDIUM: 'Trung bình (Medium)',
   LOW: 'Thấp (Low)',
 };
+
+const RATING_DESC = [
+  'Rất không hài lòng',
+  'Chưa hài lòng',
+  'Bình thường',
+  'Hài lòng',
+  'Rất hài lòng',
+];
 
 export const ChatPage: React.FC = () => {
   const { user } = useAuth();
@@ -98,6 +108,18 @@ export const ChatPage: React.FC = () => {
     noVolunteer: boolean;
     hotline?: string;
   }>({ noVolunteer: false });
+
+  // State cho Đánh giá phiên hỗ trợ (PB-27)
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState<boolean>(false);
+  const [feedbackSessionId, setFeedbackSessionId] = useState<string | null>(null);
+  const [rating, setRating] = useState<number>(5);
+  const [comment, setComment] = useState<string>('');
+  const [submittingFeedback, setSubmittingFeedback] = useState<boolean>(false);
+  const activeSessionRef = useRef<ChatSession | null>(null);
+
+  useEffect(() => {
+    activeSessionRef.current = activeSession;
+  }, [activeSession]);
 
   // Tải danh sách tin nhắn của session
   const loadMessages = useCallback(async (sessionId: string) => {
@@ -226,12 +248,16 @@ export const ChatPage: React.FC = () => {
     };
 
     // Khi phiên chat kết thúc
-    const onSessionEnded = () => {
+    const onSessionEnded = (closedSession?: ChatSession) => {
+      const endedSessionId = closedSession?.id || activeSessionRef.current?.id;
       setActiveSession(null);
       setMessages([]);
       message.info('Phiên tư vấn hỗ trợ đã kết thúc.');
       if (isVolunteer) {
         fetchWaitingSessions();
+      } else if (endedSessionId) {
+        setFeedbackSessionId(endedSessionId);
+        setIsFeedbackModalOpen(true);
       }
     };
 
@@ -304,7 +330,7 @@ export const ChatPage: React.FC = () => {
       if (response.noVolunteerAvailable) {
         setNoVolunteerInfo({
           noVolunteer: true,
-          hotline: response.hotline || '1900 1234',
+          hotline: response.hotline || import.meta.env.VITE_EMERGENCY_HOTLINE || '1900 6789',
         });
         return;
       }
@@ -365,6 +391,37 @@ export const ChatPage: React.FC = () => {
     });
 
     setInputMessage('');
+  };
+
+  // Xử lý gửi đánh giá chất lượng phiên (PB-27)
+  const handleSubmitFeedback = async () => {
+    if (!feedbackSessionId) return;
+    if (rating < 1) {
+      message.warning('Vui lòng chọn số sao đánh giá (từ 1 đến 5 sao)');
+      return;
+    }
+
+    setSubmittingFeedback(true);
+    try {
+      await chatApi.submitFeedback(feedbackSessionId, {
+        rating,
+        comment: comment.trim() || undefined,
+      });
+      message.success('Cảm ơn bạn đã gửi đánh giá! Ý kiến của bạn giúp nâng cao chất lượng tư vấn. 💖');
+      setIsFeedbackModalOpen(false);
+      setFeedbackSessionId(null);
+      setRating(5);
+      setComment('');
+    } catch (err: unknown) {
+      let msg = 'Không thể gửi đánh giá phiên hỗ trợ';
+      if (axios.isAxiosError(err)) {
+        const axiosErr = err as AxiosError<{ message?: string }>;
+        msg = axiosErr.response?.data?.message || msg;
+      }
+      message.error(msg);
+    } finally {
+      setSubmittingFeedback(false);
+    }
   };
 
   // ==========================================
@@ -717,8 +774,9 @@ export const ChatPage: React.FC = () => {
   // VIEW 4: USER INITIAL STATE (Hoặc No Volunteer Emergency Alert)
   // ==========================================
   return (
-    <div
-      style={{
+    <>
+      <div
+        style={{
         maxWidth: '580px',
         margin: '40px auto',
         padding: '36px',
@@ -745,7 +803,7 @@ export const ChatPage: React.FC = () => {
                 <p style={{ margin: 0 }}>
                   Trong trường hợp khẩn cấp hoặc cần hỗ trợ ngay lập tức, vui lòng liên hệ đường dây nóng:
                   <strong style={{ display: 'block', fontSize: '18px', color: 'var(--accent)', marginTop: '4px' }}>
-                    📞 {noVolunteerInfo.hotline || '1900 1234'}
+                    📞 {noVolunteerInfo.hotline || import.meta.env.VITE_EMERGENCY_HOTLINE || '1900 6789'}
                   </strong>
                 </p>
               </div>
@@ -797,5 +855,96 @@ export const ChatPage: React.FC = () => {
         </div>
       )}
     </div>
+
+    {/* Modal Đánh giá phiên hỗ trợ (PB-27) */}
+    <Modal
+      title={
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Heart size={20} color="#e11d48" />
+          <span>Đánh giá phiên hỗ trợ tâm lý (PB-27)</span>
+        </div>
+      }
+      open={isFeedbackModalOpen}
+      onCancel={() => {
+        setIsFeedbackModalOpen(false);
+        setFeedbackSessionId(null);
+      }}
+      footer={null}
+      destroyOnClose
+      centered
+      width={480}
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '16px' }}>
+        <p style={{ margin: 0, fontSize: '14px', color: 'var(--text)', lineHeight: 1.5 }}>
+          Phiên tư vấn vừa kết thúc. Hãy dành ít phút để gửi đánh giá và nhận xét về buổi trò chuyện cùng Tình nguyện viên nhé!
+        </p>
+
+        <div
+          style={{
+            padding: '16px',
+            borderRadius: '12px',
+            background: 'var(--bg)',
+            border: '1px solid var(--border)',
+            textAlign: 'center',
+          }}
+        >
+          <div style={{ fontSize: '13px', color: 'var(--text)', marginBottom: '8px' }}>
+            Mức độ hài lòng của bạn:
+          </div>
+          <Rate
+            allowClear={false}
+            value={rating}
+            onChange={setRating}
+            style={{ fontSize: 32, color: '#f59e0b' }}
+          />
+          <div style={{ marginTop: '8px', fontSize: '14px', fontWeight: 600, color: 'var(--text-h)' }}>
+            {RATING_DESC[rating - 1]}
+          </div>
+        </div>
+
+        <div>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '13px',
+              fontWeight: 500,
+              color: 'var(--text-h)',
+              marginBottom: '6px',
+            }}
+          >
+            Nhận xét hoặc lời nhắn gửi đến Tình nguyện viên (tùy chọn):
+          </label>
+          <Input.TextArea
+            rows={3}
+            maxLength={1000}
+            showCount
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="Chia sẻ cảm xúc của bạn hoặc góp ý để chúng tôi cải thiện tốt hơn..."
+          />
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+          <Button
+            onClick={() => {
+              setIsFeedbackModalOpen(false);
+              setFeedbackSessionId(null);
+            }}
+          >
+            Để sau
+          </Button>
+          <Button
+            type="primary"
+            onClick={handleSubmitFeedback}
+            loading={submittingFeedback}
+            icon={<Star size={14} />}
+            style={{ background: 'var(--accent)', borderColor: 'var(--accent)' }}
+          >
+            Gửi đánh giá
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  </>
   );
 };

@@ -18,8 +18,16 @@ exports.SYSTEM_PROMPT = `Phân tích cảm xúc của đoạn nhật ký sau (ti
 {
   "sentiment_label": "positive" | "neutral" | "negative" | "crisis",
   "sentiment_score": số từ -1.0 đến 1.0,
-  "suggested_resource_category": "breathing" | "calm_audio" | "none"
+  "suggested_resource_category": "breathing" | "music" | "meditation" | "mindfulness" | "none"
 }
+
+Quy tắc gợi ý danh mục tài nguyên (suggested_resource_category):
+- "breathing": Khi người viết hoảng loạn, căng thẳng cực độ, giận dữ, lo âu cấp tính, tim đập nhanh hoặc khủng hoảng (crisis).
+- "music": Khi người viết mệt mỏi, uể oải, mất ngủ, khó ngủ, buồn bã, cô đơn, kiệt sức sau một ngày dài hoặc cần không gian âm thanh thư giãn (tiếng mưa, tiếng sóng, nhạc êm dịu).
+- "meditation": Khi người viết suy nghĩ quá nhiều (overthinking), bồn chồn, trăn trở, cần tĩnh tâm định thần.
+- "mindfulness": Khi người viết cần kỹ thuật nhận thức thực tại, thả lỏng cơ thể, ngắt cơn lo âu.
+- "none": Khi nhật ký có cảm xúc tích cực (positive) hoặc trạng thái bình thường (neutral).
+
 Không giải thích gì thêm, chỉ trả về đúng JSON.`;
 let AiSentimentService = AiSentimentService_1 = class AiSentimentService {
     configService;
@@ -77,7 +85,14 @@ let AiSentimentService = AiSentimentService_1 = class AiSentimentService {
     }
     validateAndFormatResult(data) {
         const validLabels = ['positive', 'neutral', 'negative', 'crisis'];
-        const validCategories = ['breathing', 'calm_audio', 'none'];
+        const validCategories = [
+            'breathing',
+            'calm_audio',
+            'music',
+            'meditation',
+            'mindfulness',
+            'none',
+        ];
         const rawLabel = typeof data.sentiment_label === 'string' ? data.sentiment_label.toLowerCase() : null;
         const sentimentLabel = validLabels.includes(rawLabel) ? rawLabel : null;
         let sentimentScore = null;

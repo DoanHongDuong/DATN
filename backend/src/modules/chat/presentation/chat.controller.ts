@@ -3,6 +3,7 @@ import {
   Post,
   Get,
   Param,
+  Body,
   Req,
   UseGuards,
   Inject,
@@ -16,6 +17,9 @@ import { AcceptSessionUseCase } from '../application/use-cases/accept-session.us
 import { GetQueuePositionUseCase } from '../application/use-cases/get-queue-position.use-case';
 import { GetMyActiveSessionUseCase } from '../application/use-cases/get-my-active-session.use-case';
 import { CancelSessionUseCase } from '../application/use-cases/cancel-session.use-case';
+import { SubmitSessionFeedbackUseCase } from '../application/use-cases/submit-session-feedback.use-case';
+import { GetSessionFeedbackUseCase } from '../application/use-cases/get-session-feedback.use-case';
+import { CreateFeedbackDto } from '../application/dto/create-feedback.dto';
 import {
   CHAT_REPOSITORY,
   IChatRepository,
@@ -38,6 +42,8 @@ export class ChatController {
     private readonly getQueuePositionUseCase: GetQueuePositionUseCase,
     private readonly getMyActiveSessionUseCase: GetMyActiveSessionUseCase,
     private readonly cancelSessionUseCase: CancelSessionUseCase,
+    private readonly submitSessionFeedbackUseCase: SubmitSessionFeedbackUseCase,
+    private readonly getSessionFeedbackUseCase: GetSessionFeedbackUseCase,
     @Inject(CHAT_REPOSITORY)
     private readonly chatRepository: IChatRepository,
     private readonly chatGateway: ChatGateway,
@@ -154,5 +160,39 @@ export class ChatController {
       throw new ForbiddenException('Chỉ tình nguyện viên mới có thể xem danh sách hàng đợi');
     }
     return this.chatRepository.findWaitingSessions();
+  }
+
+  /**
+   * POST /chat/:id/feedback
+   * Gửi đánh giá chất lượng phiên hỗ trợ (PB-27)
+   */
+  @ApiOperation({ summary: 'Gửi đánh giá chất lượng phiên hỗ trợ (PB-27)' })
+  @Post(':id/feedback')
+  async submitFeedback(
+    @Param('id') sessionId: string,
+    @Body() dto: CreateFeedbackDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.submitSessionFeedbackUseCase.execute(
+      req.user.userId,
+      sessionId,
+      dto,
+    );
+  }
+
+  /**
+   * GET /chat/:id/feedback
+   * Xem đánh giá của phiên hỗ trợ
+   */
+  @ApiOperation({ summary: 'Xem đánh giá của phiên hỗ trợ' })
+  @Get(':id/feedback')
+  async getFeedback(
+    @Param('id') sessionId: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.getSessionFeedbackUseCase.execute(
+      req.user.userId,
+      sessionId,
+    );
   }
 }

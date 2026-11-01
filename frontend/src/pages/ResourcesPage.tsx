@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Card, Tag, Button, Modal, Tabs, Space, Typography } from 'antd';
 import {
   Wind,
@@ -8,6 +9,7 @@ import {
   Pause,
   RotateCcw,
   Volume2,
+  Video,
   Eye,
   Hand,
   Ear,
@@ -20,6 +22,9 @@ import { LoadingSpinner } from '../components/common/LoadingSpinner';
 const { Title, Paragraph, Text } = Typography;
 
 export const ResourcesPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const openParam = searchParams.get('open');
+
   const [resources, setResources] = useState<RelaxationResource[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<string>('all');
@@ -45,6 +50,20 @@ export const ResourcesPage: React.FC = () => {
   // Article / Guide Modal State
   const [guideModalOpen, setGuideModalOpen] = useState<boolean>(false);
   const [selectedGuide, setSelectedGuide] = useState<RelaxationResource | null>(null);
+
+  // Video Modal State
+  const [videoModalOpen, setVideoModalOpen] = useState<boolean>(false);
+  const [selectedVideo, setSelectedVideo] = useState<RelaxationResource | null>(null);
+
+  const handleOpenVideo = (res: RelaxationResource) => {
+    setSelectedVideo(res);
+    setVideoModalOpen(true);
+  };
+
+  const handleCloseVideo = () => {
+    setVideoModalOpen(false);
+    setSelectedVideo(null);
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -231,6 +250,35 @@ export const ResourcesPage: React.FC = () => {
     setGuideModalOpen(true);
   };
 
+  // Tự động mở tài nguyên khi điều hướng từ trang Nhật ký hoặc có tham số ?open=...
+  useEffect(() => {
+    if (!openParam || resources.length === 0) return;
+
+    const target = resources.find(
+      (r) =>
+        r.id === openParam ||
+        r.url === openParam ||
+        r.url.toLowerCase() === openParam.toLowerCase() ||
+        r.title.toLowerCase().includes(openParam.toLowerCase()),
+    );
+
+    if (target) {
+      const timer = setTimeout(() => {
+        const typeLower = (target.type || '').toLowerCase();
+        if (typeLower === 'breathing' || typeLower === 'exercise') {
+          handleOpenBreathing(target);
+        } else if (typeLower === 'audio' || typeLower === 'music') {
+          handleOpenAudio(target);
+        } else if (typeLower === 'video') {
+          handleOpenVideo(target);
+        } else {
+          handleOpenGuide(target);
+        }
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [openParam, resources]);
+
   const getPhaseText = () => {
     switch (breathingPhase) {
       case 'inhale':
@@ -303,7 +351,10 @@ export const ResourcesPage: React.FC = () => {
           type="primary"
           icon={<Wind size={16} />}
           onClick={() => {
-            const defaultBreathing = resources.find((r) => r.type === 'BREATHING') || {
+            const defaultBreathing = resources.find((r) => {
+              const t = (r.type || '').toLowerCase();
+              return t === 'breathing' || t === 'exercise';
+            }) || {
               id: 'temp',
               title: 'Kỹ thuật thở sâu 4-7-8',
               type: 'BREATHING',
@@ -327,7 +378,8 @@ export const ResourcesPage: React.FC = () => {
         items={[
           { key: 'all', label: 'Tất cả tài nguyên' },
           { key: 'breathing', label: '🫁 Luyện tập nhịp thở' },
-          { key: 'calm_audio', label: '🎧 Âm thanh thiên nhiên' },
+          { key: 'music', label: '🎧 Nhạc & Âm thanh thư giãn' },
+          { key: 'meditation', label: '🧘 Thiền định' },
           { key: 'mindfulness', label: '🌿 Kỹ thuật giải tỏa lo âu' },
         ]}
       />
@@ -343,9 +395,11 @@ export const ResourcesPage: React.FC = () => {
           }}
         >
           {resources.map((item) => {
-            const isBreathing = item.type === 'BREATHING';
-            const isAudio = item.type === 'AUDIO';
-            const isGuide = item.type === 'ARTICLE';
+            const typeLower = (item.type || '').toLowerCase();
+            const isBreathing = typeLower === 'breathing' || typeLower === 'exercise';
+            const isAudio = typeLower === 'audio' || typeLower === 'music';
+            const isVideo = typeLower === 'video';
+            const isGuide = typeLower === 'article' || typeLower === 'mindfulness' || typeLower === 'guide';
 
             return (
               <Card
@@ -373,8 +427,16 @@ export const ResourcesPage: React.FC = () => {
                           ? 'rgba(59, 130, 246, 0.15)'
                           : isAudio
                           ? 'rgba(16, 185, 129, 0.15)'
+                          : isVideo
+                          ? 'rgba(99, 102, 241, 0.15)'
                           : 'rgba(168, 85, 247, 0.15)',
-                        color: isBreathing ? '#3b82f6' : isAudio ? '#10b981' : '#a855f7',
+                        color: isBreathing
+                          ? '#3b82f6'
+                          : isAudio
+                          ? '#10b981'
+                          : isVideo
+                          ? '#6366f1'
+                          : '#a855f7',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -382,11 +444,12 @@ export const ResourcesPage: React.FC = () => {
                     >
                       {isBreathing && <Wind size={22} />}
                       {isAudio && <Headphones size={22} />}
+                      {isVideo && <Video size={22} />}
                       {isGuide && <Sparkles size={22} />}
                     </div>
 
-                    <Tag color={isBreathing ? 'blue' : isAudio ? 'green' : 'purple'}>
-                      {isBreathing ? 'Luyện thở' : isAudio ? 'Âm thanh' : 'Kỹ thuật'}
+                    <Tag color={isBreathing ? 'blue' : isAudio ? 'green' : isVideo ? 'geekblue' : 'purple'}>
+                      {isBreathing ? 'Luyện thở' : isAudio ? 'Âm thanh' : isVideo ? 'Video' : 'Kỹ thuật'}
                     </Tag>
                   </div>
 
@@ -421,6 +484,18 @@ export const ResourcesPage: React.FC = () => {
                       style={{ borderRadius: '8px', color: '#10b981', borderColor: '#10b981' }}
                     >
                       Phát âm thanh thư giãn
+                    </Button>
+                  )}
+
+                  {isVideo && (
+                    <Button
+                      type="default"
+                      block
+                      icon={<Play size={15} />}
+                      onClick={() => handleOpenVideo(item)}
+                      style={{ borderRadius: '8px', color: '#6366f1', borderColor: '#6366f1' }}
+                    >
+                      Xem video hướng dẫn
                     </Button>
                   )}
 
@@ -687,6 +762,30 @@ export const ResourcesPage: React.FC = () => {
                 <p style={{ margin: '4px 0 0', fontSize: '13px', color: 'var(--text)' }}>Cắn chặt răng nhẹ và nhíu mày trong 5 giây, sau đó thả lỏng toàn bộ cơ mặt và mỉm cười nhẹ.</p>
               </div>
             </div>
+          )}
+        </div>
+      </Modal>
+
+      {/* MODAL 4: VIDEO PLAYER */}
+      <Modal
+        open={videoModalOpen}
+        onCancel={handleCloseVideo}
+        footer={null}
+        width={720}
+        centered
+        destroyOnClose
+      >
+        <div style={{ textAlign: 'center', padding: '16px 8px 20px' }}>
+          <Title level={4} style={{ margin: '0 0 16px', color: 'var(--text-h)' }}>
+            {selectedVideo?.title}
+          </Title>
+          {selectedVideo && (
+            <video
+              src={selectedVideo.url}
+              controls
+              autoPlay
+              style={{ width: '100%', maxHeight: '450px', borderRadius: '12px', background: '#000' }}
+            />
           )}
         </div>
       </Modal>

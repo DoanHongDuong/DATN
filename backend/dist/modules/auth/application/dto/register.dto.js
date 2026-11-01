@@ -34,11 +34,11 @@ __decorate([
 ], RegisterDto.prototype, "email", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ description: 'Mật khẩu (tối thiểu 8 ký tự, gồm cả chữ và số)', example: 'Password123' }),
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.MinLength)(8),
-    (0, class_validator_1.Matches)(/^(?=.*[a-zA-Z])(?=.*\d).+$/, {
-        message: 'Mật khẩu phải có ít nhất 8 ký tự, bao gồm cả chữ và số',
+    (0, class_validator_1.IsString)({ message: 'Mật khẩu phải là chuỗi ký tự' }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'Mật khẩu không được để trống' }),
+    (0, class_validator_1.MinLength)(8, { message: 'Mật khẩu phải có ít nhất 8 ký tự' }),
+    (0, class_validator_1.Matches)(/^(?=.*[a-zA-Z])(?=.*\d)/, {
+        message: 'Mật khẩu phải bao gồm cả chữ cái và chữ số',
     }),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "password", void 0);

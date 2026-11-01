@@ -23,6 +23,7 @@ const create_resource_use_case_1 = require("../application/use-cases/create-reso
 const update_resource_use_case_1 = require("../application/use-cases/update-resource.use-case");
 const delete_resource_use_case_1 = require("../application/use-cases/delete-resource.use-case");
 const get_audit_logs_use_case_1 = require("../application/use-cases/get-audit-logs.use-case");
+const get_system_stats_use_case_1 = require("../application/use-cases/get-system-stats.use-case");
 let AdminModule = class AdminModule {
 };
 exports.AdminModule = AdminModule;
@@ -45,6 +46,7 @@ exports.AdminModule = AdminModule = __decorate([
             update_resource_use_case_1.UpdateResourceUseCase,
             delete_resource_use_case_1.DeleteResourceUseCase,
             get_audit_logs_use_case_1.GetAuditLogsUseCase,
+            get_system_stats_use_case_1.GetSystemStatsUseCase,
         ],
     })
 ], AdminModule);

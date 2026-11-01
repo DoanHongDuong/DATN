@@ -17,6 +17,18 @@ export interface ApplyVolunteerPayload {
   certificateUrl?: string;
 }
 
+export interface UpdateVolunteerProfilePayload {
+  specialization?: string;
+  bio?: string;
+  certificateUrl?: string;
+}
+
+export interface UpdateVolunteerProfileResponse {
+  profile: VolunteerProfile;
+  requiresReverification: boolean;
+  message: string;
+}
+
 export const volunteerApi = {
   apply: async (payload: ApplyVolunteerPayload): Promise<VolunteerProfile> => {
     const res = await apiClient.post<VolunteerProfile>('/volunteers/apply', payload);
@@ -30,6 +42,11 @@ export const volunteerApi = {
 
   updateOnlineStatus: async (isOnline: boolean): Promise<VolunteerProfile> => {
     const res = await apiClient.patch<VolunteerProfile>('/volunteers/me/online', { isOnline });
+    return res.data;
+  },
+
+  updateProfile: async (payload: UpdateVolunteerProfilePayload): Promise<UpdateVolunteerProfileResponse> => {
+    const res = await apiClient.patch<UpdateVolunteerProfileResponse>('/volunteers/me', payload);
     return res.data;
   },
 };

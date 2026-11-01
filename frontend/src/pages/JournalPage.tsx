@@ -76,7 +76,7 @@ export const JournalPage: React.FC = () => {
 
       // Nhánh crisis: chỉ hiển thị Modal cho bản ghi VỪA TẠO
       if (created.sentimentLabel === 'crisis') {
-        setCrisisHotline(created.emergencyHotline || '1900xxxx - Đường dây nóng Tâm lý học đường');
+        setCrisisHotline(created.emergencyHotline || import.meta.env.VITE_EMERGENCY_HOTLINE || '1900 6789');
         setNoVolunteerAvailable(false);
         setCrisisModalOpen(true);
       }
@@ -137,6 +137,22 @@ export const JournalPage: React.FC = () => {
     } finally {
       setIsConnectingVolunteer(false);
     }
+  };
+
+  const handleResourceClick = (r: RelaxationResource) => {
+    // Nếu là link web bài viết bên ngoài (không phải file media r2 và không phải mã nội bộ)
+    if (
+      r.url.startsWith('http') &&
+      !r.url.includes('.mp3') &&
+      !r.url.includes('.ogg') &&
+      !r.url.includes('.mp4') &&
+      !r.url.includes('r2.dev')
+    ) {
+      window.open(r.url, '_blank', 'noreferrer');
+      return;
+    }
+    // Điều hướng đến trang tài nguyên và tự động mở modal/trình phát tương ứng
+    navigate(`/resources?open=${encodeURIComponent(r.id)}`);
   };
 
   const handleDelete = async (id: string) => {
@@ -310,28 +326,40 @@ export const JournalPage: React.FC = () => {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {resources.map((r) => (
-                <a
+                <div
                   key={r.id}
-                  href={r.url}
-                  target="_blank"
-                  rel="noreferrer"
+                  onClick={() => handleResourceClick(r)}
                   style={{
-                    padding: '12px',
-                    borderRadius: '8px',
+                    padding: '12px 14px',
+                    borderRadius: '10px',
                     border: '1px solid var(--border)',
                     background: 'var(--bg)',
-                    textDecoration: 'none',
-                    display: 'block'
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'block',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--accent)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--border)';
+                    e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
-                  <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-h)', marginBottom: '4px' }}>
-                    {r.title}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-h)' }}>
+                      {r.title}
+                    </div>
+                    <span style={{ fontSize: '12px', color: 'var(--accent)', fontWeight: 500 }}>
+                      Xem ngay →
+                    </span>
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--text)', display: 'flex', justifyContent: 'space-between' }}>
                     <span>Danh mục: {r.category}</span>
                     {r.durationSeconds && <span>⏱ {Math.round(r.durationSeconds / 60)} phút</span>}
                   </div>
-                </a>
+                </div>
               ))}
             </div>
           )}
@@ -392,7 +420,7 @@ export const JournalPage: React.FC = () => {
                 Đường dây nóng hỗ trợ khẩn cấp:
               </div>
               <div style={{ fontSize: '15px', fontWeight: 700, color: '#be123c', marginTop: '2px' }}>
-                {crisisHotline || '1900xxxx - Đường dây nóng Tâm lý học đường'}
+                {crisisHotline || import.meta.env.VITE_EMERGENCY_HOTLINE || '1900 6789'}
               </div>
             </div>
           </div>

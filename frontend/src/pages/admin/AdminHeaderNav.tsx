@@ -1,11 +1,16 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShieldCheck, Users, UserCheck, Sparkles, ClipboardList } from 'lucide-react';
+import { ShieldCheck, Users, UserCheck, Sparkles, ClipboardList, BarChart3 } from 'lucide-react';
 
 export const AdminHeaderNav: React.FC = () => {
   const location = useLocation();
 
   const tabs = [
+    {
+      label: 'Tổng quan & Thống kê',
+      path: '/admin/stats',
+      icon: BarChart3,
+    },
     {
       label: 'Hồ sơ TNV chờ duyệt',
       path: '/admin/volunteers',

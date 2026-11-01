@@ -11,6 +11,8 @@ import { EndSessionUseCase } from '../application/use-cases/end-session.use-case
 import { GetQueuePositionUseCase } from '../application/use-cases/get-queue-position.use-case';
 import { GetMyActiveSessionUseCase } from '../application/use-cases/get-my-active-session.use-case';
 import { CancelSessionUseCase } from '../application/use-cases/cancel-session.use-case';
+import { SubmitSessionFeedbackUseCase } from '../application/use-cases/submit-session-feedback.use-case';
+import { GetSessionFeedbackUseCase } from '../application/use-cases/get-session-feedback.use-case';
 
 import { ChatPrismaRepository } from './persistence/chat.prisma.repository';
 import { CHAT_REPOSITORY } from '../domain/repositories/chat.repository.interface';
@@ -34,6 +36,8 @@ import { AuthModule } from '../../auth/infrastructure/auth.module';
     GetQueuePositionUseCase,
     GetMyActiveSessionUseCase,
     CancelSessionUseCase,
+    SubmitSessionFeedbackUseCase,
+    GetSessionFeedbackUseCase,
     ChatGateway,
   ],
   exports: [ChatGateway],

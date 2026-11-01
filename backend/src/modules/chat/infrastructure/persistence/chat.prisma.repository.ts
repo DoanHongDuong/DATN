@@ -8,6 +8,7 @@ import {
 } from '@prisma/client';
 import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
 import { IChatRepository } from '../../domain/repositories/chat.repository.interface';
+import { SessionFeedbackEntity } from '../../domain/entities/session-feedback.entity';
 
 /**
  * Prisma-based implementation of IChatRepository.
@@ -220,6 +221,26 @@ export class ChatPrismaRepository implements IChatRepository {
       orderBy: [
         { queuedAt: 'asc' },
       ],
+    });
+  }
+
+  async createFeedback(data: {
+    sessionId: string;
+    rating: number;
+    comment?: string | null;
+  }): Promise<SessionFeedbackEntity> {
+    return this.prisma.sessionFeedback.create({
+      data: {
+        sessionId: data.sessionId,
+        rating: data.rating,
+        comment: data.comment ?? null,
+      },
+    });
+  }
+
+  async findFeedbackBySessionId(sessionId: string): Promise<SessionFeedbackEntity | null> {
+    return this.prisma.sessionFeedback.findUnique({
+      where: { sessionId },
     });
   }
 }

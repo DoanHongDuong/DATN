@@ -22,16 +22,20 @@ const roles_decorator_1 = require("../../auth/presentation/decorators/roles.deco
 const apply_volunteer_use_case_1 = require("../application/use-cases/apply-volunteer.use-case");
 const get_my_volunteer_profile_use_case_1 = require("../application/use-cases/get-my-volunteer-profile.use-case");
 const update_volunteer_online_use_case_1 = require("../application/use-cases/update-volunteer-online.use-case");
+const update_volunteer_profile_use_case_1 = require("../application/use-cases/update-volunteer-profile.use-case");
 const apply_volunteer_dto_1 = require("../application/dto/apply-volunteer.dto");
 const update_online_status_dto_1 = require("../application/dto/update-online-status.dto");
+const update_volunteer_profile_dto_1 = require("../application/dto/update-volunteer-profile.dto");
 let VolunteerController = class VolunteerController {
     applyVolunteerUseCase;
     getMyVolunteerProfileUseCase;
     updateVolunteerOnlineUseCase;
-    constructor(applyVolunteerUseCase, getMyVolunteerProfileUseCase, updateVolunteerOnlineUseCase) {
+    updateVolunteerProfileUseCase;
+    constructor(applyVolunteerUseCase, getMyVolunteerProfileUseCase, updateVolunteerOnlineUseCase, updateVolunteerProfileUseCase) {
         this.applyVolunteerUseCase = applyVolunteerUseCase;
         this.getMyVolunteerProfileUseCase = getMyVolunteerProfileUseCase;
         this.updateVolunteerOnlineUseCase = updateVolunteerOnlineUseCase;
+        this.updateVolunteerProfileUseCase = updateVolunteerProfileUseCase;
     }
     async apply(req, dto) {
         return this.applyVolunteerUseCase.execute(req.user.userId, dto);
@@ -41,6 +45,9 @@ let VolunteerController = class VolunteerController {
     }
     async updateOnline(req, dto) {
         return this.updateVolunteerOnlineUseCase.execute(req.user.userId, dto.isOnline);
+    }
+    async updateProfile(req, dto) {
+        return this.updateVolunteerProfileUseCase.execute(req.user.userId, dto);
     }
 };
 exports.VolunteerController = VolunteerController;
@@ -75,12 +82,24 @@ __decorate([
     __metadata("design:paramtypes", [Object, update_online_status_dto_1.UpdateOnlineStatusDto]),
     __metadata("design:returntype", Promise)
 ], VolunteerController.prototype, "updateOnline", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Cập nhật thông tin hồ sơ tình nguyện viên (PB-28)' }),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(client_1.Role.VOLUNTEER),
+    (0, common_1.Patch)('me'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, update_volunteer_profile_dto_1.UpdateVolunteerProfileDto]),
+    __metadata("design:returntype", Promise)
+], VolunteerController.prototype, "updateProfile", null);
 exports.VolunteerController = VolunteerController = __decorate([
     (0, swagger_1.ApiTags)('Volunteers'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Controller)('volunteers'),
     __metadata("design:paramtypes", [apply_volunteer_use_case_1.ApplyVolunteerUseCase,
         get_my_volunteer_profile_use_case_1.GetMyVolunteerProfileUseCase,
-        update_volunteer_online_use_case_1.UpdateVolunteerOnlineUseCase])
+        update_volunteer_online_use_case_1.UpdateVolunteerOnlineUseCase,
+        update_volunteer_profile_use_case_1.UpdateVolunteerProfileUseCase])
 ], VolunteerController);
 //# sourceMappingURL=volunteer.controller.js.map

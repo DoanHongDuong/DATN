@@ -7,6 +7,7 @@ import { VOLUNTEER_REPOSITORY } from '../domain/repositories/volunteer.repositor
 import { ApplyVolunteerUseCase } from '../application/use-cases/apply-volunteer.use-case';
 import { GetMyVolunteerProfileUseCase } from '../application/use-cases/get-my-volunteer-profile.use-case';
 import { UpdateVolunteerOnlineUseCase } from '../application/use-cases/update-volunteer-online.use-case';
+import { UpdateVolunteerProfileUseCase } from '../application/use-cases/update-volunteer-profile.use-case';
 
 @Module({
   imports: [ConfigModule, AuthModule],
@@ -19,6 +20,7 @@ import { UpdateVolunteerOnlineUseCase } from '../application/use-cases/update-vo
     ApplyVolunteerUseCase,
     GetMyVolunteerProfileUseCase,
     UpdateVolunteerOnlineUseCase,
+    UpdateVolunteerProfileUseCase,
   ],
   exports: [GetMyVolunteerProfileUseCase],
 })

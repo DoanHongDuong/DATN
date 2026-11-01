@@ -31,6 +31,19 @@ export interface RequestSupportResponse {
   hotline?: string;
 }
 
+export interface SessionFeedback {
+  id: string;
+  sessionId: string;
+  rating: number;
+  comment?: string | null;
+  createdAt: string;
+}
+
+export interface CreateFeedbackPayload {
+  rating: number;
+  comment?: string;
+}
+
 export const chatApi = {
   requestSupport: async (): Promise<RequestSupportResponse> => {
     const res = await apiClient.post('/chat/request-support');
@@ -64,6 +77,16 @@ export const chatApi = {
 
   cancelSession: async (sessionId: string): Promise<ChatSession> => {
     const res = await apiClient.post<ChatSession>(`/chat/${sessionId}/cancel`);
+    return res.data;
+  },
+
+  submitFeedback: async (sessionId: string, payload: CreateFeedbackPayload): Promise<SessionFeedback> => {
+    const res = await apiClient.post<SessionFeedback>(`/chat/${sessionId}/feedback`, payload);
+    return res.data;
+  },
+
+  getFeedback: async (sessionId: string): Promise<SessionFeedback | null> => {
+    const res = await apiClient.get<SessionFeedback | null>(`/chat/${sessionId}/feedback`);
     return res.data;
   },
 };

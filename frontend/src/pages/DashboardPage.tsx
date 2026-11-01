@@ -6,6 +6,7 @@ import { journalApi, type JournalEntry } from '../api/journal.api';
 import { HeartPulse, BookOpen, MessageSquare, ShieldAlert, HeartHandshake } from 'lucide-react';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { VolunteerDashboard } from './volunteer/VolunteerDashboard';
+import { MoodTrendChart } from '../components/dashboard/MoodTrendChart';
 
 export const DashboardPage: React.FC = () => {
   const { user } = useAuth();
@@ -182,6 +183,9 @@ export const DashboardPage: React.FC = () => {
         </Link>
       </div>
 
+      {/* Mood Trend Chart (PB-11) */}
+      <MoodTrendChart />
+
       {/* Main Content Grid: Recent Assessments & Recent Journals */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
         {/* Recent Assessment Results */}
@@ -278,7 +282,7 @@ export const DashboardPage: React.FC = () => {
       }}>
         <ShieldAlert size={24} color="#ef4444" />
         <div style={{ fontSize: '14px', color: 'var(--text-h)' }}>
-          <strong>Khẩn cấp?</strong> Nếu bạn đang gặp khủng hoảng tâm lý nghiêm trọng, hãy gọi đường dây nóng hỗ trợ khẩn cấp: <strong>111</strong> hoặc <strong>1900 599 930</strong>.
+          <strong>Khẩn cấp?</strong> Nếu bạn đang gặp khủng hoảng tâm lý nghiêm trọng, hãy gọi đường dây nóng hỗ trợ khẩn cấp: <strong>{import.meta.env.VITE_EMERGENCY_HOTLINE || '1900 6789'}</strong>.
         </div>
       </div>
     </div>

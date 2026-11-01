@@ -1,5 +1,11 @@
 export type SentimentLabel = 'positive' | 'neutral' | 'negative' | 'crisis';
-export type SuggestedResourceCategory = 'breathing' | 'calm_audio' | 'none';
+export type SuggestedResourceCategory =
+  | 'breathing'
+  | 'calm_audio'
+  | 'music'
+  | 'meditation'
+  | 'mindfulness'
+  | 'none';
 
 export interface SentimentAnalysisResult {
   sentimentLabel: SentimentLabel | null;

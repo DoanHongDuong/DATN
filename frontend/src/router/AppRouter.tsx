@@ -16,6 +16,7 @@ import { AdminVolunteersPage } from '../pages/admin/AdminVolunteersPage';
 import { AdminUsersPage } from '../pages/admin/AdminUsersPage';
 import { AdminResourcesPage } from '../pages/admin/AdminResourcesPage';
 import { AdminAuditLogsPage } from '../pages/admin/AdminAuditLogsPage';
+import { AdminStatsPage } from '../pages/admin/AdminStatsPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 
 export const AppRouter: React.FC = () => {
@@ -44,11 +45,19 @@ export const AppRouter: React.FC = () => {
             <Route path="/chat" element={<ChatPage />} />
             <Route path="/volunteer/apply" element={<VolunteerApplyPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+
+            {/* Direct aliases for interactive relaxation guides */}
+            <Route path="/pmr-guide" element={<Navigate to="/resources?open=pmr-guide" replace />} />
+            <Route path="/grounding-54321" element={<Navigate to="/resources?open=grounding-54321" replace />} />
+            <Route path="/box-breathing" element={<Navigate to="/resources?open=box-breathing" replace />} />
+            <Route path="/diaphragmatic" element={<Navigate to="/resources?open=diaphragmatic" replace />} />
+            <Route path="/4-7-8" element={<Navigate to="/resources?open=4-7-8" replace />} />
           </Route>
 
           {/* Admin Protected Routes (Role ADMIN Required) */}
           <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
-            <Route path="/admin" element={<Navigate to="/admin/volunteers" replace />} />
+            <Route path="/admin" element={<Navigate to="/admin/stats" replace />} />
+            <Route path="/admin/stats" element={<AdminStatsPage />} />
             <Route path="/admin/volunteers" element={<AdminVolunteersPage />} />
             <Route path="/admin/users" element={<AdminUsersPage />} />
             <Route path="/admin/resources" element={<AdminResourcesPage />} />

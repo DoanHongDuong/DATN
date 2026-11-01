@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Button, Tag, Switch, Alert, Table, message, Typography } from 'antd';
+import { Card, Button, Tag, Switch, Alert, Table, message, Typography, Modal, Form, Input } from 'antd';
 import {
   MessageSquare,
   Users,
@@ -12,9 +12,11 @@ import {
   HeartHandshake,
   RefreshCw,
   ExternalLink,
+  Edit3,
 } from 'lucide-react';
+import axios, { AxiosError } from 'axios';
 import { chatApi, type ChatSession, type PriorityLevel } from '../../api/chat.api';
-import { volunteerApi, type VolunteerProfile } from '../../api/volunteer.api';
+import { volunteerApi, type VolunteerProfile, type UpdateVolunteerProfilePayload } from '../../api/volunteer.api';
 import { useAuth } from '../../hooks/useAuth';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 
@@ -44,6 +46,48 @@ export const VolunteerDashboard: React.FC = () => {
   const [togglingOnline, setTogglingOnline] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
+
+  // State cho Modal Cập nhật hồ sơ TNV (PB-28)
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const [updatingProfile, setUpdatingProfile] = useState<boolean>(false);
+  const [editForm] = Form.useForm<UpdateVolunteerProfilePayload>();
+
+  const handleOpenEditModal = () => {
+    editForm.setFieldsValue({
+      specialization: profile?.specialization || '',
+      bio: profile?.bio || '',
+      certificateUrl: profile?.certificateUrl || '',
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateProfile = async (values: UpdateVolunteerProfilePayload) => {
+    setUpdatingProfile(true);
+    try {
+      const res = await volunteerApi.updateProfile({
+        specialization: values.specialization?.trim(),
+        bio: values.bio?.trim(),
+        certificateUrl: values.certificateUrl?.trim() || undefined,
+      });
+      setProfile(res.profile);
+      if (res.requiresReverification) {
+        setIsOnline(false);
+        message.warning(res.message);
+      } else {
+        message.success(res.message);
+      }
+      setIsEditModalOpen(false);
+    } catch (err: unknown) {
+      let msg = 'Không thể cập nhật hồ sơ tình nguyện viên';
+      if (axios.isAxiosError(err)) {
+        const axiosErr = err as AxiosError<{ message?: string }>;
+        msg = axiosErr.response?.data?.message || msg;
+      }
+      message.error(msg);
+    } finally {
+      setUpdatingProfile(false);
+    }
+  };
 
   const fetchVolunteerData = useCallback(async () => {
     setLoading(true);
@@ -218,12 +262,58 @@ export const VolunteerDashboard: React.FC = () => {
                   Đã xác minh chính thức
                 </Tag>
               ) : (
-                <Tag color="warning">Chờ duyệt hồ sơ</Tag>
+                <Tag color="warning" icon={<Clock size={12} />}>
+                  Chờ duyệt lại hồ sơ
+                </Tag>
               )}
             </div>
             <p style={{ margin: 0, fontSize: '14px', color: 'var(--text)' }}>
               Chuyên môn: <strong style={{ color: 'var(--text-h)' }}>{profile?.specialization || 'Tư vấn tâm lý chung'}</strong> • Sẵn sàng đồng hành cùng sinh viên.
             </p>
+            {profile?.bio && (
+              <p
+                style={{
+                  margin: '6px 0 0 0',
+                  fontSize: '13px',
+                  color: 'var(--text)',
+                  maxWidth: '650px',
+                  fontStyle: 'italic',
+                  lineHeight: 1.5,
+                }}
+              >
+                "{profile.bio}"
+              </p>
+            )}
+            {profile?.certificateUrl && (
+              <div style={{ marginTop: '6px' }}>
+                <a
+                  href={profile.certificateUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontSize: '12px',
+                    color: 'var(--accent)',
+                    fontWeight: 500,
+                  }}
+                >
+                  <ExternalLink size={12} />
+                  <span>Xem tài liệu / chứng chỉ chuyên môn</span>
+                </a>
+              </div>
+            )}
+            <div style={{ marginTop: '10px' }}>
+              <Button
+                size="small"
+                icon={<Edit3 size={13} />}
+                onClick={handleOpenEditModal}
+                style={{ fontSize: '12px', borderRadius: '6px' }}
+              >
+                Cập nhật thông tin chuyên môn
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -250,12 +340,24 @@ export const VolunteerDashboard: React.FC = () => {
           </div>
           <Switch
             checked={isOnline}
+            disabled={!profile?.isVerified}
             loading={togglingOnline}
             onChange={handleToggleOnline}
             style={{ marginLeft: '8px' }}
           />
         </div>
       </div>
+
+      {/* Cảnh báo hồ sơ chờ duyệt lại */}
+      {!profile?.isVerified && (
+        <Alert
+          type="warning"
+          showIcon
+          icon={<Clock size={20} />}
+          message={<strong>Hồ sơ đang chờ Quản trị viên duyệt lại</strong>}
+          description="Bạn vừa cập nhật thông tin chuyên môn hoặc chứng chỉ. Để đảm bảo an toàn cho người dùng, hệ thống tạm thời khóa tính năng nhận phiên trực tuyến cho đến khi Quản trị viên đối soát xong."
+        />
+      )}
 
       {/* Critical Alert Banner if high risk waiting */}
       {criticalCount > 0 && (
@@ -463,7 +565,7 @@ export const VolunteerDashboard: React.FC = () => {
                   Hotline Hỗ trợ Khẩn cấp
                 </div>
                 <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-h)' }}>
-                  1900 6006 • 115
+                  {import.meta.env.VITE_EMERGENCY_HOTLINE || '1900 6789'}
                 </div>
               </div>
             </div>
@@ -487,6 +589,77 @@ export const VolunteerDashboard: React.FC = () => {
           </Card>
         </div>
       </div>
+
+      {/* Modal Cập nhật hồ sơ TNV (PB-28) */}
+      <Modal
+        title="Cập nhật hồ sơ Tình nguyện viên"
+        open={isEditModalOpen}
+        onCancel={() => setIsEditModalOpen(false)}
+        footer={null}
+        destroyOnClose
+        centered
+      >
+        <Form
+          form={editForm}
+          layout="vertical"
+          onFinish={handleUpdateProfile}
+          style={{ marginTop: '16px' }}
+        >
+          <Alert
+            type="info"
+            showIcon
+            message="Lưu ý về kiểm duyệt chuyên môn"
+            description="Nếu bạn thay đổi Chuyên môn hoặc Đường dẫn chứng chỉ, hồ sơ sẽ tự động chuyển sang trạng thái Chờ duyệt lại bởi Quản trị viên để đảm bảo an toàn cho sinh viên. Việc chỉ sửa Lời giới thiệu (Bio) sẽ có hiệu lực ngay lập tức."
+            style={{ marginBottom: '16px', fontSize: '13px' }}
+          />
+          <Form.Item
+            label="Chuyên môn / Học vấn"
+            name="specialization"
+            rules={[
+              { required: true, message: 'Vui lòng nhập chuyên môn' },
+              { max: 255, message: 'Tối đa 255 ký tự' },
+            ]}
+          >
+            <Input placeholder="VD: Cử nhân Tâm lý học, Tham vấn viên..." />
+          </Form.Item>
+
+          <Form.Item
+            label="Giới thiệu bản thân & Kinh nghiệm"
+            name="bio"
+            rules={[
+              { required: true, message: 'Vui lòng viết đôi nét giới thiệu' },
+              { max: 1000, message: 'Tối đa 1000 ký tự' },
+            ]}
+          >
+            <Input.TextArea
+              rows={4}
+              placeholder="Chia sẻ kinh nghiệm tư vấn hoặc phương châm hỗ trợ của bạn..."
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Đường dẫn chứng chỉ / Bằng cấp chuyên môn"
+            name="certificateUrl"
+            rules={[{ max: 500, message: 'Tối đa 500 ký tự' }]}
+          >
+            <Input placeholder="https://drive.google.com/... hoặc link ảnh chứng chỉ" />
+          </Form.Item>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '24px' }}>
+            <Button onClick={() => setIsEditModalOpen(false)}>
+              Huỷ
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={updatingProfile}
+              style={{ background: 'var(--accent)', borderColor: 'var(--accent)' }}
+            >
+              Lưu thay đổi
+            </Button>
+          </div>
+        </Form>
+      </Modal>
     </div>
   );
 };

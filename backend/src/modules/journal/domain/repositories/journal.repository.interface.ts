@@ -31,6 +31,7 @@ export interface IJournalRepository {
   create(data: CreateJournalEntryData): Promise<JournalEntry>;
   findById(id: string): Promise<JournalEntry | null>;
   findByUserId(userId: string, skip: number, take: number): Promise<JournalEntry[]>;
+  findByUserIdSince(userId: string, since: Date): Promise<JournalEntry[]>;
   countByUserId(userId: string): Promise<number>;
   update(id: string, data: UpdateJournalEntryData): Promise<JournalEntry>;
   delete(id: string): Promise<void>;

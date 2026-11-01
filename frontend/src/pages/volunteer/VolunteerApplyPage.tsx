@@ -110,7 +110,7 @@ export const VolunteerApplyPage: React.FC = () => {
                   </Button>
                 </div>
               ) : (
-                <div key="action-goto-chat" style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
+                <div key="action-goto-chat" style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
                   <Button
                     type="primary"
                     size="large"
@@ -119,6 +119,12 @@ export const VolunteerApplyPage: React.FC = () => {
                     style={{ background: '#10b981', borderColor: '#10b981' }}
                   >
                     Đến phòng tư vấn trực tuyến
+                  </Button>
+                  <Button
+                    size="large"
+                    onClick={() => navigate('/dashboard')}
+                  >
+                    Về Bàn trực TNV
                   </Button>
                 </div>
               ),

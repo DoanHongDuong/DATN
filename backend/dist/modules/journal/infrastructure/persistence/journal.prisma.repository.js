@@ -41,6 +41,15 @@ let JournalPrismaRepository = class JournalPrismaRepository {
             take,
         });
     }
+    async findByUserIdSince(userId, since) {
+        return this.prisma.journalEntry.findMany({
+            where: {
+                userId,
+                createdAt: { gte: since },
+            },
+            orderBy: { createdAt: 'asc' },
+        });
+    }
     async countByUserId(userId) {
         return this.prisma.journalEntry.count({
             where: { userId },
@@ -63,6 +72,20 @@ let JournalPrismaRepository = class JournalPrismaRepository {
         });
     }
     async findRelaxationResourcesByCategory(category) {
+        if (category === 'music' || category === 'calm_audio') {
+            return this.prisma.relaxationResource.findMany({
+                where: {
+                    category: { in: ['music', 'calm_audio'] },
+                },
+            });
+        }
+        if (category === 'meditation' || category === 'mindfulness') {
+            return this.prisma.relaxationResource.findMany({
+                where: {
+                    category: { in: ['meditation', 'mindfulness'] },
+                },
+            });
+        }
         return this.prisma.relaxationResource.findMany({
             where: { category },
         });
