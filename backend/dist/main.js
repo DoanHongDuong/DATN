@@ -11,7 +11,17 @@ async function bootstrap() {
     const frontendUrl = configService.get('FRONTEND_URL') || 'http://localhost:5173';
     const allowedOrigins = frontendUrl.split(',').map((url) => url.trim());
     app.enableCors({
-        origin: allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins,
+        origin: (origin, callback) => {
+            if (!origin ||
+                allowedOrigins.includes(origin) ||
+                origin.endsWith('.vercel.app') ||
+                origin.includes('localhost')) {
+                callback(null, true);
+            }
+            else {
+                callback(null, true);
+            }
+        },
         credentials: true,
     });
     app.useGlobalPipes(new common_1.ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));

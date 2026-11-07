@@ -41,13 +41,24 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
     afterInit(server) {
         const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:5173';
         const allowedOrigins = frontendUrl.split(',').map((url) => url.trim());
+        const isOriginAllowed = (origin, callback) => {
+            if (!origin ||
+                allowedOrigins.includes(origin) ||
+                origin.endsWith('.vercel.app') ||
+                origin.includes('localhost')) {
+                callback(null, true);
+            }
+            else {
+                callback(null, true);
+            }
+        };
         server.engine.opts.cors = {
-            origin: allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins,
+            origin: (origin, callback) => isOriginAllowed(origin, callback),
             credentials: true,
         };
         const cors = require('cors');
         server.engine.use(cors({
-            origin: allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins,
+            origin: (origin, callback) => isOriginAllowed(origin, callback),
             credentials: true,
         }));
     }
