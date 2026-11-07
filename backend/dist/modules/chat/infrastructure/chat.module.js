@@ -10,6 +10,7 @@ exports.ChatModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const chat_controller_1 = require("../presentation/chat.controller");
+const support_controller_1 = require("../presentation/support.controller");
 const chat_gateway_1 = require("../presentation/chat.gateway");
 const request_support_use_case_1 = require("../application/use-cases/request-support.use-case");
 const accept_session_use_case_1 = require("../application/use-cases/accept-session.use-case");
@@ -23,6 +24,7 @@ const get_session_feedback_use_case_1 = require("../application/use-cases/get-se
 const chat_prisma_repository_1 = require("./persistence/chat.prisma.repository");
 const chat_repository_interface_1 = require("../domain/repositories/chat.repository.interface");
 const auth_module_1 = require("../../auth/infrastructure/auth.module");
+const notification_module_1 = require("../../notification/infrastructure/notification.module");
 let ChatModule = class ChatModule {
 };
 exports.ChatModule = ChatModule;
@@ -31,8 +33,9 @@ exports.ChatModule = ChatModule = __decorate([
         imports: [
             config_1.ConfigModule,
             auth_module_1.AuthModule,
+            notification_module_1.NotificationModule,
         ],
-        controllers: [chat_controller_1.ChatController],
+        controllers: [chat_controller_1.ChatController, support_controller_1.SupportController],
         providers: [
             {
                 provide: chat_repository_interface_1.CHAT_REPOSITORY,

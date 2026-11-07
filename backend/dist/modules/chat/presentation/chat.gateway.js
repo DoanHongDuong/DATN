@@ -39,14 +39,15 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
         this.chatRepository = chatRepository;
     }
     afterInit(server) {
-        const frontendUrl = this.configService.get('FRONTEND_URL');
+        const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:5173';
+        const allowedOrigins = frontendUrl.split(',').map((url) => url.trim());
         server.engine.opts.cors = {
-            origin: frontendUrl,
+            origin: allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins,
             credentials: true,
         };
         const cors = require('cors');
         server.engine.use(cors({
-            origin: frontendUrl,
+            origin: allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins,
             credentials: true,
         }));
     }

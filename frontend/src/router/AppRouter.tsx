@@ -18,6 +18,7 @@ import { AdminResourcesPage } from '../pages/admin/AdminResourcesPage';
 import { AdminAuditLogsPage } from '../pages/admin/AdminAuditLogsPage';
 import { AdminStatsPage } from '../pages/admin/AdminStatsPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
+import { PrivacyPage } from '../pages/PrivacyPage';
 
 export const AppRouter: React.FC = () => {
   return (
@@ -26,6 +27,7 @@ export const AppRouter: React.FC = () => {
         <Route element={<MainLayout />}>
           {/* Public General Routes */}
           <Route path="/" element={<HomePage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/verify-email" element={<Navigate to="/login" replace />} />
 
           {/* Guest-only Routes (Redirect to app if already authenticated) */}

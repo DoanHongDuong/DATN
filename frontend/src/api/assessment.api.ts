@@ -39,8 +39,13 @@ export interface TestResultResponse {
   testId: string;
   totalScore: number;
   severityLevel: string;
-  recommendation: string;
-  createdAt: string;
+  recommendation?: string;
+  takenAt?: string;
+  createdAt?: string;
+  test?: {
+    name: string;
+    code: string;
+  };
 }
 
 export const assessmentApi = {

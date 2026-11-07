@@ -4,11 +4,13 @@ import {
   ConflictException,
   NotFoundException,
   ForbiddenException,
+  Optional,
 } from '@nestjs/common';
 import {
   CHAT_REPOSITORY,
   IChatRepository,
 } from '../../domain/repositories/chat.repository.interface';
+import { CreateNotificationUseCase } from '../../../notification/application/use-cases/create-notification.use-case';
 
 /**
  * UC-07 — TNV nhận phiên hỗ trợ (REST)
@@ -25,6 +27,8 @@ export class AcceptSessionUseCase {
   constructor(
     @Inject(CHAT_REPOSITORY)
     private readonly chatRepository: IChatRepository,
+    @Optional()
+    private readonly createNotificationUseCase?: CreateNotificationUseCase,
   ) {}
 
   async execute(volunteerId: string, sessionId: string) {
@@ -48,6 +52,15 @@ export class AcceptSessionUseCase {
 
     if (!acceptedSession) {
       throw new ConflictException('Phiên đã được nhận bởi người khác');
+    }
+
+    if (this.createNotificationUseCase) {
+      await this.createNotificationUseCase.execute({
+        userId: acceptedSession.userId,
+        title: 'Tình nguyện viên đã tiếp nhận phiên hỗ trợ',
+        content: 'Một tình nguyện viên vừa tiếp nhận yêu cầu hỗ trợ của bạn. Hãy vào phòng chat để bắt đầu.',
+        type: 'SESSION_ACCEPTED',
+      }).catch(() => null);
     }
 
     return acceptedSession;

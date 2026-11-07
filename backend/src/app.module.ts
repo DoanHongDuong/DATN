@@ -11,6 +11,7 @@ import { ChatModule } from './modules/chat/infrastructure/chat.module';
 import { VolunteerModule } from './modules/volunteer/infrastructure/volunteer.module';
 import { AdminModule } from './modules/admin/infrastructure/admin.module';
 import { UsersModule } from './modules/users/infrastructure/users.module';
+import { NotificationModule } from './modules/notification/infrastructure/notification.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { UsersModule } from './modules/users/infrastructure/users.module';
     VolunteerModule,
     AdminModule,
     UsersModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

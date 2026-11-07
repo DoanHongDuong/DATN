@@ -86,7 +86,7 @@ export const JournalPage: React.FC = () => {
         const axiosErr = err as AxiosError<{ message?: string }>;
         msg = axiosErr.response?.data?.message || msg;
       }
-      alert(msg);
+      message.error(msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -161,7 +161,7 @@ export const JournalPage: React.FC = () => {
       await journalApi.delete(id);
       setEntries((prev) => prev.filter((item) => item.id !== id));
     } catch {
-      alert('Không thể xóa bài nhật ký');
+      message.error('Không thể xóa bài nhật ký');
     }
   };
 

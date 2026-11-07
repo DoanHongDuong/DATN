@@ -10,6 +10,7 @@ exports.JournalModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const auth_module_1 = require("../../auth/infrastructure/auth.module");
+const notification_module_1 = require("../../notification/infrastructure/notification.module");
 const journal_controller_1 = require("../presentation/journal.controller");
 const journal_prisma_repository_1 = require("./persistence/journal.prisma.repository");
 const ai_sentiment_service_1 = require("./ai/ai-sentiment.service");
@@ -32,6 +33,7 @@ exports.JournalModule = JournalModule = __decorate([
         imports: [
             auth_module_1.AuthModule,
             config_1.ConfigModule,
+            notification_module_1.NotificationModule,
         ],
         controllers: [journal_controller_1.JournalController],
         providers: [

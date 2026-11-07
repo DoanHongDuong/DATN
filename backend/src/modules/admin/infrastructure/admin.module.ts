@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '../../auth/infrastructure/auth.module';
+import { NotificationModule } from '../../notification/infrastructure/notification.module';
 import { AdminController } from '../presentation/admin.controller';
 import { AdminPrismaRepository } from './persistence/admin.prisma.repository';
 import { ADMIN_REPOSITORY } from '../domain/repositories/admin.repository.interface';
@@ -17,7 +18,7 @@ import { GetAuditLogsUseCase } from '../application/use-cases/get-audit-logs.use
 import { GetSystemStatsUseCase } from '../application/use-cases/get-system-stats.use-case';
 
 @Module({
-  imports: [ConfigModule, AuthModule],
+  imports: [ConfigModule, AuthModule, NotificationModule],
   controllers: [AdminController],
   providers: [
     {

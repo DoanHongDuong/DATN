@@ -8,6 +8,7 @@ import {
   Calendar,
   PlusCircle,
   Activity,
+  AlertTriangle,
 } from 'lucide-react';
 import {
   journalApi,
@@ -123,30 +124,38 @@ export const MoodTrendChart: React.FC<MoodTrendChartProps> = ({ className }) => 
   };
 
   const getTrendBadge = () => {
-    if (!summary || summary.totalEntries < 2) {
+    // Quy tắc an toàn & tin cậy: Có crisis thì ưu tiên trạng thái hỗ trợ cao nhất, không hiển thị tích cực/ổn định
+    if (summary?.trend === 'crisis' || (summary && summary.crisisCount > 0)) {
+      return (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#ef4444', fontWeight: 600 }}>
+          <AlertTriangle size={16} /> Cần hỗ trợ ưu tiên (Phát hiện dấu hiệu khủng hoảng)
+        </span>
+      );
+    }
+    if (!summary || summary.trend === 'insufficient_data') {
       return (
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: 'var(--text)' }}>
-          <Minus size={15} /> Cần thêm dữ liệu để phân tích xu hướng
+          <Minus size={15} /> Chưa đủ dữ liệu để nhận xét xu hướng
         </span>
       );
     }
     if (summary.trend === 'improving') {
       return (
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#10b981', fontWeight: 600 }}>
-          <TrendingUp size={16} /> Xu hướng tích cực (Tâm trạng đang cải thiện)
+          <TrendingUp size={16} /> Xu hướng tích cực (Đang cải thiện)
         </span>
       );
     }
     if (summary.trend === 'declining') {
       return (
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#f59e0b', fontWeight: 600 }}>
-          <TrendingDown size={16} /> Cần quan tâm (Tâm trạng có dấu hiệu chùng xuống)
+          <TrendingDown size={16} /> Cần quan tâm (Có xu hướng đi xuống)
         </span>
       );
     }
     return (
       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#8b5cf6', fontWeight: 600 }}>
-        <Activity size={16} /> Tâm trạng duy trì ổn định
+        <Activity size={16} /> Tương đối ổn định
       </span>
     );
   };
@@ -268,6 +277,50 @@ export const MoodTrendChart: React.FC<MoodTrendChartProps> = ({ className }) => 
             </div>
             <div>{getTrendBadge()}</div>
           </div>
+        </div>
+      )}
+
+      {/* Cảnh báo ưu tiên hỗ trợ khi có crisis trong khoảng thời gian đang xem */}
+      {summary && (summary.trend === 'crisis' || summary.crisisCount > 0) && (
+        <div style={{
+          padding: '16px 20px',
+          borderRadius: '12px',
+          background: 'rgba(239, 68, 68, 0.1)',
+          border: '1px solid rgba(239, 68, 68, 0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', maxWidth: '600px' }}>
+            <AlertTriangle size={22} style={{ color: '#ef4444', flexShrink: 0, marginTop: '2px' }} />
+            <div>
+              <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#ef4444' }}>
+                Hệ thống ghi nhận dấu hiệu khủng hoảng cảm xúc
+              </h4>
+              <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--text)', lineHeight: '1.4' }}>
+                Trong khoảng thời gian này ghi nhận cảm xúc bất ổn hoặc căng thẳng cao. Bạn không phải vượt qua điều này một mình, hãy kết nối với Tình nguyện viên hoặc liên hệ đường dây nóng hỗ trợ.
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/chat"
+            style={{
+              padding: '8px 18px',
+              borderRadius: '8px',
+              background: '#ef4444',
+              color: '#fff',
+              fontSize: '13px',
+              fontWeight: 600,
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            Kết nối tư vấn
+          </Link>
         </div>
       )}
 

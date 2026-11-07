@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { assessmentApi, type AssessmentTest, type TestQuestion, type TestResultResponse } from '../api/assessment.api';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { CheckCircle2, ArrowLeft, ClipboardList, History, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { message } from 'antd';
 
 type ActiveTab = 'tests' | 'history';
 
@@ -113,7 +114,7 @@ export const AssessmentPage: React.FC = () => {
     }));
 
     if (formattedAnswers.length < questions.length) {
-      alert('Vui lòng trả lời đầy đủ tất cả các câu hỏi trước khi nộp bài.');
+      message.warning('Vui lòng trả lời đầy đủ tất cả các câu hỏi trước khi nộp bài.');
       return;
     }
 
@@ -127,7 +128,7 @@ export const AssessmentPage: React.FC = () => {
         const axiosErr = err as AxiosError<{ message?: string }>;
         msg = axiosErr.response?.data?.message || msg;
       }
-      alert(msg);
+      message.error(msg);
     } finally {
       setSubmitting(false);
     }
@@ -140,7 +141,7 @@ export const AssessmentPage: React.FC = () => {
   // ---- Helper dùng chung cho cả result screen và history ----
   const getSeverityInfo = (level: string) => {
     switch (level) {
-      case 'MINIMAL':   return { label: 'Tối thiểu / Bình thường', color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)' };
+      case 'MINIMAL':   return { label: 'Bình thường / Ổn định',   color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)' };
       case 'MILD':      return { label: 'Mức độ nhẹ',              color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.12)' };
       case 'MODERATE':  return { label: 'Mức độ vừa phải',         color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)' };
       case 'MODERATELY_SEVERE': return { label: 'Khá nghiêm trọng', color: '#f97316', bg: 'rgba(249, 115, 22, 0.12)' };
@@ -164,7 +165,7 @@ export const AssessmentPage: React.FC = () => {
 
     const defaultRecommendation = () => {
       if (finalLevel === 'MINIMAL') {
-        return 'Tình trạng tâm lý của bạn hiện ở mức bình thường hoặc tối thiểu. Hãy tiếp tục duy trì lối sống điều độ, ngủ đủ giấc và vận động thể thao để giữ tinh thần luôn thoải mái.';
+        return 'Tình trạng tâm lý của bạn hiện ở mức bình thường và ổn định (triệu chứng ở mức tối thiểu). Hãy tiếp tục duy trì lối sống điều độ, ngủ đủ giấc và vận động thể thao để giữ tinh thần luôn thoải mái.';
       }
       if (finalLevel === 'MILD') {
         return 'Bạn đang có dấu hiệu căng thẳng hoặc lo âu nhẹ. Hãy dành thời gian nghỉ ngơi, thực hành các bài tập nhịp thở 4-7-8, nghe âm thanh thư giãn hoặc viết nhật ký để giải tỏa áp lực.';
@@ -431,6 +432,11 @@ export const AssessmentPage: React.FC = () => {
                   {/* Info */}
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
+                      {item.test?.name && (
+                        <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-h)' }}>
+                          {item.test.name}
+                        </span>
+                      )}
                       <span style={{ display: 'inline-block', padding: '2px 10px', borderRadius: '12px', background: info.bg, color: info.color, fontWeight: 700, fontSize: '12px' }}>
                         {info.label}
                       </span>
@@ -447,13 +453,22 @@ export const AssessmentPage: React.FC = () => {
 
                   {/* Ngày */}
                   <div style={{ fontSize: '12px', color: 'var(--text)', whiteSpace: 'nowrap', textAlign: 'right' }}>
-                    {new Date(item.createdAt).toLocaleDateString('vi-VN', {
-                      day: '2-digit', month: '2-digit', year: 'numeric',
-                    })}
-                    <br />
-                    <span style={{ opacity: 0.7 }}>
-                      {new Date(item.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
-                    </span>
+                    {(() => {
+                      const rawDate = item.takenAt || item.createdAt;
+                      if (!rawDate) return null;
+                      const validDate = new Date(rawDate);
+                      return (
+                        <>
+                          {validDate.toLocaleDateString('vi-VN', {
+                            day: '2-digit', month: '2-digit', year: 'numeric',
+                          })}
+                          <br />
+                          <span style={{ opacity: 0.7 }}>
+                            {validDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
               );

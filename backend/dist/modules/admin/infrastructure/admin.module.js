@@ -10,6 +10,7 @@ exports.AdminModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const auth_module_1 = require("../../auth/infrastructure/auth.module");
+const notification_module_1 = require("../../notification/infrastructure/notification.module");
 const admin_controller_1 = require("../presentation/admin.controller");
 const admin_prisma_repository_1 = require("./persistence/admin.prisma.repository");
 const admin_repository_interface_1 = require("../domain/repositories/admin.repository.interface");
@@ -29,7 +30,7 @@ let AdminModule = class AdminModule {
 exports.AdminModule = AdminModule;
 exports.AdminModule = AdminModule = __decorate([
     (0, common_1.Module)({
-        imports: [config_1.ConfigModule, auth_module_1.AuthModule],
+        imports: [config_1.ConfigModule, auth_module_1.AuthModule, notification_module_1.NotificationModule],
         controllers: [admin_controller_1.AdminController],
         providers: [
             {

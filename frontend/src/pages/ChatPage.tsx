@@ -116,10 +116,16 @@ export const ChatPage: React.FC = () => {
   const [comment, setComment] = useState<string>('');
   const [submittingFeedback, setSubmittingFeedback] = useState<boolean>(false);
   const activeSessionRef = useRef<ChatSession | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     activeSessionRef.current = activeSession;
   }, [activeSession]);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   // Tải danh sách tin nhắn của session
   const loadMessages = useCallback(async (sessionId: string) => {
@@ -547,6 +553,8 @@ export const ChatPage: React.FC = () => {
               );
             })
           )}
+          {/* Auto-scroll sentinel */}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Send Input Footer */}

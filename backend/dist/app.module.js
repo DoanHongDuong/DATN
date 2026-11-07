@@ -20,6 +20,7 @@ const chat_module_1 = require("./modules/chat/infrastructure/chat.module");
 const volunteer_module_1 = require("./modules/volunteer/infrastructure/volunteer.module");
 const admin_module_1 = require("./modules/admin/infrastructure/admin.module");
 const users_module_1 = require("./modules/users/infrastructure/users.module");
+const notification_module_1 = require("./modules/notification/infrastructure/notification.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -36,6 +37,7 @@ exports.AppModule = AppModule = __decorate([
             volunteer_module_1.VolunteerModule,
             admin_module_1.AdminModule,
             users_module_1.UsersModule,
+            notification_module_1.NotificationModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

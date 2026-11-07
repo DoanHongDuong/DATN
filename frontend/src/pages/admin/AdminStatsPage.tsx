@@ -269,7 +269,7 @@ export const AdminStatsPage: React.FC = () => {
       </div>
 
       {/* Middle Grid: 7-Day Activity Chart & Severity / Sentiment Distributions */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '20px', marginBottom: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px', marginBottom: '24px' }}>
         {/* 7-Day Activity Bar Chart */}
         <div style={{
           padding: '24px',
@@ -394,7 +394,7 @@ export const AdminStatsPage: React.FC = () => {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {[
-              { label: 'Tối thiểu (Minimal)', count: a?.severityDistribution.minimal || 0, color: '#10b981' },
+              { label: 'Bình thường / Ổn định (Minimal)', count: a?.severityDistribution.minimal || 0, color: '#10b981' },
               { label: 'Nhẹ (Mild)', count: a?.severityDistribution.mild || 0, color: '#3b82f6' },
               { label: 'Trung bình (Moderate)', count: a?.severityDistribution.moderate || 0, color: '#f59e0b' },
               { label: 'Khá nặng (Moderately Severe)', count: a?.severityDistribution.moderatelySevere || 0, color: '#f97316' },

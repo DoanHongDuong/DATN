@@ -16,10 +16,13 @@ exports.EndSessionUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const client_1 = require("@prisma/client");
 const chat_repository_interface_1 = require("../../domain/repositories/chat.repository.interface");
+const create_notification_use_case_1 = require("../../../notification/application/use-cases/create-notification.use-case");
 let EndSessionUseCase = class EndSessionUseCase {
     chatRepository;
-    constructor(chatRepository) {
+    createNotificationUseCase;
+    constructor(chatRepository, createNotificationUseCase) {
         this.chatRepository = chatRepository;
+        this.createNotificationUseCase = createNotificationUseCase;
     }
     async execute(volunteerId, sessionId) {
         const session = await this.chatRepository.findSessionById(sessionId);
@@ -32,13 +35,23 @@ let EndSessionUseCase = class EndSessionUseCase {
         if (session.volunteerId !== volunteerId) {
             throw new common_1.ForbiddenException('Chỉ tình nguyện viên của phiên này mới có quyền kết thúc');
         }
-        return this.chatRepository.closeSession(sessionId);
+        const closedSession = await this.chatRepository.closeSession(sessionId);
+        if (this.createNotificationUseCase && closedSession?.userId) {
+            await this.createNotificationUseCase.execute({
+                userId: closedSession.userId,
+                title: 'Phiên hỗ trợ đã hoàn thành',
+                content: 'Phiên tư vấn của bạn đã kết thúc. Vui lòng dành chút thời gian để gửi đánh giá trải nghiệm hỗ trợ nhé.',
+                type: 'SESSION_ENDED',
+            }).catch(() => null);
+        }
+        return closedSession;
     }
 };
 exports.EndSessionUseCase = EndSessionUseCase;
 exports.EndSessionUseCase = EndSessionUseCase = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(chat_repository_interface_1.CHAT_REPOSITORY)),
-    __metadata("design:paramtypes", [Object])
+    __param(1, (0, common_1.Optional)()),
+    __metadata("design:paramtypes", [Object, create_notification_use_case_1.CreateNotificationUseCase])
 ], EndSessionUseCase);
 //# sourceMappingURL=end-session.use-case.js.map

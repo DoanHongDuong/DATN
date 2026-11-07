@@ -15,10 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ApproveVolunteerUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const admin_repository_interface_1 = require("../../domain/repositories/admin.repository.interface");
+const create_notification_use_case_1 = require("../../../notification/application/use-cases/create-notification.use-case");
 let ApproveVolunteerUseCase = class ApproveVolunteerUseCase {
     adminRepo;
-    constructor(adminRepo) {
+    createNotificationUseCase;
+    constructor(adminRepo, createNotificationUseCase) {
         this.adminRepo = adminRepo;
+        this.createNotificationUseCase = createNotificationUseCase;
     }
     async execute(actorId, profileId) {
         const profile = await this.adminRepo.findVolunteerProfileById(profileId);
@@ -29,6 +32,14 @@ let ApproveVolunteerUseCase = class ApproveVolunteerUseCase {
             throw new common_1.BadRequestException('Hồ sơ tình nguyện viên này đã được duyệt');
         }
         await this.adminRepo.approveVolunteer(actorId, profile.id, profile.userId);
+        if (this.createNotificationUseCase) {
+            await this.createNotificationUseCase.execute({
+                userId: profile.userId,
+                title: 'Hồ sơ tình nguyện viên đã được phê duyệt',
+                content: 'Chúc mừng! Hồ sơ tình nguyện viên của bạn đã được kiểm duyệt thành công. Bạn đã có thể bắt đầu nhận ca và hỗ trợ các bạn sinh viên.',
+                type: 'VOLUNTEER_APPROVED',
+            }).catch(() => null);
+        }
         return { message: 'Phê duyệt hồ sơ tình nguyện viên thành công' };
     }
 };
@@ -36,6 +47,7 @@ exports.ApproveVolunteerUseCase = ApproveVolunteerUseCase;
 exports.ApproveVolunteerUseCase = ApproveVolunteerUseCase = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(admin_repository_interface_1.ADMIN_REPOSITORY)),
-    __metadata("design:paramtypes", [Object])
+    __param(1, (0, common_1.Optional)()),
+    __metadata("design:paramtypes", [Object, create_notification_use_case_1.CreateNotificationUseCase])
 ], ApproveVolunteerUseCase);
 //# sourceMappingURL=approve-volunteer.use-case.js.map

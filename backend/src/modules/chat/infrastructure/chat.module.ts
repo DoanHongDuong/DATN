@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { ChatController } from '../presentation/chat.controller';
+import { SupportController } from '../presentation/support.controller';
 import { ChatGateway } from '../presentation/chat.gateway';
 
 import { RequestSupportUseCase } from '../application/use-cases/request-support.use-case';
@@ -17,13 +18,15 @@ import { GetSessionFeedbackUseCase } from '../application/use-cases/get-session-
 import { ChatPrismaRepository } from './persistence/chat.prisma.repository';
 import { CHAT_REPOSITORY } from '../domain/repositories/chat.repository.interface';
 import { AuthModule } from '../../auth/infrastructure/auth.module';
+import { NotificationModule } from '../../notification/infrastructure/notification.module';
 
 @Module({
   imports: [
     ConfigModule,
     AuthModule, // Cần JwtModule export từ AuthModule
+    NotificationModule,
   ],
-  controllers: [ChatController],
+  controllers: [ChatController, SupportController],
   providers: [
     {
       provide: CHAT_REPOSITORY,

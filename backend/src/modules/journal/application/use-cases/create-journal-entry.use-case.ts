@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   JOURNAL_REPOSITORY,
@@ -7,6 +7,7 @@ import {
 import { IAiSentimentService } from '../../domain/services/ai-sentiment.service.interface';
 import { EncryptionService } from '../../infrastructure/ai/encryption.service';
 import { CreateJournalEntryDto } from '../dto/create-journal-entry.dto';
+import { CreateNotificationUseCase } from '../../../notification/application/use-cases/create-notification.use-case';
 
 export const AI_SENTIMENT_SERVICE = 'IAiSentimentService';
 
@@ -19,6 +20,8 @@ export class CreateJournalEntryUseCase {
     private readonly aiSentimentService: IAiSentimentService,
     private readonly encryptionService: EncryptionService,
     private readonly configService: ConfigService,
+    @Optional()
+    private readonly createNotificationUseCase?: CreateNotificationUseCase,
   ) {}
 
   async execute(userId: string, dto: CreateJournalEntryDto) {
@@ -58,6 +61,15 @@ export class CreateJournalEntryUseCase {
     if (sentiment.sentimentLabel === 'crisis') {
       response.emergencyHotline =
         this.configService.get<string>('EMERGENCY_HOTLINE') ?? null;
+
+      if (this.createNotificationUseCase) {
+        await this.createNotificationUseCase.execute({
+          userId,
+          title: 'Cảnh báo sức khỏe cảm xúc',
+          content: 'Hệ thống nhận thấy bạn đang trải qua cảm xúc căng thẳng hoặc khủng hoảng. Đừng ngần ngại liên hệ hotline khẩn cấp hoặc yêu cầu hỗ trợ từ tình nguyện viên.',
+          type: 'CRISIS_ALERT',
+        }).catch(() => null);
+      }
     }
 
     return response;

@@ -1,8 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheck, HeartPulse, Sparkles, MessageCircleHeart } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 export const HomePage: React.FC = () => {
+  const { user } = useAuth();
+  const isAuthenticated = !!user;
+
   return (
     <div style={{ textAlign: 'center', padding: '40px 20px' }}>
       <div style={{
@@ -30,29 +34,45 @@ export const HomePage: React.FC = () => {
         nhật ký mã hóa bảo mật hỗ trợ bởi AI, và kết nối trò chuyện trực tiếp cùng Tình nguyện viên.
       </p>
 
-      <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginBottom: '60px' }}>
-        <Link to="/register" style={{
-          padding: '14px 32px',
-          borderRadius: '10px',
-          background: 'var(--accent)',
-          color: '#fff',
-          fontWeight: 600,
-          textDecoration: 'none',
-          fontSize: '16px'
-        }}>
-          Bắt đầu ngay
-        </Link>
-        <Link to="/login" style={{
-          padding: '14px 32px',
-          borderRadius: '10px',
-          border: '1px solid var(--border)',
-          color: 'var(--text-h)',
-          fontWeight: 600,
-          textDecoration: 'none',
-          fontSize: '16px'
-        }}>
-          Đăng nhập
-        </Link>
+      <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginBottom: '60px', flexWrap: 'wrap' }}>
+        {isAuthenticated ? (
+          <Link to="/dashboard" style={{
+            padding: '14px 32px',
+            borderRadius: '10px',
+            background: 'var(--accent)',
+            color: '#fff',
+            fontWeight: 600,
+            textDecoration: 'none',
+            fontSize: '16px'
+          }}>
+            Đi đến Bảng điều khiển
+          </Link>
+        ) : (
+          <>
+            <Link to="/register" style={{
+              padding: '14px 32px',
+              borderRadius: '10px',
+              background: 'var(--accent)',
+              color: '#fff',
+              fontWeight: 600,
+              textDecoration: 'none',
+              fontSize: '16px'
+            }}>
+              Bắt đầu ngay
+            </Link>
+            <Link to="/login" style={{
+              padding: '14px 32px',
+              borderRadius: '10px',
+              border: '1px solid var(--border)',
+              color: 'var(--text-h)',
+              fontWeight: 600,
+              textDecoration: 'none',
+              fontSize: '16px'
+            }}>
+              Đăng nhập
+            </Link>
+          </>
+        )}
       </div>
 
       <div style={{
@@ -83,7 +103,7 @@ export const HomePage: React.FC = () => {
           <ShieldCheck size={32} color="var(--accent)" style={{ marginBottom: '12px' }} />
           <h3 style={{ margin: '0 0 8px 0', color: 'var(--text-h)' }}>Nhật ký Mã hóa AI</h3>
           <p style={{ color: 'var(--text)', fontSize: '14px', lineHeight: 1.5 }}>
-            Viết nhật ký cá nhân an toàn tuyệt đối với công nghệ mã hóa đầu cuối và trợ lý AI phân tích cảm xúc nhẹ nhàng.
+            Viết nhật ký cá nhân an toàn tuyệt đối với công nghệ mã hóa dữ liệu AES-256 an toàn và trợ lý AI phân tích cảm xúc nhẹ nhàng.
           </p>
         </div>
 

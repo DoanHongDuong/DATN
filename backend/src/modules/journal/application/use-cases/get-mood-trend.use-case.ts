@@ -19,7 +19,7 @@ export interface MoodTrendSummary {
   neutralCount: number;
   negativeCount: number;
   crisisCount: number;
-  trend: 'improving' | 'stable' | 'declining' | 'insufficient_data';
+  trend: 'improving' | 'stable' | 'declining' | 'insufficient_data' | 'crisis';
 }
 
 export interface MoodTrendResponse {
@@ -139,27 +139,41 @@ export class GetMoodTrendUseCase {
       };
     });
 
-    let trend: 'improving' | 'stable' | 'declining' | 'insufficient_data' = 'insufficient_data';
-    if (entries.length >= 2 && points.length >= 2) {
-      const midpoint = Math.floor(points.length / 2);
-      const earlierPoints = points.slice(0, midpoint);
-      const recentPoints = points.slice(midpoint);
+    let trend: 'improving' | 'stable' | 'declining' | 'insufficient_data' | 'crisis' = 'insufficient_data';
 
-      const earlierAvg =
-        earlierPoints.reduce((acc, p) => acc + p.avgScore, 0) / earlierPoints.length;
-      const recentAvg =
-        recentPoints.reduce((acc, p) => acc + p.avgScore, 0) / recentPoints.length;
+    // Quy tắc an toàn & tin cậy: Có crisis thì ưu tiên trạng thái hỗ trợ cao nhất
+    if (crisisCount > 0) {
+      trend = 'crisis';
+    } else if (points.length < 3) {
+      // Tổng số ngày có dữ liệu dưới 3 -> hiển thị trạng thái chưa đủ dữ liệu
+      trend = 'insufficient_data';
+    } else {
+      // Chia khoảng ngày được chọn thành hai nửa theo ngày lịch
+      const nowTime = Date.now();
+      const midpointTime = nowTime - (validDays / 2) * 24 * 60 * 60 * 1000;
+      const midpointDateStr = new Date(midpointTime).toISOString().split('T')[0];
 
-      const diff = recentAvg - earlierAvg;
-      if (diff > 0.15) {
-        trend = 'improving';
-      } else if (diff < -0.15) {
-        trend = 'declining';
+      const earlierPoints = points.filter((p) => p.date < midpointDateStr);
+      const recentPoints = points.filter((p) => p.date >= midpointDateStr);
+
+      // Nếu một trong hai nửa không có dữ liệu để so sánh -> Chưa đủ dữ liệu
+      if (earlierPoints.length === 0 || recentPoints.length === 0) {
+        trend = 'insufficient_data';
       } else {
-        trend = 'stable';
+        const earlierAvg =
+          earlierPoints.reduce((acc, p) => acc + p.avgScore, 0) / earlierPoints.length;
+        const recentAvg =
+          recentPoints.reduce((acc, p) => acc + p.avgScore, 0) / recentPoints.length;
+
+        const diff = recentAvg - earlierAvg;
+        if (diff > 0.15) {
+          trend = 'improving';
+        } else if (diff < -0.15) {
+          trend = 'declining';
+        } else {
+          trend = 'stable';
+        }
       }
-    } else if (entries.length >= 2) {
-      trend = 'stable';
     }
 
     return {

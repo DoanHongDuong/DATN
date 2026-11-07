@@ -12,8 +12,8 @@ export interface ChatSession {
   queuedAt?: string;
   startedAt?: string | null;
   endedAt?: string | null;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ChatMessage {
@@ -22,7 +22,8 @@ export interface ChatMessage {
   senderId: string;
   content: string;
   sentAt?: string;
-  createdAt: string;
+  isRead?: boolean;
+  createdAt?: string;
 }
 
 export interface RequestSupportResponse {

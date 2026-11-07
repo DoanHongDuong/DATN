@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '../../auth/infrastructure/auth.module';
+import { NotificationModule } from '../../notification/infrastructure/notification.module';
 import { JournalController } from '../presentation/journal.controller';
 import { JournalPrismaRepository } from './persistence/journal.prisma.repository';
 import { AiSentimentService } from './ai/ai-sentiment.service';
@@ -21,6 +22,7 @@ import { ENCRYPTION_SERVICE } from '../domain/services/encryption.service.interf
   imports: [
     AuthModule,   // exports JwtModule → provides JwtService for JwtAuthGuard
     ConfigModule, // provides ConfigService for AiSentimentService & EncryptionService
+    NotificationModule,
   ],
   controllers: [JournalController],
   providers: [

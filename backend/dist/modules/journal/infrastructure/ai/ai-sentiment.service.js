@@ -33,11 +33,12 @@ let AiSentimentService = AiSentimentService_1 = class AiSentimentService {
     configService;
     logger = new common_1.Logger(AiSentimentService_1.name);
     ai = null;
-    timeoutMs = 10000;
+    timeoutMs;
     model = 'gemini-3.5-flash-lite';
     constructor(configService) {
         this.configService = configService;
         const apiKey = this.configService.get('GEMINI_API_KEY');
+        this.timeoutMs = Number(this.configService.get('AI_TIMEOUT_MS')) || 40000;
         if (apiKey) {
             this.ai = new genai_1.GoogleGenAI({ apiKey });
         }
@@ -59,7 +60,7 @@ let AiSentimentService = AiSentimentService_1 = class AiSentimentService {
             let timeoutHandle;
             const timeoutPromise = new Promise((_, reject) => {
                 timeoutHandle = setTimeout(() => {
-                    reject(new Error('AI sentiment analysis timed out after 10 seconds'));
+                    reject(new Error(`AI sentiment analysis timed out after ${this.timeoutMs / 1000} seconds`));
                 }, this.timeoutMs);
             });
             const generatePromise = this.ai.models.generateContent({

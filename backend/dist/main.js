@@ -9,8 +9,9 @@ async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const configService = app.get(config_1.ConfigService);
     const frontendUrl = configService.get('FRONTEND_URL') || 'http://localhost:5173';
+    const allowedOrigins = frontendUrl.split(',').map((url) => url.trim());
     app.enableCors({
-        origin: frontendUrl,
+        origin: allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins,
         credentials: true,
     });
     app.useGlobalPipes(new common_1.ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));

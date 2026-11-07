@@ -15,10 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AcceptSessionUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const chat_repository_interface_1 = require("../../domain/repositories/chat.repository.interface");
+const create_notification_use_case_1 = require("../../../notification/application/use-cases/create-notification.use-case");
 let AcceptSessionUseCase = class AcceptSessionUseCase {
     chatRepository;
-    constructor(chatRepository) {
+    createNotificationUseCase;
+    constructor(chatRepository, createNotificationUseCase) {
         this.chatRepository = chatRepository;
+        this.createNotificationUseCase = createNotificationUseCase;
     }
     async execute(volunteerId, sessionId) {
         const isVerified = await this.chatRepository.isVolunteerVerified(volunteerId);
@@ -33,6 +36,14 @@ let AcceptSessionUseCase = class AcceptSessionUseCase {
         if (!acceptedSession) {
             throw new common_1.ConflictException('Phiên đã được nhận bởi người khác');
         }
+        if (this.createNotificationUseCase) {
+            await this.createNotificationUseCase.execute({
+                userId: acceptedSession.userId,
+                title: 'Tình nguyện viên đã tiếp nhận phiên hỗ trợ',
+                content: 'Một tình nguyện viên vừa tiếp nhận yêu cầu hỗ trợ của bạn. Hãy vào phòng chat để bắt đầu.',
+                type: 'SESSION_ACCEPTED',
+            }).catch(() => null);
+        }
         return acceptedSession;
     }
 };
@@ -40,6 +51,7 @@ exports.AcceptSessionUseCase = AcceptSessionUseCase;
 exports.AcceptSessionUseCase = AcceptSessionUseCase = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(chat_repository_interface_1.CHAT_REPOSITORY)),
-    __metadata("design:paramtypes", [Object])
+    __param(1, (0, common_1.Optional)()),
+    __metadata("design:paramtypes", [Object, create_notification_use_case_1.CreateNotificationUseCase])
 ], AcceptSessionUseCase);
 //# sourceMappingURL=accept-session.use-case.js.map

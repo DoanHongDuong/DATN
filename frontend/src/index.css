@@ -106,3 +106,31 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* Responsive Navigation & Mobile Viewport Rules (375px - 768px) */
+.desktop-nav {
+  display: flex;
+  gap: 8px;
+}
+
+.mobile-menu-btn {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .desktop-nav {
+    display: none !important;
+  }
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+  .user-name-text {
+    display: none !important;
+  }
+}
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+

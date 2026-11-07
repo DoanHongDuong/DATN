@@ -524,6 +524,7 @@ export const VolunteerDashboard: React.FC = () => {
               columns={queueColumns}
               rowKey="id"
               pagination={{ pageSize: 5 }}
+              scroll={{ x: 750 }}
               size="middle"
             />
           )}

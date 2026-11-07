@@ -1,12 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { HeartPulse, BookOpen, MessageSquare, LayoutDashboard, LogOut, User as UserIcon, ShieldCheck, Sparkles } from 'lucide-react';
+import {
+  HeartPulse,
+  BookOpen,
+  MessageSquare,
+  LayoutDashboard,
+  LogOut,
+  User as UserIcon,
+  ShieldCheck,
+  Sparkles,
+  Menu,
+  X,
+} from 'lucide-react';
+import { NotificationDropdown } from '../notification/NotificationDropdown';
 
 export const Navbar: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [prevPathname, setPrevPathname] = useState(location.pathname);
+
+  if (prevPathname !== location.pathname) {
+    setPrevPathname(location.pathname);
+    setMobileMenuOpen(false);
+  }
 
   const isAuthPage = ['/login', '/register', '/forgot-password', '/reset-password'].includes(
     location.pathname,
@@ -65,7 +84,7 @@ export const Navbar: React.FC = () => {
       </Link>
 
       {!isAuthPage && isAuthenticated && (
-        <nav style={{ display: 'flex', gap: '8px' }}>
+        <nav className="desktop-nav">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname.startsWith(item.path);
@@ -129,6 +148,7 @@ export const Navbar: React.FC = () => {
           )
         ) : isAuthenticated ? (
           <>
+            <NotificationDropdown />
             <Link
               to="/profile"
               title="Hồ sơ cá nhân & Đổi mật khẩu"
@@ -147,7 +167,7 @@ export const Navbar: React.FC = () => {
               }}
             >
               <UserIcon size={16} />
-              <span style={{ fontWeight: 500 }}>{user?.fullName}</span>
+              <span className="user-name-text" style={{ fontWeight: 500 }}>{user?.fullName}</span>
               <span style={{
                 fontSize: '11px',
                 padding: '2px 6px',
@@ -181,8 +201,30 @@ export const Navbar: React.FC = () => {
               }}
             >
               <LogOut size={16} />
-              <span>Đăng xuất</span>
+              <span className="user-name-text">Đăng xuất</span>
             </button>
+
+            {/* Mobile Hamburger Button */}
+            {!isAuthPage && (
+              <button
+                className="mobile-menu-btn"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Menu"
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border)',
+                  background: mobileMenuOpen ? 'var(--accent-bg)' : 'transparent',
+                  color: mobileMenuOpen ? 'var(--accent)' : 'var(--text)',
+                  cursor: 'pointer',
+                }}
+              >
+                {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
+            )}
           </>
         ) : (
           <>
@@ -216,6 +258,52 @@ export const Navbar: React.FC = () => {
           </>
         )}
       </div>
+
+      {/* Mobile Navigation Drawer */}
+      {mobileMenuOpen && !isAuthPage && isAuthenticated && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            background: 'var(--bg)',
+            borderBottom: '1px solid var(--border)',
+            padding: '12px 16px 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+          }}
+        >
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname.startsWith(item.path);
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '10px 14px',
+                  borderRadius: '8px',
+                  textDecoration: 'none',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  background: isActive ? 'var(--accent-bg)' : 'transparent',
+                  color: isActive ? 'var(--accent)' : 'var(--text)',
+                }}
+              >
+                <Icon size={18} />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      )}
     </header>
   );
 };

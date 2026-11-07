@@ -361,6 +361,7 @@ export const AdminResourcesPage: React.FC = () => {
           columns={columns}
           rowKey="id"
           loading={loading}
+          scroll={{ x: 750 }}
           pagination={{ pageSize: 8, showTotal: (total) => `Tổng cộng ${total} tài nguyên` }}
         />
       </Card>

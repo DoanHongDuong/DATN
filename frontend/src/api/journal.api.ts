@@ -47,7 +47,7 @@ export interface MoodTrendSummary {
   neutralCount: number;
   negativeCount: number;
   crisisCount: number;
-  trend: 'improving' | 'stable' | 'declining' | 'insufficient_data';
+  trend: 'improving' | 'stable' | 'declining' | 'insufficient_data' | 'crisis';
 }
 
 export interface MoodTrendResponse {

@@ -278,6 +278,7 @@ export const AdminAuditLogsPage: React.FC = () => {
           dataSource={logs}
           rowKey="id"
           loading={loading}
+          scroll={{ x: 750 }}
           locale={{ emptyText: 'Không tìm thấy bản ghi kiểm toán nào.' }}
           pagination={{
             current: page,

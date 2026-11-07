@@ -8,6 +8,17 @@ import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { VolunteerDashboard } from './volunteer/VolunteerDashboard';
 import { MoodTrendChart } from '../components/dashboard/MoodTrendChart';
 
+const getSeverityInfo = (level: string) => {
+  switch (level) {
+    case 'MINIMAL':   return { label: 'Bình thường / Ổn định',   color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)' };
+    case 'MILD':      return { label: 'Mức độ nhẹ',              color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.12)' };
+    case 'MODERATE':  return { label: 'Mức độ vừa phải',         color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)' };
+    case 'MODERATELY_SEVERE': return { label: 'Khá nghiêm trọng', color: '#f97316', bg: 'rgba(249, 115, 22, 0.12)' };
+    case 'SEVERE':    return { label: 'Nghiêm trọng',             color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)' };
+    default:          return { label: level,                       color: 'var(--accent)', bg: 'var(--accent-bg)' };
+  }
+};
+
 export const DashboardPage: React.FC = () => {
   const { user } = useAuth();
   const isVolunteer = user?.role === 'VOLUNTEER';
@@ -187,7 +198,7 @@ export const DashboardPage: React.FC = () => {
       <MoodTrendChart />
 
       {/* Main Content Grid: Recent Assessments & Recent Journals */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
         {/* Recent Assessment Results */}
         <div style={{ padding: '24px', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--bg)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -199,7 +210,9 @@ export const DashboardPage: React.FC = () => {
             <p style={{ color: 'var(--text)', fontSize: '14px' }}>Bạn chưa thực hiện bài đánh giá nào.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {recentTests.map((t) => (
+              {recentTests.map((t) => {
+                const severityInfo = getSeverityInfo(t.severityLevel);
+                return (
                 <div key={t.id} style={{
                   padding: '12px',
                   borderRadius: '8px',
@@ -210,24 +223,26 @@ export const DashboardPage: React.FC = () => {
                 }}>
                   <div>
                     <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-h)' }}>
-                      Mức độ: {t.severityLevel} (Điểm: {t.totalScore})
+                      Mức độ: {severityInfo.label} (Điểm: {t.totalScore})
                     </div>
                     <div style={{ fontSize: '12px', color: 'var(--text)' }}>
-                      {new Date(t.createdAt).toLocaleDateString('vi-VN')}
+                      {(t.takenAt || t.createdAt)
+                        ? new Date(t.takenAt || t.createdAt!).toLocaleDateString('vi-VN')
+                        : ''}
                     </div>
                   </div>
                   <span style={{
                     fontSize: '11px',
                     padding: '4px 8px',
                     borderRadius: '4px',
-                    background: t.severityLevel === 'SEVERE' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)',
-                    color: t.severityLevel === 'SEVERE' ? '#ef4444' : '#10b981',
+                    background: severityInfo.bg,
+                    color: severityInfo.color,
                     fontWeight: 600
                   }}>
-                    {t.severityLevel}
+                    {severityInfo.label}
                   </span>
                 </div>
-              ))}
+              )})}
             </div>
           )}
         </div>

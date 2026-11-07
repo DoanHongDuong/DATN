@@ -49,16 +49,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   ) { }
 
   afterInit(server: Server) {
-    const frontendUrl = this.configService.get<string>('FRONTEND_URL');
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5173';
+    const allowedOrigins = frontendUrl.split(',').map((url) => url.trim());
     server.engine.opts.cors = {
-      origin: frontendUrl,
+      origin: allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins,
       credentials: true,
     };
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const cors = require('cors');
     (server.engine as any).use(
       cors({
-        origin: frontendUrl,
+        origin: allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins,
         credentials: true,
       }),
     );

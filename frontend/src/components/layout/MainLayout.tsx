@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Link } from 'react-router-dom';
 import { Navbar } from './Navbar';
 
 export const MainLayout: React.FC = () => {
@@ -14,9 +14,18 @@ export const MainLayout: React.FC = () => {
         padding: '20px',
         borderTop: '1px solid var(--border)',
         fontSize: '13px',
-        color: 'var(--text)'
+        color: 'var(--text)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '12px',
+        flexWrap: 'wrap',
       }}>
-        © {new Date().getFullYear()} MindCare - Hệ thống Hỗ trợ Sức khỏe Tâm thần Sinh viên.
+        <span>© {new Date().getFullYear()} MindCare - Hệ thống Hỗ trợ Sức khỏe Tâm thần Sinh viên.</span>
+        <span>•</span>
+        <Link to="/privacy" style={{ color: 'var(--accent)', textDecoration: 'none' }}>
+          Chính sách quyền riêng tư
+        </Link>
       </footer>
     </div>
   );

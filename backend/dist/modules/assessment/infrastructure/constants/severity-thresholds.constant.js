@@ -34,7 +34,7 @@ function getSeverityLevel(testCode, totalScore) {
 function getRecommendation(testCode, level) {
     switch (level) {
         case client_1.SeverityLevel.MINIMAL:
-            return 'Tình trạng tâm lý của bạn hiện ở mức bình thường hoặc tối thiểu. Hãy tiếp tục duy trì lối sống điều độ, ngủ đủ giấc và vận động thể thao để giữ tinh thần luôn thoải mái.';
+            return 'Tình trạng tâm lý của bạn hiện ở mức bình thường và ổn định (triệu chứng ở mức tối thiểu). Hãy tiếp tục duy trì lối sống điều độ, ngủ đủ giấc và vận động thể thao để giữ tinh thần luôn thoải mái.';
         case client_1.SeverityLevel.MILD:
             return 'Bạn đang có dấu hiệu căng thẳng hoặc lo âu nhẹ. Hãy dành thời gian nghỉ ngơi, thực hành các bài tập nhịp thở 4-7-8, nghe âm thanh thư giãn hoặc viết nhật ký để giải tỏa áp lực.';
         case client_1.SeverityLevel.MODERATE:

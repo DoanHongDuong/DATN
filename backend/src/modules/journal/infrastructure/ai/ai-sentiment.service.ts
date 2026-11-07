@@ -31,11 +31,12 @@ export type { SentimentAnalysisResult, SentimentLabel, SuggestedResourceCategory
 export class AiSentimentService implements IAiSentimentService {
   private readonly logger = new Logger(AiSentimentService.name);
   private readonly ai: GoogleGenAI | null = null;
-  private readonly timeoutMs = 10000; // 10 seconds timeout as specified in NFR-03
+  private readonly timeoutMs: number;
   private readonly model = 'gemini-3.5-flash-lite';
 
   constructor(private readonly configService: ConfigService) {
     const apiKey = this.configService.get<string>('GEMINI_API_KEY');
+    this.timeoutMs = Number(this.configService.get<number>('AI_TIMEOUT_MS')) || 40000;
     if (apiKey) {
       this.ai = new GoogleGenAI({ apiKey });
     } else {
@@ -60,7 +61,7 @@ export class AiSentimentService implements IAiSentimentService {
 
       const timeoutPromise = new Promise<never>((_, reject) => {
         timeoutHandle = setTimeout(() => {
-          reject(new Error('AI sentiment analysis timed out after 10 seconds'));
+          reject(new Error(`AI sentiment analysis timed out after ${this.timeoutMs / 1000} seconds`));
         }, this.timeoutMs);
       });
 
