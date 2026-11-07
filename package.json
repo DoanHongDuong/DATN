@@ -9,10 +9,15 @@
     "lint-staged": "^17.5.0"
   },
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "build": "npm run build --workspace=backend && npm run build --workspace=frontend"
   },
   "lint-staged": {
     "backend/**/*.ts": "npm run lint --workspace=backend",
     "frontend/**/*.{ts,tsx}": "npm run lint --workspace=frontend"
+  },
+  "dependencies": {
+    "@neon/config": "^1.13.0",
+    "@neon/env": "^2.1.0"
   }
 }

@@ -15,7 +15,10 @@ import { NotificationModule } from './modules/notification/infrastructure/notifi
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['.env.local', '../.env.local', '.env', 'backend/.env'],
+    }),
     PrismaModule,
     MailModule,
     AuthModule,
