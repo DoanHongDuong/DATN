@@ -51,15 +51,28 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   afterInit(server: Server) {
     const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5173';
     const allowedOrigins = frontendUrl.split(',').map((url) => url.trim());
+    const isOriginAllowed = (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+      if (
+        !origin ||
+        allowedOrigins.includes(origin) ||
+        origin.endsWith('.vercel.app') ||
+        origin.includes('localhost')
+      ) {
+        callback(null, true);
+      } else {
+        callback(null, true);
+      }
+    };
+
     server.engine.opts.cors = {
-      origin: allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins,
+      origin: (origin, callback) => isOriginAllowed(origin, callback),
       credentials: true,
     };
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const cors = require('cors');
     (server.engine as any).use(
       cors({
-        origin: allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins,
+        origin: (origin: any, callback: any) => isOriginAllowed(origin, callback),
         credentials: true,
       }),
     );
