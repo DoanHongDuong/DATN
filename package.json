@@ -9,7 +9,7 @@
     "lint-staged": "^17.5.0"
   },
   "scripts": {
-    "prepare": "husky",
+    "prepare": "husky || true",
     "build": "npm run build --workspace=backend && npm run build --workspace=frontend"
   },
   "lint-staged": {
