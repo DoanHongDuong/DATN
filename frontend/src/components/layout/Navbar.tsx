@@ -48,35 +48,27 @@ export const Navbar: React.FC = () => {
   ];
 
   return (
-    <header style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '16px 24px',
-      borderBottom: '1px solid var(--border)',
-      background: 'var(--bg)',
-      position: 'sticky',
-      top: 0,
-      zIndex: 100
-    }}>
+    <header className="app-header">
       <Link to="/" style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '10px',
+        gap: '8px',
         textDecoration: 'none',
         fontWeight: 700,
-        fontSize: '20px',
-        color: 'var(--text-h)'
+        fontSize: '18px',
+        color: 'var(--text-h)',
+        flexShrink: 0,
       }}>
         <div style={{
-          width: '36px',
-          height: '36px',
-          borderRadius: '10px',
+          width: '32px',
+          height: '32px',
+          borderRadius: '8px',
           background: 'linear-gradient(135deg, #aa3bff 0%, #6b21a8 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#fff'
+          color: '#fff',
+          fontSize: '16px',
         }}>
           💜
         </div>
@@ -114,7 +106,7 @@ export const Navbar: React.FC = () => {
         </nav>
       )}
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
         {isAuthPage ? (
           location.pathname === '/login' ? (
             <Link
@@ -155,18 +147,18 @@ export const Navbar: React.FC = () => {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                padding: '6px 12px',
+                gap: '6px',
+                padding: '5px 10px',
                 borderRadius: '20px',
                 background: location.pathname === '/profile' ? 'var(--accent-bg, #f3e8ff)' : 'var(--code-bg)',
                 border: location.pathname === '/profile' ? '1px solid var(--accent, #9333ea)' : '1px solid transparent',
-                fontSize: '14px',
+                fontSize: '13px',
                 color: location.pathname === '/profile' ? 'var(--accent, #9333ea)' : 'var(--text-h)',
                 textDecoration: 'none',
                 transition: 'all 0.2s ease',
               }}
             >
-              <UserIcon size={16} />
+              <UserIcon size={15} />
               <span className="user-name-text" style={{ fontWeight: 500 }}>{user?.fullName}</span>
               <span style={{
                 fontSize: '11px',
@@ -184,23 +176,25 @@ export const Navbar: React.FC = () => {
                 {user?.role === 'ADMIN' ? 'Admin' : user?.role === 'VOLUNTEER' ? 'TNV' : 'User'}
               </span>
             </Link>
+
+            {/* Desktop-only Logout Button */}
             <button
               onClick={handleLogout}
+              className="desktop-logout-btn"
               style={{
-                display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '8px 14px',
+                padding: '7px 12px',
                 borderRadius: '8px',
                 border: '1px solid var(--border)',
                 background: 'transparent',
                 color: 'var(--text)',
                 cursor: 'pointer',
-                fontSize: '14px',
+                fontSize: '13px',
                 fontWeight: 500
               }}
             >
-              <LogOut size={16} />
+              <LogOut size={15} />
               <span className="user-name-text">Đăng xuất</span>
             </button>
 
@@ -209,17 +203,18 @@ export const Navbar: React.FC = () => {
               <button
                 className="mobile-menu-btn"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                aria-label="Menu"
+                aria-label="Menu danh mục"
                 style={{
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '38px',
-                  height: '38px',
+                  width: '36px',
+                  height: '36px',
                   borderRadius: '8px',
                   border: '1px solid var(--border)',
                   background: mobileMenuOpen ? 'var(--accent-bg)' : 'transparent',
                   color: mobileMenuOpen ? 'var(--accent)' : 'var(--text)',
                   cursor: 'pointer',
+                  padding: 0,
                 }}
               >
                 {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -302,6 +297,34 @@ export const Navbar: React.FC = () => {
               </Link>
             );
           })}
+
+          {/* Đăng xuất trong menu 3 gạch mobile */}
+          <div style={{ borderTop: '1px solid var(--border)', marginTop: '8px', paddingTop: '10px' }}>
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                handleLogout();
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: '8px',
+                border: 'none',
+                background: 'rgba(239, 68, 68, 0.08)',
+                color: '#ef4444',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: 500,
+                textAlign: 'left',
+              }}
+            >
+              <LogOut size={18} />
+              <span>Đăng xuất</span>
+            </button>
+          </div>
         </div>
       )}
     </header>

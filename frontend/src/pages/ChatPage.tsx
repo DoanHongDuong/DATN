@@ -474,18 +474,20 @@ export const ChatPage: React.FC = () => {
         {/* Chat Header */}
         <div
           style={{
-            padding: '16px 20px',
+            padding: '12px 16px',
             borderBottom: '1px solid var(--border)',
             background: 'var(--code-bg)',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '10px',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <UserCheck size={22} color="#10b981" />
             <div>
-              <div style={{ fontWeight: 600, color: 'var(--text-h)' }}>
+              <div style={{ fontWeight: 600, color: 'var(--text-h)', fontSize: '14px' }}>
                 {isVolunteer
                   ? 'Phiên tư vấn với Người dùng'
                   : 'Đang trò chuyện với Tình nguyện viên'}
@@ -496,7 +498,7 @@ export const ChatPage: React.FC = () => {
             </div>
           </div>
 
-          <Space>
+          <Space wrap size="small">
             <Tag color={isConnected ? 'success' : 'error'}>
               {isConnected ? '● Trực tuyến' : '○ Đang kết nối'}
             </Tag>
@@ -680,18 +682,24 @@ export const ChatPage: React.FC = () => {
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <Title level={3} style={{ margin: 0, color: 'var(--text-h)' }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          flexWrap: 'wrap',
+          gap: '12px'
+        }}>
+          <div style={{ minWidth: '220px', flex: '1 1 auto' }}>
+            <Title level={3} style={{ margin: 0, color: 'var(--text-h)', fontSize: 'clamp(18px, 4vw, 24px)' }}>
               📋 Hàng đợi Yêu cầu Hỗ trợ Tâm lý
             </Title>
-            <Text type="secondary">
+            <Text type="secondary" style={{ display: 'block', marginTop: '4px' }}>
               Danh sách các phiên chat đang chờ Tình nguyện viên tiếp nhận.
             </Text>
           </div>
-          <Space size="middle">
+          <Space wrap size="middle" style={{ marginTop: '4px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-h)' }}>
+              <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-h)' }}>
                 Sẵn sàng nhận phiên:
               </span>
               <Switch
@@ -722,6 +730,7 @@ export const ChatPage: React.FC = () => {
               emptyText: 'Hiện không có người dùng nào đang chờ hỗ trợ.',
             }}
             pagination={{ pageSize: 10 }}
+            scroll={{ x: 650 }}
           />
         </Card>
       </div>

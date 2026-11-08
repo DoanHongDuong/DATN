@@ -253,7 +253,7 @@ export const VolunteerDashboard: React.FC = () => {
             <HeartHandshake size={28} />
           </div>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
               <Title level={4} style={{ margin: 0, color: 'var(--text-h)' }}>
                 Bàn trực Tình nguyện viên: {user?.fullName}
               </Title>
@@ -495,7 +495,7 @@ export const VolunteerDashboard: React.FC = () => {
       </div>
 
       {/* Main Content Grid: Waiting Queue + Guidelines */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
+      <div className="dashboard-split-grid">
         {/* Waiting Queue Table */}
         <Card
           title={

@@ -6,7 +6,7 @@ export const MainLayout: React.FC = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'var(--bg)' }}>
       <Navbar />
-      <main style={{ flex: 1, padding: '24px', width: '100%', maxWidth: '1440px', margin: '0 auto', boxSizing: 'border-box' }}>
+      <main className="app-main-content">
         <Outlet />
       </main>
       <footer style={{

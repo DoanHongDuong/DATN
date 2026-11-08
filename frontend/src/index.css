@@ -117,6 +117,37 @@ code {
   display: none;
 }
 
+.desktop-logout-btn {
+  display: flex !important;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.app-main-content {
+  flex: 1;
+  padding: 24px;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.dashboard-split-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
 @media (max-width: 900px) {
   .desktop-nav {
     display: none !important;
@@ -124,8 +155,20 @@ code {
   .mobile-menu-btn {
     display: flex !important;
   }
+  .desktop-logout-btn {
+    display: none !important;
+  }
   .user-name-text {
     display: none !important;
+  }
+  .app-header {
+    padding: 10px 14px !important;
+  }
+  .app-main-content {
+    padding: 16px 12px !important;
+  }
+  .dashboard-split-grid {
+    grid-template-columns: 1fr !important;
   }
 }
 
