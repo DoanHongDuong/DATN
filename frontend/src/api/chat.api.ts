@@ -81,6 +81,11 @@ export const chatApi = {
     return res.data;
   },
 
+  endSession: async (sessionId: string): Promise<ChatSession> => {
+    const res = await apiClient.post<ChatSession>(`/chat/${sessionId}/end`);
+    return res.data;
+  },
+
   submitFeedback: async (sessionId: string, payload: CreateFeedbackPayload): Promise<SessionFeedback> => {
     const res = await apiClient.post<SessionFeedback>(`/chat/${sessionId}/feedback`, payload);
     return res.data;

@@ -32,8 +32,8 @@ let EndSessionUseCase = class EndSessionUseCase {
         if (session.status !== client_1.SessionStatus.ACTIVE) {
             throw new common_1.ForbiddenException('Phiên hỗ trợ chưa bắt đầu hoặc đã kết thúc');
         }
-        if (session.volunteerId !== volunteerId) {
-            throw new common_1.ForbiddenException('Chỉ tình nguyện viên của phiên này mới có quyền kết thúc');
+        if (session.volunteerId !== volunteerId && session.userId !== volunteerId) {
+            throw new common_1.ForbiddenException('Chỉ người tham gia phiên này mới có quyền kết thúc');
         }
         const closedSession = await this.chatRepository.closeSession(sessionId);
         if (this.createNotificationUseCase && closedSession?.userId) {

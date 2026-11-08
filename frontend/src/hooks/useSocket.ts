@@ -17,6 +17,9 @@ export const useSocket = () => {
     const socketInstance = io(SOCKET_URL, {
       auth: { token },
       autoConnect: true,
+      transports: ['polling', 'websocket'],
+      reconnectionAttempts: 10,
+      reconnectionDelay: 1000,
     });
 
     socketInstance.on('connect', () => {
@@ -25,6 +28,10 @@ export const useSocket = () => {
 
     socketInstance.on('disconnect', () => {
       setIsConnected(false);
+    });
+
+    socketInstance.on('connect_error', (err) => {
+      console.warn('Socket connect_error:', err.message);
     });
 
     // Save socket to state

@@ -314,16 +314,34 @@ export const ChatPage: React.FC = () => {
     }
   };
 
-  // Xử lý Volunteer: Kết thúc phiên
-  const handleEndSession = () => {
-    if (!activeSession || !socket) return;
+  // Xử lý Kết thúc phiên (TNV hoặc User)
+  const handleEndSession = async () => {
+    if (!activeSession) return;
     if (!confirm('Bạn có chắc chắn muốn kết thúc phiên tư vấn này?')) return;
 
-    socket.emit('end_session', { sessionId: activeSession.id });
-    setActiveSession(null);
-    setMessages([]);
-    message.success('Đã kết thúc phiên hỗ trợ.');
-    fetchWaitingSessions();
+    try {
+      // 1. Gọi HTTP API chắc chắn cập nhật DB thành CLOSED
+      await chatApi.endSession(activeSession.id);
+
+      // 2. Gửi socket emit để realtime cho bên kia
+      if (socket) {
+        socket.emit('end_session', { sessionId: activeSession.id });
+      }
+
+      setActiveSession(null);
+      setMessages([]);
+      message.success('Đã kết thúc phiên hỗ trợ.');
+      if (isVolunteer) {
+        fetchWaitingSessions();
+      }
+    } catch (err: unknown) {
+      let msg = 'Không thể kết thúc phiên hỗ trợ';
+      if (axios.isAxiosError(err)) {
+        const axiosErr = err as AxiosError<{ message?: string }>;
+        msg = axiosErr.response?.data?.message || msg;
+      }
+      message.error(msg);
+    }
   };
 
   // Xử lý User: Gửi yêu cầu hỗ trợ
@@ -389,7 +407,12 @@ export const ChatPage: React.FC = () => {
   // Xử lý gửi tin nhắn
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputMessage.trim() || !activeSession || !socket) return;
+    if (!inputMessage.trim() || !activeSession) return;
+
+    if (!socket || !isConnected) {
+      message.warning('Đang kết nối lại máy chủ trò chuyện, vui lòng thử lại sau giây lát...');
+      return;
+    }
 
     socket.emit('send_message', {
       sessionId: activeSession.id,
@@ -474,19 +497,20 @@ export const ChatPage: React.FC = () => {
           </div>
 
           <Space>
+            <Tag color={isConnected ? 'success' : 'error'}>
+              {isConnected ? '● Trực tuyến' : '○ Đang kết nối'}
+            </Tag>
             <Tag color={PRIORITY_COLOR_MAP[activeSession.priorityLevel]}>
               Ưu tiên: {activeSession.priorityLevel}
             </Tag>
-            {isVolunteer && (
-              <Button
-                danger
-                size="small"
-                icon={<LogOut size={14} />}
-                onClick={handleEndSession}
-              >
-                Kết thúc phiên
-              </Button>
-            )}
+            <Button
+              danger
+              size="small"
+              icon={<LogOut size={14} />}
+              onClick={handleEndSession}
+            >
+              Kết thúc phiên
+            </Button>
           </Space>
         </div>
 

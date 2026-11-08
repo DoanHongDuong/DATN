@@ -39,9 +39,9 @@ export class EndSessionUseCase {
       throw new ForbiddenException('Phiên hỗ trợ chưa bắt đầu hoặc đã kết thúc');
     }
 
-    if (session.volunteerId !== volunteerId) {
+    if (session.volunteerId !== volunteerId && session.userId !== volunteerId) {
       throw new ForbiddenException(
-        'Chỉ tình nguyện viên của phiên này mới có quyền kết thúc',
+        'Chỉ người tham gia phiên này mới có quyền kết thúc',
       );
     }
 

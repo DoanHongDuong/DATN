@@ -38,24 +38,8 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
         this.endSessionUseCase = endSessionUseCase;
         this.chatRepository = chatRepository;
     }
-    afterInit(server) {
-        const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:5173';
-        const allowedOrigins = frontendUrl.split(',').map((url) => url.trim());
-        const isOriginAllowed = (origin, callback) => {
-            if (!origin ||
-                allowedOrigins.includes(origin) ||
-                origin.endsWith('.vercel.app') ||
-                origin.includes('localhost')) {
-                callback(null, true);
-            }
-            else {
-                callback(null, true);
-            }
-        };
-        server.engine.opts.cors = {
-            origin: (origin, callback) => isOriginAllowed(origin, callback),
-            credentials: true,
-        };
+    afterInit() {
+        this.logger.log('ChatGateway initialized with CORS origin: true');
     }
     async handleConnection(client) {
         try {
@@ -134,6 +118,9 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
     emitSessionAccepted(userId, session) {
         this.server.to(`user:${userId}`).emit('session_accepted', session);
     }
+    emitSessionEnded(sessionId, session) {
+        this.server.to(`session:${sessionId}`).emit('session_ended', session);
+    }
     extractToken(client) {
         const authToken = client.handshake.auth?.token;
         if (typeof authToken === 'string' && authToken.length > 0) {
@@ -182,7 +169,12 @@ __decorate([
 ], ChatGateway.prototype, "handleEndSession", null);
 exports.ChatGateway = ChatGateway = ChatGateway_1 = __decorate([
     (0, common_1.Injectable)(),
-    (0, websockets_1.WebSocketGateway)(),
+    (0, websockets_1.WebSocketGateway)({
+        cors: {
+            origin: true,
+            credentials: true,
+        },
+    }),
     __param(4, (0, common_2.Inject)(chat_repository_interface_1.CHAT_REPOSITORY)),
     __metadata("design:paramtypes", [jwt_1.JwtService,
         config_1.ConfigService,

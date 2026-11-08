@@ -18,6 +18,7 @@ const swagger_1 = require("@nestjs/swagger");
 const jwt_auth_guard_1 = require("../../auth/presentation/guards/jwt-auth.guard");
 const request_support_use_case_1 = require("../application/use-cases/request-support.use-case");
 const accept_session_use_case_1 = require("../application/use-cases/accept-session.use-case");
+const end_session_use_case_1 = require("../application/use-cases/end-session.use-case");
 const get_queue_position_use_case_1 = require("../application/use-cases/get-queue-position.use-case");
 const get_my_active_session_use_case_1 = require("../application/use-cases/get-my-active-session.use-case");
 const cancel_session_use_case_1 = require("../application/use-cases/cancel-session.use-case");
@@ -33,16 +34,18 @@ let ChatController = class ChatController {
     getQueuePositionUseCase;
     getMyActiveSessionUseCase;
     cancelSessionUseCase;
+    endSessionUseCase;
     submitSessionFeedbackUseCase;
     getSessionFeedbackUseCase;
     chatRepository;
     chatGateway;
-    constructor(requestSupportUseCase, acceptSessionUseCase, getQueuePositionUseCase, getMyActiveSessionUseCase, cancelSessionUseCase, submitSessionFeedbackUseCase, getSessionFeedbackUseCase, chatRepository, chatGateway) {
+    constructor(requestSupportUseCase, acceptSessionUseCase, getQueuePositionUseCase, getMyActiveSessionUseCase, cancelSessionUseCase, endSessionUseCase, submitSessionFeedbackUseCase, getSessionFeedbackUseCase, chatRepository, chatGateway) {
         this.requestSupportUseCase = requestSupportUseCase;
         this.acceptSessionUseCase = acceptSessionUseCase;
         this.getQueuePositionUseCase = getQueuePositionUseCase;
         this.getMyActiveSessionUseCase = getMyActiveSessionUseCase;
         this.cancelSessionUseCase = cancelSessionUseCase;
+        this.endSessionUseCase = endSessionUseCase;
         this.submitSessionFeedbackUseCase = submitSessionFeedbackUseCase;
         this.getSessionFeedbackUseCase = getSessionFeedbackUseCase;
         this.chatRepository = chatRepository;
@@ -68,6 +71,11 @@ let ChatController = class ChatController {
         const session = await this.acceptSessionUseCase.execute(req.user.userId, sessionId);
         this.chatGateway.emitSessionAccepted(session.userId, session);
         return session;
+    }
+    async endSession(sessionId, req) {
+        const closedSession = await this.endSessionUseCase.execute(req.user.userId, sessionId);
+        this.chatGateway.emitSessionEnded(sessionId, closedSession);
+        return closedSession;
     }
     async getQueuePosition(sessionId, req) {
         return this.getQueuePositionUseCase.execute(req.user.userId, sessionId);
@@ -132,6 +140,15 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ChatController.prototype, "acceptSession", null);
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Kết thúc phiên hỗ trợ (TNV hoặc User)' }),
+    (0, common_1.Post)(':id/end'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ChatController.prototype, "endSession", null);
+__decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Lấy vị trí của phiên chat trong hàng đợi' }),
     (0, common_1.Get)(':id/queue-position'),
     __param(0, (0, common_1.Param)('id')),
@@ -181,12 +198,13 @@ exports.ChatController = ChatController = __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Controller)('chat'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    __param(7, (0, common_1.Inject)(chat_repository_interface_1.CHAT_REPOSITORY)),
+    __param(8, (0, common_1.Inject)(chat_repository_interface_1.CHAT_REPOSITORY)),
     __metadata("design:paramtypes", [request_support_use_case_1.RequestSupportUseCase,
         accept_session_use_case_1.AcceptSessionUseCase,
         get_queue_position_use_case_1.GetQueuePositionUseCase,
         get_my_active_session_use_case_1.GetMyActiveSessionUseCase,
         cancel_session_use_case_1.CancelSessionUseCase,
+        end_session_use_case_1.EndSessionUseCase,
         submit_session_feedback_use_case_1.SubmitSessionFeedbackUseCase,
         get_session_feedback_use_case_1.GetSessionFeedbackUseCase, Object, chat_gateway_1.ChatGateway])
 ], ChatController);

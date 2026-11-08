@@ -14,6 +14,7 @@ import { Request } from 'express';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard';
 import { RequestSupportUseCase } from '../application/use-cases/request-support.use-case';
 import { AcceptSessionUseCase } from '../application/use-cases/accept-session.use-case';
+import { EndSessionUseCase } from '../application/use-cases/end-session.use-case';
 import { GetQueuePositionUseCase } from '../application/use-cases/get-queue-position.use-case';
 import { GetMyActiveSessionUseCase } from '../application/use-cases/get-my-active-session.use-case';
 import { CancelSessionUseCase } from '../application/use-cases/cancel-session.use-case';
@@ -42,6 +43,7 @@ export class ChatController {
     private readonly getQueuePositionUseCase: GetQueuePositionUseCase,
     private readonly getMyActiveSessionUseCase: GetMyActiveSessionUseCase,
     private readonly cancelSessionUseCase: CancelSessionUseCase,
+    private readonly endSessionUseCase: EndSessionUseCase,
     private readonly submitSessionFeedbackUseCase: SubmitSessionFeedbackUseCase,
     private readonly getSessionFeedbackUseCase: GetSessionFeedbackUseCase,
     @Inject(CHAT_REPOSITORY)
@@ -109,6 +111,27 @@ export class ChatController {
     this.chatGateway.emitSessionAccepted(session.userId, session);
 
     return session;
+  }
+
+  /**
+   * POST /chat/:id/end
+   * UC-08: Kết thúc phiên hỗ trợ
+   */
+  @ApiOperation({ summary: 'Kết thúc phiên hỗ trợ (TNV hoặc User)' })
+  @Post(':id/end')
+  async endSession(
+    @Param('id') sessionId: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    const closedSession = await this.endSessionUseCase.execute(
+      req.user.userId,
+      sessionId,
+    );
+
+    // Broadcast sự kiện 'session_ended' tới room session qua Socket.IO
+    this.chatGateway.emitSessionEnded(sessionId, closedSession);
+
+    return closedSession;
   }
 
   /**

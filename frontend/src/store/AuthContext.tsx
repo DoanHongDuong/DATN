@@ -39,7 +39,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const storedToken = localStorage.getItem('token');
       if (storedToken) {
         try {
-          const profile = await authApi.getMe();
+          // Timeout bảo vệ tối đa 8 giây để tránh treo loading vĩnh viễn nếu backend cold start chậm
+          const profilePromise = authApi.getMe();
+          const timeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('Auth check timeout')), 8000)
+          );
+
+          const profile = await Promise.race([profilePromise, timeoutPromise]);
           if (isMounted) {
             const currentUserJson = localStorage.getItem('user');
             const parsedUser = currentUserJson ? JSON.parse(currentUserJson) : null;
@@ -53,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             localStorage.setItem('user', JSON.stringify(updatedUser));
           }
         } catch (error) {
-          console.error('Failed to verify session token:', error);
+          console.warn('Phiên đăng nhập không khả dụng hoặc hết hạn:', error);
           if (isMounted) {
             logout();
           }

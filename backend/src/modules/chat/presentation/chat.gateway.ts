@@ -32,7 +32,12 @@ interface JwtPayload {
 }
 
 @Injectable()
-@WebSocketGateway()
+@WebSocketGateway({
+  cors: {
+    origin: true,
+    credentials: true,
+  },
+})
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server!: Server;
@@ -48,26 +53,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     private readonly chatRepository: IChatRepository,
   ) { }
 
-  afterInit(server: Server) {
-    const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5173';
-    const allowedOrigins = frontendUrl.split(',').map((url) => url.trim());
-    const isOriginAllowed = (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-      if (
-        !origin ||
-        allowedOrigins.includes(origin) ||
-        origin.endsWith('.vercel.app') ||
-        origin.includes('localhost')
-      ) {
-        callback(null, true);
-      } else {
-        callback(null, true);
-      }
-    };
-
-    server.engine.opts.cors = {
-      origin: (origin, callback) => isOriginAllowed(origin, callback),
-      credentials: true,
-    };
+  afterInit() {
+    this.logger.log('ChatGateway initialized with CORS origin: true');
   }
 
   /**
@@ -217,6 +204,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
    */
   emitSessionAccepted(userId: string, session: ChatSession): void {
     this.server.to(`user:${userId}`).emit('session_accepted', session);
+  }
+
+  /**
+   * Broadcast sự kiện 'session_ended' tới room session
+   */
+  emitSessionEnded(sessionId: string, session: ChatSession): void {
+    this.server.to(`session:${sessionId}`).emit('session_ended', session);
   }
 
   /**
