@@ -56,11 +56,6 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
             origin: (origin, callback) => isOriginAllowed(origin, callback),
             credentials: true,
         };
-        const cors = require('cors');
-        server.engine.use(cors({
-            origin: (origin, callback) => isOriginAllowed(origin, callback),
-            credentials: true,
-        }));
     }
     async handleConnection(client) {
         try {

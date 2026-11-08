@@ -68,14 +68,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       origin: (origin, callback) => isOriginAllowed(origin, callback),
       credentials: true,
     };
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const cors = require('cors');
-    (server.engine as any).use(
-      cors({
-        origin: (origin: any, callback: any) => isOriginAllowed(origin, callback),
-        credentials: true,
-      }),
-    );
   }
 
   /**
