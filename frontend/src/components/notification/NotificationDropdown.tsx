@@ -202,11 +202,13 @@ export const NotificationDropdown: React.FC = () => {
 
       {isOpen && (
         <div
+          className="notification-dropdown-panel"
           style={{
             position: 'absolute',
             top: '46px',
             right: 0,
-            width: 'min(360px, calc(100vw - 24px))',
+            width: '360px',
+            maxWidth: 'calc(100vw - 24px)',
             maxHeight: '480px',
             background: 'var(--card-bg, #1e1e2d)',
             borderRadius: '14px',

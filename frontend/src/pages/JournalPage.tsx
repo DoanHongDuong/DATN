@@ -166,12 +166,12 @@ export const JournalPage: React.FC = () => {
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '28px' }}>
+    <div className="journal-layout-grid">
       {/* Left Column: Create & Entries List */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         {/* Write Form */}
-        <div style={{ padding: '24px', borderRadius: '16px', border: '1px solid var(--border)', background: 'var(--code-bg)' }}>
-          <h3 style={{ margin: '0 0 16px 0', color: 'var(--text-h)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ padding: '20px', borderRadius: '16px', border: '1px solid var(--border)', background: 'var(--code-bg)' }}>
+          <h3 style={{ margin: '0 0 16px 0', color: 'var(--text-h)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '18px' }}>
             <Smile size={20} color="var(--accent)" /> Viết Nhật ký Cá nhân
           </h3>
 
@@ -249,11 +249,11 @@ export const JournalPage: React.FC = () => {
 
         {/* Entries List */}
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h3 style={{ margin: 0, color: 'var(--text-h)' }}>Lịch sử Nhật ký</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+            <h3 style={{ margin: 0, color: 'var(--text-h)', fontSize: '18px' }}>Lịch sử Nhật ký</h3>
             <button
               onClick={fetchJournalEntries}
-              style={{ padding: '6px 12px', fontSize: '12px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', cursor: 'pointer' }}
+              style={{ padding: '6px 14px', fontSize: '13px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', cursor: 'pointer' }}
             >
               Làm mới
             </button>

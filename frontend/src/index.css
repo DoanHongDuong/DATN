@@ -148,6 +148,29 @@ code {
   gap: 24px;
 }
 
+.journal-layout-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 28px;
+}
+
+.notification-dropdown-panel {
+  position: absolute;
+  top: 46px;
+  right: 0;
+  width: 360px;
+  max-width: calc(100vw - 24px);
+  max-height: 480px;
+  background: var(--card-bg, #1e1e2d);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+}
+
 @media (max-width: 900px) {
   .desktop-nav {
     display: none !important;
@@ -169,6 +192,22 @@ code {
   }
   .dashboard-split-grid {
     grid-template-columns: 1fr !important;
+  }
+  .journal-layout-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .notification-dropdown-panel {
+    position: fixed !important;
+    top: 56px !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    max-width: none !important;
+    max-height: calc(100vh - 80px) !important;
   }
 }
 
