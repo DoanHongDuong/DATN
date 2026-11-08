@@ -43,4 +43,29 @@ describe('EncryptionService', () => {
 
     expect(result).toEqual(legacyText);
   });
+
+  it('should decrypt text encrypted with fallback JWT_SECRET key', () => {
+    // Simulate legacy service using JWT_SECRET
+    const legacyConfigService = {
+      get: jest.fn().mockImplementation((key: string) => {
+        if (key === 'JWT_SECRET') return 'old-jwt-secret';
+        return undefined;
+      }),
+    } as unknown as ConfigService;
+    const legacyService = new EncryptionService(legacyConfigService);
+    const legacyEncrypted = legacyService.encrypt('Nội dung bảo mật cũ');
+
+    // Current service with dedicated JOURNAL_ENCRYPTION_KEY and JWT_SECRET as fallback
+    const currentConfigService = {
+      get: jest.fn().mockImplementation((key: string) => {
+        if (key === 'JOURNAL_ENCRYPTION_KEY') return 'new-dedicated-key-32bytes-long!';
+        if (key === 'JWT_SECRET') return 'old-jwt-secret';
+        return undefined;
+      }),
+    } as unknown as ConfigService;
+    const currentService = new EncryptionService(currentConfigService);
+
+    const decrypted = currentService.decrypt(legacyEncrypted);
+    expect(decrypted).toEqual('Nội dung bảo mật cũ');
+  });
 });

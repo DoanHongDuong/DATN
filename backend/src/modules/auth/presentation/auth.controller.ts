@@ -35,6 +35,8 @@ export class AuthController {
   ) { }
 
   @ApiOperation({ summary: 'Đăng ký tài khoản mới' })
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 5, ttl: 900000 } })
   @Post('register')
   register(@Body() dto: RegisterDto) {
     return this.registerUserUseCase.execute(dto);
@@ -55,18 +57,24 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Gửi lại email xác minh' })
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 5, ttl: 900000 } })
   @Post('resend-verification')
   resendVerification(@Body() dto: ForgotPasswordDto) {
     return this.resendVerificationEmailUseCase.execute(dto.email);
   }
 
   @ApiOperation({ summary: 'Yêu cầu khôi phục mật khẩu' })
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 5, ttl: 900000 } })
   @Post('forgot-password')
   forgotPassword(@Body() dto: ForgotPasswordDto) {
     return this.requestPasswordResetUseCase.execute(dto);
   }
 
   @ApiOperation({ summary: 'Đặt lại mật khẩu bằng token' })
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 5, ttl: 900000 } })
   @Post('reset-password')
   resetPassword(@Body() dto: ResetPasswordDto) {
     return this.resetPasswordUseCase.execute(dto);

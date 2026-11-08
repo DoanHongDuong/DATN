@@ -9,18 +9,19 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   const frontendUrl = configService.get<string>('FRONTEND_URL') || 'http://localhost:5173';
-  const allowedOrigins = frontendUrl.split(',').map((url) => url.trim());
+  const allowedOrigins = frontendUrl.split(',').map((url) => url.trim().replace(/\/+$/, ''));
   app.enableCors({
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
       if (
         !origin ||
         allowedOrigins.includes(origin) ||
         origin.endsWith('.vercel.app') ||
-        origin.includes('localhost')
+        origin.startsWith('http://localhost:') ||
+        origin.startsWith('http://127.0.0.1:')
       ) {
         callback(null, true);
       } else {
-        callback(null, true);
+        callback(null, false);
       }
     },
     credentials: true,

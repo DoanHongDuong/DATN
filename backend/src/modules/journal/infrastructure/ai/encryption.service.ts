@@ -8,15 +8,26 @@ export class EncryptionService implements IEncryptionService {
   private readonly logger = new Logger(EncryptionService.name);
   private readonly algorithm = 'aes-256-gcm';
   private readonly key: Buffer;
+  private readonly fallbackKey: Buffer | null = null;
 
   constructor(private readonly configService: ConfigService) {
     const rawKey =
+      this.configService.get<string>('JOURNAL_ENCRYPTION_KEY') ||
       this.configService.get<string>('ENCRYPTION_KEY') ||
       this.configService.get<string>('JWT_SECRET') ||
       'datn-secret-key-fallback-32b-length!';
 
     // Derive a fixed 32-byte key using sha256 to ensure 256-bit key length for AES-256
     this.key = crypto.createHash('sha256').update(rawKey).digest();
+
+    // Fallback key (for existing entries encrypted with legacy JWT_SECRET)
+    const jwtSecret = this.configService.get<string>('JWT_SECRET');
+    if (jwtSecret) {
+      const derivedJwtKey = crypto.createHash('sha256').update(jwtSecret).digest();
+      if (!this.key.equals(derivedJwtKey)) {
+        this.fallbackKey = derivedJwtKey;
+      }
+    }
   }
 
   encrypt(text: string): string {
@@ -35,6 +46,23 @@ export class EncryptionService implements IEncryptionService {
     }
   }
 
+  private decryptWithKey(cipherText: string, key: Buffer): string {
+    const parts = cipherText.split(':');
+    if (parts.length !== 5) {
+      return cipherText;
+    }
+
+    const iv = Buffer.from(parts[2], 'hex');
+    const authTag = Buffer.from(parts[3], 'hex');
+    const encrypted = Buffer.from(parts[4], 'hex');
+
+    const decipher = crypto.createDecipheriv(this.algorithm, key, iv);
+    decipher.setAuthTag(authTag);
+    const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
+
+    return decrypted.toString('utf8');
+  }
+
   decrypt(cipherText: string): string {
     if (!cipherText) return cipherText;
 
@@ -44,23 +72,21 @@ export class EncryptionService implements IEncryptionService {
     }
 
     try {
-      const parts = cipherText.split(':');
-      if (parts.length !== 5) {
-        return cipherText;
+      return this.decryptWithKey(cipherText, this.key);
+    } catch (primaryError) {
+      // If primary key failed, try fallback key (e.g. legacy entries encrypted with JWT_SECRET)
+      if (this.fallbackKey) {
+        try {
+          return this.decryptWithKey(cipherText, this.fallbackKey);
+        } catch {
+          // Both failed, proceed to warning below
+        }
       }
 
-      const iv = Buffer.from(parts[2], 'hex');
-      const authTag = Buffer.from(parts[3], 'hex');
-      const encrypted = Buffer.from(parts[4], 'hex');
-
-      const decipher = crypto.createDecipheriv(this.algorithm, this.key, iv);
-      decipher.setAuthTag(authTag);
-      const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
-
-      return decrypted.toString('utf8');
-    } catch (error) {
       // Do NOT log the content to comply with AGENTS.md security guidelines
-      this.logger.warn(`Decryption failed, returning text as-is: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      this.logger.warn(
+        `Decryption failed, returning text as-is: ${primaryError instanceof Error ? primaryError.message : 'Unknown error'}`,
+      );
       return cipherText;
     }
   }
