@@ -4,7 +4,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000, // 15s timeout – Render free tier có thể mất 30-50s cold start
+  timeout: 60000, // 60s timeout – Render free tier mất khoảng 40-55s khi khởi động từ trạng thái ngủ (cold start)
   headers: {
     'Content-Type': 'application/json',
   },

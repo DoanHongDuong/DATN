@@ -47,7 +47,7 @@ export const LoginPage: React.FC = () => {
       if (axios.isAxiosError(error)) {
         const axiosErr = error as AxiosError<ApiErrorResponse>;
         if (!axiosErr.response) {
-          msg = 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra backend server.';
+          msg = 'Máy chủ đang khởi động lại từ chế độ ngủ (Render cold-start ~30-50s) hoặc gặp lỗi mạng. Vui lòng bấm thử lại!';
         } else {
           const backendMsg = axiosErr.response.data?.message;
           if (Array.isArray(backendMsg)) {
