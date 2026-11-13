@@ -84,7 +84,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       // Tự động join room theo userId để nhận thông báo cá nhân
       await client.join(`user:${payload.sub}`);
 
-      this.logger.log(`Socket connected: userId=${payload.sub}`);
+      // Nếu là Tình nguyện viên hoặc Admin, join room 'volunteers' để nhận thông báo hàng đợi
+      if (payload.role === 'VOLUNTEER' || payload.role === 'ADMIN') {
+        await client.join('volunteers');
+      }
+
+      this.logger.log(`Socket connected: userId=${payload.sub}, role=${payload.role}`);
     } catch {
       this.logger.warn('Socket connection rejected: invalid token');
       client.disconnect();
@@ -199,11 +204,22 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   /**
+   * Broadcast sự kiện 'new_waiting_session' tới room volunteers
+   * và kích hoạt cập nhật thông báo realtime cho các TNV
+   */
+  emitNewWaitingSession(session: ChatSession): void {
+    this.server.to('volunteers').emit('new_waiting_session', session);
+    this.server.to('volunteers').emit('new_notification');
+  }
+
+  /**
    * Emit sự kiện 'session_accepted' tới đúng user đang chờ
    * Được gọi từ ChatController sau khi AcceptSessionUseCase thành công
    */
   emitSessionAccepted(userId: string, session: ChatSession): void {
     this.server.to(`user:${userId}`).emit('session_accepted', session);
+    this.server.to(`user:${userId}`).emit('new_notification');
+    this.server.to('volunteers').emit('waiting_session_accepted', { sessionId: session.id });
   }
 
   /**
@@ -211,6 +227,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
    */
   emitSessionEnded(sessionId: string, session: ChatSession): void {
     this.server.to(`session:${sessionId}`).emit('session_ended', session);
+    if (session.userId) {
+      this.server.to(`user:${session.userId}`).emit('new_notification');
+    }
   }
 
   /**

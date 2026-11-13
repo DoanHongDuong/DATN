@@ -20,9 +20,12 @@ import { AdminStatsPage } from '../pages/admin/AdminStatsPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import { PrivacyPage } from '../pages/PrivacyPage';
 
+import { GlobalSocketListener } from '../components/common/GlobalSocketListener';
+
 export const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
+      <GlobalSocketListener />
       <Routes>
         <Route element={<MainLayout />}>
           {/* Public General Routes */}

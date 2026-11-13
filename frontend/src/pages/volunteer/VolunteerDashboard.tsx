@@ -134,6 +134,21 @@ export const VolunteerDashboard: React.FC = () => {
     };
   }, []);
 
+  // Tự động làm mới danh sách hàng đợi khi có sinh viên mới hoặc có ca được nhận
+  useEffect(() => {
+    const handleQueueUpdate = () => {
+      chatApi
+        .getWaitingSessions()
+        .then((queueData) => setWaitingSessions(queueData || []))
+        .catch((err) => console.error('Failed to auto-refresh queue:', err));
+    };
+
+    window.addEventListener('waiting_queue_updated', handleQueueUpdate);
+    return () => {
+      window.removeEventListener('waiting_queue_updated', handleQueueUpdate);
+    };
+  }, []);
+
   const handleToggleOnline = async (checked: boolean) => {
     setTogglingOnline(true);
     try {

@@ -267,14 +267,25 @@ export const ChatPage: React.FC = () => {
       }
     };
 
+    // Khi có sinh viên mới vào hàng đợi hoặc một phiên vừa được nhận
+    const onQueueChanged = () => {
+      if (isVolunteer && !activeSessionRef.current) {
+        fetchWaitingSessions();
+      }
+    };
+
     socket.on('session_accepted', onSessionAccepted);
     socket.on('new_message', onNewMessage);
     socket.on('session_ended', onSessionEnded);
+    socket.on('new_waiting_session', onQueueChanged);
+    socket.on('waiting_session_accepted', onQueueChanged);
 
     return () => {
       socket.off('session_accepted', onSessionAccepted);
       socket.off('new_message', onNewMessage);
       socket.off('session_ended', onSessionEnded);
+      socket.off('new_waiting_session', onQueueChanged);
+      socket.off('waiting_session_accepted', onQueueChanged);
     };
   }, [socket, loadMessages, isVolunteer, fetchWaitingSessions]);
 

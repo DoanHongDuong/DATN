@@ -1,4 +1,4 @@
-import { Injectable, Inject, ConflictException } from '@nestjs/common';
+import { Injectable, Inject, ConflictException, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SessionStatus } from '@prisma/client';
 import {
@@ -9,6 +9,7 @@ import {
   SEVERITY_TO_PRIORITY_MAP,
   DEFAULT_PRIORITY_LEVEL,
 } from '../../infrastructure/constants/priority-mapping.constant';
+import { CreateNotificationUseCase } from '../../../notification/application/use-cases/create-notification.use-case';
 
 /**
  * UC-06 — Yêu cầu hỗ trợ tâm lý (REST, không phải Socket)
@@ -18,6 +19,7 @@ import {
  * 2. Kiểm tra có TNV online & verified hay không
  *    - KHÔNG → trả về { noVolunteerAvailable: true, hotline }
  *    - CÓ    → map severity → priority, tạo session status=WAITING
+ * 3. Tạo thông báo cho các TNV đang trực tuyến
  */
 @Injectable()
 export class RequestSupportUseCase {
@@ -25,6 +27,8 @@ export class RequestSupportUseCase {
     @Inject(CHAT_REPOSITORY)
     private readonly chatRepository: IChatRepository,
     private readonly configService: ConfigService,
+    @Optional()
+    private readonly createNotificationUseCase?: CreateNotificationUseCase,
   ) {}
 
   async execute(userId: string) {
@@ -58,6 +62,21 @@ export class RequestSupportUseCase {
       priorityLevel,
       status: SessionStatus.WAITING,
     });
+
+    // Tạo thông báo cho các TNV trực tuyến
+    if (this.createNotificationUseCase) {
+      const volunteerUserIds = await this.chatRepository.findAvailableVolunteerUserIds();
+      await Promise.allSettled(
+        volunteerUserIds.map((vId) =>
+          this.createNotificationUseCase!.execute({
+            userId: vId,
+            title: 'Có sinh viên vào hàng đợi tư vấn',
+            content: `Một sinh viên vừa gửi yêu cầu hỗ trợ với mức ưu tiên: ${priorityLevel}. Hãy tiếp nhận phiên ngay.`,
+            type: 'NEW_WAITING_SESSION',
+          }),
+        ),
+      );
+    }
 
     return {
       noVolunteerAvailable: false,

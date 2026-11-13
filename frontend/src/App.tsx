@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ConfigProvider, theme } from 'antd';
 import viVN from 'antd/locale/vi_VN';
 import { AuthProvider } from './store/AuthContext';
+import { SocketProvider } from './store/SocketProvider';
 import { AppRouter } from './router/AppRouter';
 
 const queryClient = new QueryClient({
@@ -51,7 +52,9 @@ export const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <ConfigProvider locale={viVN} theme={antdTheme}>
         <AuthProvider>
-          <AppRouter />
+          <SocketProvider>
+            <AppRouter />
+          </SocketProvider>
         </AuthProvider>
       </ConfigProvider>
     </QueryClientProvider>

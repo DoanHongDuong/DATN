@@ -31,6 +31,11 @@ export interface IChatRepository {
   hasAvailableVolunteer(): Promise<boolean>;
 
   /**
+   * Lấy danh sách user_id của các TNV is_online = true VÀ is_verified = true
+   */
+  findAvailableVolunteerUserIds(): Promise<string[]>;
+
+  /**
    * Kiểm tra tình nguyện viên cụ thể đã được xác thực (is_verified = true) hay chưa
    */
   isVolunteerVerified(volunteerId: string): Promise<boolean>;

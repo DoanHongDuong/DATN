@@ -85,7 +85,14 @@ export class ChatController {
   @ApiOperation({ summary: 'Yêu cầu tư vấn hỗ trợ tâm lý' })
   @Post('request-support')
   async requestSupport(@Req() req: AuthenticatedRequest) {
-    return this.requestSupportUseCase.execute(req.user.userId);
+    const result = await this.requestSupportUseCase.execute(req.user.userId);
+
+    // Nếu tạo session chờ thành công, broadcast ngay tới các Tình nguyện viên
+    if (result.session) {
+      this.chatGateway.emitNewWaitingSession(result.session);
+    }
+
+    return result;
   }
 
   /**

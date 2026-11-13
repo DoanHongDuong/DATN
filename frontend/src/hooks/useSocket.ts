@@ -1,54 +1,11 @@
-import { useEffect, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
-import { useAuth } from './useAuth';
+import { useContext } from 'react';
+import { SocketContext } from '../store/socket.context';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
+/**
+ * Hook trả về socket và trạng thái kết nối từ SocketContext toàn cục.
+ * Socket được tạo một lần duy nhất tại SocketProvider (App.tsx),
+ * nên mọi component đều dùng chung connection.
+ */
 export const useSocket = () => {
-  const { token } = useAuth();
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [isConnected, setIsConnected] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (!token) {
-      return;
-    }
-
-    const socketInstance = io(SOCKET_URL, {
-      auth: { token },
-      autoConnect: true,
-      transports: ['polling', 'websocket'],
-      reconnectionAttempts: 10,
-      reconnectionDelay: 1000,
-    });
-
-    socketInstance.on('connect', () => {
-      setIsConnected(true);
-    });
-
-    socketInstance.on('disconnect', () => {
-      setIsConnected(false);
-    });
-
-    socketInstance.on('connect_error', (err) => {
-      console.warn('Socket connect_error:', err.message);
-    });
-
-    // Save socket to state
-    const timer = setTimeout(() => {
-      setSocket(socketInstance);
-    }, 0);
-
-    return () => {
-      clearTimeout(timer);
-      socketInstance.disconnect();
-      setIsConnected(false);
-      setSocket(null);
-    };
-  }, [token]);
-
-  return {
-    socket,
-    isConnected,
-  };
+  return useContext(SocketContext);
 };

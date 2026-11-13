@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   UserX,
   Sparkles,
+  Clock,
 } from 'lucide-react';
 import { notificationApi, type NotificationItem } from '../../api/notification.api';
 
@@ -53,11 +54,21 @@ export const NotificationDropdown: React.FC = () => {
     checkCount();
     const timer = setInterval(checkCount, 45000);
 
+    // Lắng nghe thông báo socket realtime
+    const handleSocketNotification = () => {
+      checkCount();
+      if (isOpen) {
+        fetchNotifications();
+      }
+    };
+    window.addEventListener('socket:new_notification', handleSocketNotification);
+
     return () => {
       cancelled = true;
       clearInterval(timer);
+      window.removeEventListener('socket:new_notification', handleSocketNotification);
     };
-  }, []);
+  }, [isOpen, fetchNotifications]);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -108,7 +119,7 @@ export const NotificationDropdown: React.FC = () => {
     setIsOpen(false);
 
     // Deep navigation based on notification type
-    if (item.type.startsWith('SESSION_')) {
+    if (item.type.startsWith('SESSION_') || item.type === 'NEW_WAITING_SESSION') {
       navigate('/chat');
     } else if (item.type === 'VOLUNTEER_APPROVED') {
       navigate('/chat');
@@ -145,6 +156,8 @@ export const NotificationDropdown: React.FC = () => {
         return <UserX size={18} style={{ color: '#ef4444', flexShrink: 0 }} />;
       case 'SESSION_ACCEPTED':
         return <MessageSquare size={18} style={{ color: '#3b82f6', flexShrink: 0 }} />;
+      case 'NEW_WAITING_SESSION':
+        return <Clock size={18} style={{ color: '#f59e0b', flexShrink: 0 }} />;
       case 'SESSION_ENDED':
         return <CheckCircle size={18} style={{ color: '#8b5cf6', flexShrink: 0 }} />;
       case 'CRISIS_ALERT':
