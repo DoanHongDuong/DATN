@@ -63,9 +63,12 @@ export const GlobalSocketListener: React.FC = () => {
     };
 
     // === Cho VOLUNTEER: thông báo realtime khi có user mới vào hàng đợi ===
-    const onNewWaitingSession = (data: { priorityLevel: string }) => {
-      // Chỉ thông báo cho Volunteer hoặc Admin
-      if (user.role !== 'VOLUNTEER' && user.role !== 'ADMIN') return;
+    const onNewWaitingSession = (data: { priorityLevel: string; userId?: string }) => {
+      // 1. Tuyệt đối không thông báo nếu chính mình là người gửi yêu cầu hỗ trợ này
+      if (data?.userId && data.userId === user.id) return;
+
+      // 2. CHỈ thông báo cho Tình nguyện viên đang trực ca (không báo cho User thường hay Admin)
+      if (user.role !== 'VOLUNTEER') return;
 
       const isCritical = data.priorityLevel === 'CRITICAL';
 

@@ -63,11 +63,12 @@ export class RequestSupportUseCase {
       status: SessionStatus.WAITING,
     });
 
-    // Tạo thông báo cho các TNV trực tuyến
+    // Tạo thông báo cho các TNV trực tuyến (loại trừ chính người gửi nếu là TNV tự test)
     if (this.createNotificationUseCase) {
       const volunteerUserIds = await this.chatRepository.findAvailableVolunteerUserIds();
+      const targetVolunteerIds = volunteerUserIds.filter((vId) => vId !== userId);
       await Promise.allSettled(
-        volunteerUserIds.map((vId) =>
+        targetVolunteerIds.map((vId) =>
           this.createNotificationUseCase!.execute({
             userId: vId,
             title: 'Có sinh viên vào hàng đợi tư vấn',

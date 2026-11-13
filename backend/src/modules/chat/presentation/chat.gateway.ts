@@ -84,8 +84,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       // Tự động join room theo userId để nhận thông báo cá nhân
       await client.join(`user:${payload.sub}`);
 
-      // Nếu là Tình nguyện viên hoặc Admin, join room 'volunteers' để nhận thông báo hàng đợi
-      if (payload.role === 'VOLUNTEER' || payload.role === 'ADMIN') {
+      // Chỉ Tình nguyện viên mới join room 'volunteers' để nhận thông báo hàng đợi
+      if (payload.role === 'VOLUNTEER') {
         await client.join('volunteers');
       }
 
@@ -208,7 +208,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
    * và kích hoạt cập nhật thông báo realtime cho các TNV
    */
   emitNewWaitingSession(session: ChatSession): void {
-    this.server.to('volunteers').emit('new_waiting_session', session);
+    this.server.to('volunteers').emit('new_waiting_session', {
+      id: session.id,
+      priorityLevel: session.priorityLevel,
+      userId: session.userId,
+    });
     this.server.to('volunteers').emit('new_notification');
   }
 
