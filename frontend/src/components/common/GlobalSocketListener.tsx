@@ -3,11 +3,16 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { notification } from 'antd';
 import { useSocket } from '../../hooks/useSocket';
 import { useAuth } from '../../hooks/useAuth';
+import { playNotificationSound } from '../../utils/sound';
+import {
+  sendBrowserNotification,
+  requestBrowserNotificationPermission,
+} from '../../utils/browserNotification';
 
 /**
  * Component listener toàn cục cho các sự kiện socket quan trọng:
  * - `session_accepted`: Auto-redirect USER đến /chat khi TNV nhận phiên (khi user đang ở trang khác: /assessments, /resources...)
- * - `new_waiting_session`: Hiển thị thông báo cho VOLUNTEER khi có người vào hàng đợi
+ * - `new_waiting_session`: Hiển thị thông báo + phát âm thanh + push notification cho VOLUNTEER khi có người vào hàng đợi
  * - `waiting_session_accepted`: Cập nhật hàng đợi của TNV khi có phiên vừa được tiếp nhận
  * - `new_notification`: Cập nhật chuông thông báo realtime
  */
@@ -17,14 +22,35 @@ export const GlobalSocketListener: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Chủ động đề xuất cấp quyền thông báo cho Tình nguyện viên
+  useEffect(() => {
+    if (user && (user.role === 'VOLUNTEER' || user.role === 'ADMIN')) {
+      requestBrowserNotificationPermission().catch(() => { });
+    }
+  }, [user]);
+
   useEffect(() => {
     if (!socket || !user) return;
 
     // === Cho USER: auto-redirect đến /chat khi TNV accept session ===
     const onSessionAccepted = () => {
-      // Báo chuông thông báo cập nhật
+      // 1. Phát âm thanh chuông êm dịu
+      playNotificationSound('chime');
+
+      // 2. Gửi thông báo trình duyệt nếu tab đang ẩn
+      sendBrowserNotification(
+        '💜 MindCare: Đã kết nối Tình nguyện viên!',
+        {
+          body: 'Tình nguyện viên vừa tiếp nhận phiên hỗ trợ của bạn. Bấm để vào phòng trò chuyện ngay.',
+          tag: 'session-accepted',
+        },
+        () => navigate('/chat'),
+      );
+
+      // 3. Báo chuông thông báo cập nhật
       window.dispatchEvent(new CustomEvent('socket:new_notification'));
 
+      // 4. Nếu đang ở trang khác (/resources, /assessments...), chuyển hướng ngay vào phòng chat
       if (location.pathname !== '/chat') {
         notification.success({
           message: 'Tình nguyện viên đã tiếp nhận phiên hỗ trợ!',
@@ -41,6 +67,11 @@ export const GlobalSocketListener: React.FC = () => {
       // Chỉ thông báo cho Volunteer hoặc Admin
       if (user.role !== 'VOLUNTEER' && user.role !== 'ADMIN') return;
 
+      const isCritical = data.priorityLevel === 'CRITICAL';
+
+      // 1. Phát âm thanh thông báo (urgent nếu là Critical, chime nếu thông thường)
+      playNotificationSound(isCritical ? 'urgent' : 'chime');
+
       const priorityLabel =
         data.priorityLevel === 'CRITICAL'
           ? '🔴 Rất cao (Critical)'
@@ -50,6 +81,17 @@ export const GlobalSocketListener: React.FC = () => {
               ? '🔵 Trung bình (Medium)'
               : '🟢 Thấp (Low)';
 
+      // 2. Gửi thông báo trình duyệt native
+      sendBrowserNotification(
+        isCritical ? '🚨 Cảnh báo khẩn cấp (Critical) - Sinh viên chờ hỗ trợ!' : '📋 Có sinh viên vào hàng đợi tư vấn',
+        {
+          body: `Mức độ ưu tiên: ${priorityLabel}. Bấm vào đây để tiếp nhận phiên tư vấn ngay.`,
+          tag: 'waiting-queue',
+        },
+        () => navigate('/chat'),
+      );
+
+      // 3. Toast trong ứng dụng
       notification.info({
         message: '📋 Có sinh viên mới vào hàng đợi tư vấn',
         description: `Mức độ ưu tiên: ${priorityLabel}. Nhấn để xem hoặc tiếp nhận hỗ trợ ngay.`,
@@ -60,7 +102,7 @@ export const GlobalSocketListener: React.FC = () => {
         },
       });
 
-      // Dispatch event để các component hàng đợi (VolunteerDashboard, ChatPage) tự refresh
+      // 4. Dispatch event để các component hàng đợi (VolunteerDashboard, ChatPage) tự refresh
       window.dispatchEvent(new CustomEvent('waiting_queue_updated'));
       window.dispatchEvent(new CustomEvent('socket:new_notification'));
     };

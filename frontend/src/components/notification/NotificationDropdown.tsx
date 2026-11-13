@@ -10,13 +10,22 @@ import {
   UserX,
   Sparkles,
   Clock,
+  Volume2,
 } from 'lucide-react';
 import { notificationApi, type NotificationItem } from '../../api/notification.api';
+import {
+  isBrowserNotificationSupported,
+  requestBrowserNotificationPermission,
+} from '../../utils/browserNotification';
 
 export const NotificationDropdown: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [filterTab, setFilterTab] = useState<'all' | 'unread'>('all');
+  const [hasBrowserPerm, setHasBrowserPerm] = useState(() => {
+    return isBrowserNotificationSupported() && Notification.permission === 'granted';
+  });
   const [isLoading, setIsLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -90,6 +99,11 @@ export const NotificationDropdown: React.FC = () => {
       fetchNotifications();
     }
     setIsOpen(!isOpen);
+  };
+
+  const handleEnableBrowserNotification = async () => {
+    const granted = await requestBrowserNotificationPermission();
+    setHasBrowserPerm(granted);
   };
 
   const handleMarkAllAsRead = async (e: React.MouseEvent) => {
@@ -287,6 +301,73 @@ export const NotificationDropdown: React.FC = () => {
             )}
           </div>
 
+          {/* Subheader: Filter Tabs & Browser Alert Option */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '6px 16px',
+              borderBottom: '1px solid var(--border)',
+              background: 'var(--bg)',
+              fontSize: '12px',
+            }}
+          >
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <button
+                onClick={() => setFilterTab('all')}
+                style={{
+                  background: filterTab === 'all' ? 'var(--accent-bg, rgba(168, 85, 247, 0.15))' : 'transparent',
+                  color: filterTab === 'all' ? 'var(--accent, #a855f7)' : 'var(--text)',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '3px 8px',
+                  cursor: 'pointer',
+                  fontWeight: filterTab === 'all' ? 600 : 500,
+                }}
+              >
+                Tất cả ({notifications.length})
+              </button>
+              <button
+                onClick={() => setFilterTab('unread')}
+                style={{
+                  background: filterTab === 'unread' ? 'var(--accent-bg, rgba(168, 85, 247, 0.15))' : 'transparent',
+                  color: filterTab === 'unread' ? 'var(--accent, #a855f7)' : 'var(--text)',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '3px 8px',
+                  cursor: 'pointer',
+                  fontWeight: filterTab === 'unread' ? 600 : 500,
+                }}
+              >
+                Chưa đọc ({unreadCount})
+              </button>
+            </div>
+
+            {/* Browser notification quick permission button */}
+            {isBrowserNotificationSupported() && !hasBrowserPerm && (
+              <button
+                onClick={handleEnableBrowserNotification}
+                title="Bật thông báo ngoài màn hình"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  border: 'none',
+                  background: 'transparent',
+                  color: 'var(--text)',
+                  cursor: 'pointer',
+                  fontSize: '11px',
+                  opacity: 0.85,
+                  padding: '2px 4px',
+                }}
+              >
+                <Volume2 size={12} />
+                <span>Bật pop-up</span>
+              </button>
+            )}
+          </div>
+
           {/* Body */}
           <div
             style={{
@@ -307,105 +388,107 @@ export const NotificationDropdown: React.FC = () => {
               >
                 Đang tải thông báo...
               </div>
-            ) : notifications.length === 0 ? (
-              <div
-                style={{
-                  padding: '40px 16px',
-                  textAlign: 'center',
-                  color: 'var(--text)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '10px',
-                }}
-              >
-                <Bell size={28} style={{ opacity: 0.3 }} />
-                <span style={{ fontSize: '13px', opacity: 0.7 }}>
-                  Bạn chưa có thông báo nào
-                </span>
-              </div>
+            ): (filterTab === 'unread' ? notifications.filter((n) => !n.isRead) : notifications).length === 0 ? (
+            <div
+              style={{
+                padding: '40px 16px',
+                textAlign: 'center',
+                color: 'var(--text)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '10px',
+              }}
+            >
+              <Bell size={28} style={{ opacity: 0.3 }} />
+              <span style={{ fontSize: '13px', opacity: 0.7 }}>
+                {filterTab === 'unread'
+                  ? 'Bạn không có thông báo chưa đọc nào 🎉'
+                  : 'Bạn chưa có thông báo nào'}
+              </span>
+            </div>
             ) : (
-              notifications.map((item) => (
+              (filterTab === 'unread' ? notifications.filter((n) => !n.isRead) : notifications).map((item) => (
+            <div
+              key={item.id}
+              onClick={() => handleNotificationClick(item)}
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '12px',
+                padding: '12px 16px',
+                borderBottom: '1px solid var(--border)',
+                background: item.isRead
+                  ? 'transparent'
+                  : 'var(--accent-bg, rgba(168, 85, 247, 0.08))',
+                cursor: 'pointer',
+                transition: 'background 0.15s ease',
+              }}
+            >
+              <div style={{ marginTop: '2px' }}>{renderIcon(item.type)}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <div
-                  key={item.id}
-                  onClick={() => handleNotificationClick(item)}
                   style={{
                     display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '12px',
-                    padding: '12px 16px',
-                    borderBottom: '1px solid var(--border)',
-                    background: item.isRead
-                      ? 'transparent'
-                      : 'var(--accent-bg, rgba(168, 85, 247, 0.08))',
-                    cursor: 'pointer',
-                    transition: 'background 0.15s ease',
+                    alignItems: 'baseline',
+                    justifyContent: 'space-between',
+                    gap: '8px',
+                    marginBottom: '3px',
                   }}
                 >
-                  <div style={{ marginTop: '2px' }}>{renderIcon(item.type)}</div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'baseline',
-                        justifyContent: 'space-between',
-                        gap: '8px',
-                        marginBottom: '3px',
-                      }}
-                    >
-                      <h4
-                        style={{
-                          margin: 0,
-                          fontSize: '13px',
-                          fontWeight: item.isRead ? 600 : 700,
-                          color: 'var(--text-h)',
-                          lineHeight: '1.4',
-                        }}
-                      >
-                        {item.title}
-                      </h4>
-                      <span
-                        style={{
-                          fontSize: '11px',
-                          color: 'var(--text)',
-                          opacity: 0.6,
-                          whiteSpace: 'nowrap',
-                          flexShrink: 0,
-                        }}
-                      >
-                        {formatTime(item.createdAt)}
-                      </span>
-                    </div>
-                    <p
-                      style={{
-                        margin: 0,
-                        fontSize: '12px',
-                        color: 'var(--text)',
-                        lineHeight: '1.4',
-                        opacity: item.isRead ? 0.75 : 0.95,
-                        display: '-webkit-box',
-                        WebkitLineClamp: 3,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      {item.content}
-                    </p>
-                  </div>
-                  {!item.isRead && (
-                    <span
-                      style={{
-                        width: '8px',
-                        height: '8px',
-                        borderRadius: '50%',
-                        background: 'var(--accent, #a855f7)',
-                        marginTop: '6px',
-                        flexShrink: 0,
-                      }}
-                    />
-                  )}
+                  <h4
+                    style={{
+                      margin: 0,
+                      fontSize: '13px',
+                      fontWeight: item.isRead ? 600 : 700,
+                      color: 'var(--text-h)',
+                      lineHeight: '1.4',
+                    }}
+                  >
+                    {item.title}
+                  </h4>
+                  <span
+                    style={{
+                      fontSize: '11px',
+                      color: 'var(--text)',
+                      opacity: 0.6,
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {formatTime(item.createdAt)}
+                  </span>
                 </div>
-              ))
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: '12px',
+                    color: 'var(--text)',
+                    lineHeight: '1.4',
+                    opacity: item.isRead ? 0.75 : 0.95,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {item.content}
+                </p>
+              </div>
+              {!item.isRead && (
+                <span
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: 'var(--accent, #a855f7)',
+                    marginTop: '6px',
+                    flexShrink: 0,
+                  }}
+                />
+              )}
+            </div>
+            ))
             )}
           </div>
         </div>
