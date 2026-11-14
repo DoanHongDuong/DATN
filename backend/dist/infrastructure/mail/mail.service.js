@@ -110,30 +110,8 @@ let NodemailerMailService = NodemailerMailService_1 = class NodemailerMailServic
         }
     }
     async dispatchEmail(to, subject, html) {
-        const resendApiKey = cleanEnv(this.configService.get('RESEND_API_KEY'));
         const brevoApiKey = cleanEnv(this.configService.get('BREVO_API_KEY'));
-        if (resendApiKey) {
-            this.logger.log(`Đang gửi email tới ${to} qua Resend HTTPS API (port 443)...`);
-            const res = await fetch('https://api.resend.com/emails', {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${resendApiKey}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    from: cleanEnv(this.configService.get('RESEND_FROM')) || 'PSYTHALIA <onboarding@resend.dev>',
-                    to: [to],
-                    subject,
-                    html,
-                }),
-            });
-            if (!res.ok) {
-                const errText = await res.text();
-                throw new Error(`Resend API error (${res.status}): ${errText}`);
-            }
-            this.logger.log(`Email đã được gửi thành công đến ${to} qua Resend HTTPS API.`);
-            return;
-        }
+        const resendApiKey = cleanEnv(this.configService.get('RESEND_API_KEY'));
         if (brevoApiKey) {
             this.logger.log(`Đang gửi email tới ${to} qua Brevo HTTPS API (port 443)...`);
             const res = await fetch('https://api.brevo.com/v3/smtp/email', {
@@ -158,6 +136,28 @@ let NodemailerMailService = NodemailerMailService_1 = class NodemailerMailServic
                 throw new Error(`Brevo API error (${res.status}): ${errText}`);
             }
             this.logger.log(`Email đã được gửi thành công đến ${to} qua Brevo HTTPS API.`);
+            return;
+        }
+        if (resendApiKey) {
+            this.logger.log(`Đang gửi email tới ${to} qua Resend HTTPS API (port 443)...`);
+            const res = await fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${resendApiKey}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    from: cleanEnv(this.configService.get('RESEND_FROM')) || 'PSYTHALIA <onboarding@resend.dev>',
+                    to: [to],
+                    subject,
+                    html,
+                }),
+            });
+            if (!res.ok) {
+                const errText = await res.text();
+                throw new Error(`Resend API error (${res.status}): ${errText}`);
+            }
+            this.logger.log(`Email đã được gửi thành công đến ${to} qua Resend HTTPS API.`);
             return;
         }
         if (!this.transporter) {
