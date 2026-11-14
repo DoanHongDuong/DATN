@@ -48,8 +48,8 @@ let CreateJournalEntryUseCase = class CreateJournalEntryUseCase {
             suggestedResourceCategory: sentiment.suggestedResourceCategory,
         };
         if (sentiment.sentimentLabel === 'crisis') {
-            response.emergencyHotline =
-                this.configService.get('EMERGENCY_HOTLINE') ?? null;
+            const rawHotline = this.configService.get('EMERGENCY_HOTLINE')?.replace(/^["']|["']$/g, '').trim();
+            response.emergencyHotline = (rawHotline && rawHotline !== '1900 6789') ? rawHotline : '0979877220';
             if (this.createNotificationUseCase) {
                 await this.createNotificationUseCase.execute({
                     userId,

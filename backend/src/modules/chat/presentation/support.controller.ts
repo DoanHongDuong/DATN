@@ -12,11 +12,12 @@ export class SupportController {
   @ApiResponse({ status: 200, description: 'Số điện thoại hotline khẩn cấp' })
   @ApiResponse({ status: 404, description: 'Hotline khẩn cấp chưa được cấu hình' })
   getEmergencyHotline(): { hotline: string } {
-    const hotline = this.configService.get<string>('EMERGENCY_HOTLINE');
-    if (!hotline || !hotline.trim()) {
+    const rawHotline = this.configService.get<string>('EMERGENCY_HOTLINE');
+    if (!rawHotline || !rawHotline.trim()) {
       throw new NotFoundException('Hotline khẩn cấp chưa được cấu hình');
     }
-    return { hotline: hotline.trim() };
+    const cleanHotline = rawHotline.replace(/^["']|["']$/g, '').trim();
+    return { hotline: cleanHotline };
   }
 }
 

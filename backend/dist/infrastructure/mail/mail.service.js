@@ -48,6 +48,11 @@ const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const nodemailer = __importStar(require("nodemailer"));
 exports.MAIL_SERVICE = Symbol('MAIL_SERVICE');
+const cleanEnv = (val) => {
+    if (!val)
+        return '';
+    return val.replace(/^["']|["']$/g, '').trim();
+};
 let NodemailerMailService = NodemailerMailService_1 = class NodemailerMailService {
     configService;
     logger = new common_1.Logger(NodemailerMailService_1.name);
@@ -56,8 +61,8 @@ let NodemailerMailService = NodemailerMailService_1 = class NodemailerMailServic
     frontendUrl;
     constructor(configService) {
         this.configService = configService;
-        const rawFrom = this.configService.get('MAIL_FROM');
-        const smtpUser = this.configService.get('SMTP_USER');
+        const rawFrom = cleanEnv(this.configService.get('MAIL_FROM'));
+        const smtpUser = cleanEnv(this.configService.get('SMTP_USER'));
         if (rawFrom && rawFrom.includes('@')) {
             this.fromAddress = rawFrom;
         }
@@ -65,19 +70,19 @@ let NodemailerMailService = NodemailerMailService_1 = class NodemailerMailServic
             this.fromAddress = `"${rawFrom}" <${smtpUser}>`;
         }
         else {
-            this.fromAddress = smtpUser ? `<${smtpUser}>` : 'Mental Health Support <no-reply@mentalhealth.local>';
+            this.fromAddress = smtpUser ? `"PSYTHALIA" <${smtpUser}>` : 'PSYTHALIA <no-reply@psythalia.local>';
         }
-        const rawFrontend = this.configService.get('FRONTEND_URL') || 'http://localhost:5173';
+        const rawFrontend = cleanEnv(this.configService.get('FRONTEND_URL')) || 'http://localhost:5173';
         this.frontendUrl = rawFrontend.split(',')[0].trim().replace(/\/+$/, '');
         this.initTransporter();
     }
     initTransporter() {
-        const service = this.configService.get('SMTP_SERVICE');
-        const host = this.configService.get('SMTP_HOST') || 'smtp.gmail.com';
-        const port = Number(this.configService.get('SMTP_PORT')) || 587;
-        const secure = this.configService.get('SMTP_SECURE') === 'true' || port === 465;
-        const user = this.configService.get('SMTP_USER');
-        const pass = this.configService.get('SMTP_PASS');
+        const service = cleanEnv(this.configService.get('SMTP_SERVICE'));
+        const host = cleanEnv(this.configService.get('SMTP_HOST')) || 'smtp.gmail.com';
+        const port = Number(cleanEnv(this.configService.get('SMTP_PORT'))) || 587;
+        const secure = cleanEnv(this.configService.get('SMTP_SECURE')) === 'true' || port === 465;
+        const user = cleanEnv(this.configService.get('SMTP_USER'));
+        const pass = cleanEnv(this.configService.get('SMTP_PASS'));
         if (!user || !pass) {
             this.logger.warn('⚠️ SMTP_USER hoặc SMTP_PASS chưa được cấu hình trong .env. Nodemailer sẽ không thể gửi email thật. Hãy cập nhật file .env với thông tin tài khoản SMTP (ví dụ Gmail App Password).');
             return;

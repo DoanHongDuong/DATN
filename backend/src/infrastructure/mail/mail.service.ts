@@ -13,6 +13,11 @@ export interface IMailService {
 
 export const MAIL_SERVICE = Symbol('MAIL_SERVICE');
 
+const cleanEnv = (val?: string | null): string => {
+  if (!val) return '';
+  return val.replace(/^["']|["']$/g, '').trim();
+};
+
 @Injectable()
 export class NodemailerMailService implements IMailService {
   private readonly logger = new Logger(NodemailerMailService.name);
@@ -21,31 +26,30 @@ export class NodemailerMailService implements IMailService {
   private readonly frontendUrl: string;
 
   constructor(private readonly configService: ConfigService) {
-    const rawFrom = this.configService.get<string>('MAIL_FROM');
-    const smtpUser = this.configService.get<string>('SMTP_USER');
+    const rawFrom = cleanEnv(this.configService.get<string>('MAIL_FROM'));
+    const smtpUser = cleanEnv(this.configService.get<string>('SMTP_USER'));
     if (rawFrom && rawFrom.includes('@')) {
       this.fromAddress = rawFrom;
     } else if (rawFrom && smtpUser) {
       this.fromAddress = `"${rawFrom}" <${smtpUser}>`;
     } else {
-      this.fromAddress = smtpUser ? `<${smtpUser}>` : 'Mental Health Support <no-reply@mentalhealth.local>';
+      this.fromAddress = smtpUser ? `"PSYTHALIA" <${smtpUser}>` : 'PSYTHALIA <no-reply@psythalia.local>';
     }
     const rawFrontend =
-      this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5173';
+      cleanEnv(this.configService.get<string>('FRONTEND_URL')) || 'http://localhost:5173';
     this.frontendUrl = rawFrontend.split(',')[0].trim().replace(/\/+$/, '');
-
 
     this.initTransporter();
   }
 
   private initTransporter(): void {
-    const service = this.configService.get<string>('SMTP_SERVICE');
-    const host = this.configService.get<string>('SMTP_HOST') || 'smtp.gmail.com';
-    const port = Number(this.configService.get<number>('SMTP_PORT')) || 587;
+    const service = cleanEnv(this.configService.get<string>('SMTP_SERVICE'));
+    const host = cleanEnv(this.configService.get<string>('SMTP_HOST')) || 'smtp.gmail.com';
+    const port = Number(cleanEnv(this.configService.get<string>('SMTP_PORT'))) || 587;
     const secure =
-      this.configService.get<string>('SMTP_SECURE') === 'true' || port === 465;
-    const user = this.configService.get<string>('SMTP_USER');
-    const pass = this.configService.get<string>('SMTP_PASS');
+      cleanEnv(this.configService.get<string>('SMTP_SECURE')) === 'true' || port === 465;
+    const user = cleanEnv(this.configService.get<string>('SMTP_USER'));
+    const pass = cleanEnv(this.configService.get<string>('SMTP_PASS'));
 
     if (!user || !pass) {
       this.logger.warn(

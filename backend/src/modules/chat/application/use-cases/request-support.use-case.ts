@@ -44,9 +44,11 @@ export class RequestSupportUseCase {
     // Kiểm tra có TNV nào sẵn sàng không
     const hasVolunteer = await this.chatRepository.hasAvailableVolunteer();
     if (!hasVolunteer) {
+      const rawHotline = this.configService.get<string>('EMERGENCY_HOTLINE')?.replace(/^["']|["']$/g, '').trim();
+      const hotline = (rawHotline && rawHotline !== '1900 6789') ? rawHotline : '0979877220';
       return {
         noVolunteerAvailable: true,
-        hotline: this.configService.get<string>('EMERGENCY_HOTLINE'),
+        hotline,
       };
     }
 
