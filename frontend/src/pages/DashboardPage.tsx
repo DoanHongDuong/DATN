@@ -5,6 +5,7 @@ import { assessmentApi, type TestResultResponse } from '../api/assessment.api';
 import { journalApi, type JournalEntry } from '../api/journal.api';
 import { HeartPulse, BookOpen, MessageSquare, ShieldAlert, HeartHandshake } from 'lucide-react';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { getEmergencyHotline } from '../utils/hotline';
 import { VolunteerDashboard } from './volunteer/VolunteerDashboard';
 import { MoodTrendChart } from '../components/dashboard/MoodTrendChart';
 
@@ -297,7 +298,7 @@ export const DashboardPage: React.FC = () => {
       }}>
         <ShieldAlert size={24} color="#ef4444" />
         <div style={{ fontSize: '14px', color: 'var(--text-h)' }}>
-          <strong>Khẩn cấp?</strong> Nếu bạn đang gặp khủng hoảng tâm lý nghiêm trọng, hãy gọi đường dây nóng hỗ trợ khẩn cấp: <strong>{import.meta.env.VITE_EMERGENCY_HOTLINE || '0979877220'}</strong>.
+          <strong>Khẩn cấp?</strong> Nếu bạn đang gặp khủng hoảng tâm lý nghiêm trọng, hãy gọi đường dây nóng hỗ trợ khẩn cấp: <strong>{getEmergencyHotline()}</strong>.
         </div>
       </div>
     </div>

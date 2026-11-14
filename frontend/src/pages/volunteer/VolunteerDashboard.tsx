@@ -19,6 +19,7 @@ import { chatApi, type ChatSession, type PriorityLevel } from '../../api/chat.ap
 import { volunteerApi, type VolunteerProfile, type UpdateVolunteerProfilePayload } from '../../api/volunteer.api';
 import { useAuth } from '../../hooks/useAuth';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
+import { getEmergencyHotline } from '../../utils/hotline';
 
 const { Title, Text } = Typography;
 
@@ -581,7 +582,7 @@ export const VolunteerDashboard: React.FC = () => {
                   Hotline Hỗ trợ Khẩn cấp
                 </div>
                 <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-h)' }}>
-                  {import.meta.env.VITE_EMERGENCY_HOTLINE || '0979877220'}
+                  {getEmergencyHotline()}
                 </div>
               </div>
             </div>

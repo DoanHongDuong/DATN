@@ -5,6 +5,7 @@ import { Modal, Button, Alert, message } from 'antd';
 import { journalApi, type JournalEntry, type RelaxationResource } from '../api/journal.api';
 import { chatApi } from '../api/chat.api';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { getEmergencyHotline } from '../utils/hotline';
 import { Sparkles, Trash2, Smile, HeartHandshake, PhoneCall, PlayCircle, ExternalLink, Compass } from 'lucide-react';
 
 const EMOJI_OPTIONS = ['😊', '😢', '😐', '😡', '😰', '🥰', '😴', '🤯'];
@@ -160,7 +161,7 @@ export const JournalPage: React.FC = () => {
 
       // Nhánh crisis: nếu là crisis thì thiết lập hotline
       if (created.sentimentLabel === 'crisis') {
-        setCrisisHotline(created.emergencyHotline || import.meta.env.VITE_EMERGENCY_HOTLINE || '0979877220');
+        setCrisisHotline(getEmergencyHotline(created.emergencyHotline));
         setNoVolunteerAvailable(false);
       }
     } catch (err: unknown) {
@@ -503,7 +504,7 @@ export const JournalPage: React.FC = () => {
                 Đường dây nóng hỗ trợ khẩn cấp:
               </div>
               <div style={{ fontSize: '15px', fontWeight: 700, color: '#be123c', marginTop: '2px' }}>
-                {crisisHotline || import.meta.env.VITE_EMERGENCY_HOTLINE || '0979877220'}
+                {getEmergencyHotline(crisisHotline)}
               </div>
             </div>
           </div>
@@ -636,7 +637,7 @@ export const JournalPage: React.FC = () => {
                       Đường dây nóng khẩn cấp:
                     </div>
                     <div style={{ fontSize: '15px', fontWeight: 800, color: '#be123c' }}>
-                      {crisisHotline || import.meta.env.VITE_EMERGENCY_HOTLINE || '0979877220'}
+                      {getEmergencyHotline(crisisHotline)}
                     </div>
                   </div>
                 </div>

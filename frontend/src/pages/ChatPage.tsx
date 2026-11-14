@@ -22,6 +22,7 @@ import { volunteerApi } from '../api/volunteer.api';
 import { useSocket } from '../hooks/useSocket';
 import { useAuth } from '../hooks/useAuth';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { getEmergencyHotline } from '../utils/hotline';
 
 const { Text, Title } = Typography;
 
@@ -365,7 +366,7 @@ export const ChatPage: React.FC = () => {
       if (response.noVolunteerAvailable) {
         setNoVolunteerInfo({
           noVolunteer: true,
-          hotline: response.hotline || import.meta.env.VITE_EMERGENCY_HOTLINE || '0979877220',
+          hotline: getEmergencyHotline(response.hotline),
         });
         return;
       }
@@ -855,7 +856,7 @@ export const ChatPage: React.FC = () => {
                 <p style={{ margin: 0 }}>
                   Trong trường hợp khẩn cấp hoặc cần hỗ trợ ngay lập tức, vui lòng liên hệ đường dây nóng:
                   <strong style={{ display: 'block', fontSize: '18px', color: 'var(--accent)', marginTop: '4px' }}>
-                    📞 {noVolunteerInfo.hotline || import.meta.env.VITE_EMERGENCY_HOTLINE || '0979877220'}
+                    📞 {getEmergencyHotline(noVolunteerInfo.hotline)}
                   </strong>
                 </p>
               </div>
