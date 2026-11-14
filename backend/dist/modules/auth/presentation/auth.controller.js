@@ -75,6 +75,8 @@ let AuthController = class AuthController {
 exports.AuthController = AuthController;
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Đăng ký tài khoản mới' }),
+    (0, common_1.UseGuards)(throttler_1.ThrottlerGuard),
+    (0, throttler_1.Throttle)({ default: { limit: 5, ttl: 900000 } }),
     (0, common_1.Post)('register'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -101,6 +103,8 @@ __decorate([
 ], AuthController.prototype, "verifyEmail", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Gửi lại email xác minh' }),
+    (0, common_1.UseGuards)(throttler_1.ThrottlerGuard),
+    (0, throttler_1.Throttle)({ default: { limit: 5, ttl: 900000 } }),
     (0, common_1.Post)('resend-verification'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -109,6 +113,8 @@ __decorate([
 ], AuthController.prototype, "resendVerification", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Yêu cầu khôi phục mật khẩu' }),
+    (0, common_1.UseGuards)(throttler_1.ThrottlerGuard),
+    (0, throttler_1.Throttle)({ default: { limit: 5, ttl: 900000 } }),
     (0, common_1.Post)('forgot-password'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -117,6 +123,8 @@ __decorate([
 ], AuthController.prototype, "forgotPassword", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Đặt lại mật khẩu bằng token' }),
+    (0, common_1.UseGuards)(throttler_1.ThrottlerGuard),
+    (0, throttler_1.Throttle)({ default: { limit: 5, ttl: 900000 } }),
     (0, common_1.Post)('reset-password'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),

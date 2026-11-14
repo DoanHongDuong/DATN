@@ -30,8 +30,9 @@ export class NodemailerMailService implements IMailService {
     } else {
       this.fromAddress = smtpUser ? `<${smtpUser}>` : 'Mental Health Support <no-reply@mentalhealth.local>';
     }
-    this.frontendUrl =
+    const rawFrontend =
       this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5173';
+    this.frontendUrl = rawFrontend.split(',')[0].trim().replace(/\/+$/, '');
 
 
     this.initTransporter();
@@ -88,16 +89,16 @@ export class NodemailerMailService implements IMailService {
       await this.transporter.sendMail({
         from: this.fromAddress,
         to,
-        subject: 'Xác nhận tài khoản — Mental Health Support',
+        subject: 'Xác nhận tài khoản — PSYTHALIA',
         html: `
           <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #edf2f7; border-radius: 12px; background: #ffffff;">
             <div style="text-align: center; margin-bottom: 24px;">
-              <h1 style="color: #6c5ce7; margin-bottom: 8px;">🧠 Mental Health Support</h1>
-              <p style="color: #718096; font-size: 14px; margin: 0;">Hệ thống Hỗ trợ Sức khỏe Tâm thần Học đường</p>
+              <h1 style="color: #6c5ce7; margin-bottom: 8px;">✨ PSYTHALIA</h1>
+              <p style="color: #718096; font-size: 14px; margin: 0;">Nền tảng Hỗ trợ Sức khỏe Tinh thần & Sơ cứu Tâm lý</p>
             </div>
             <h2 style="color: #2d3436; font-size: 20px;">Xin chào ${fullName},</h2>
             <p style="color: #4a5568; font-size: 15px; line-height: 1.6;">
-              Cảm ơn bạn đã đăng ký tài khoản tại Mental Health Support. Vui lòng nhấn vào nút bên dưới để kích hoạt tài khoản của bạn:
+              Cảm ơn bạn đã đăng ký tài khoản tại PSYTHALIA. Vui lòng nhấn vào nút bên dưới để kích hoạt tài khoản của bạn:
             </p>
             <div style="text-align: center; margin: 32px 0;">
               <a href="${verifyUrl}"
@@ -117,7 +118,7 @@ export class NodemailerMailService implements IMailService {
             </p>
             <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
             <p style="color: #a0aec0; font-size: 12px; text-align: center; margin: 0;">
-              © Mental Health Support System — Khóa luận Tốt nghiệp 2026
+              © 2026 PSYTHALIA — Khóa luận Tốt nghiệp
             </p>
           </div>
         `,
@@ -143,16 +144,16 @@ export class NodemailerMailService implements IMailService {
       await this.transporter.sendMail({
         from: this.fromAddress,
         to,
-        subject: 'Đặt lại mật khẩu — Mental Health Support',
+        subject: 'Đặt lại mật khẩu — PSYTHALIA',
         html: `
           <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #edf2f7; border-radius: 12px; background: #ffffff;">
             <div style="text-align: center; margin-bottom: 24px;">
-              <h1 style="color: #6c5ce7; margin-bottom: 8px;">🧠 Mental Health Support</h1>
-              <p style="color: #718096; font-size: 14px; margin: 0;">Hệ thống Hỗ trợ Sức khỏe Tâm thần Học đường</p>
+              <h1 style="color: #6c5ce7; margin-bottom: 8px;">✨ PSYTHALIA</h1>
+              <p style="color: #718096; font-size: 14px; margin: 0;">Nền tảng Hỗ trợ Sức khỏe Tinh thần & Sơ cứu Tâm lý</p>
             </div>
             <h2 style="color: #2d3436; font-size: 20px;">Xin chào ${fullName},</h2>
             <p style="color: #4a5568; font-size: 15px; line-height: 1.6;">
-              Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn. Nhấn vào nút bên dưới để tiến hành tạo mật khẩu mới:
+              Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn tại PSYTHALIA. Nhấn vào nút bên dưới để tiến hành tạo mật khẩu mới:
             </p>
             <div style="text-align: center; margin: 32px 0;">
               <a href="${resetUrl}"
@@ -172,7 +173,7 @@ export class NodemailerMailService implements IMailService {
             </p>
             <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
             <p style="color: #a0aec0; font-size: 12px; text-align: center; margin: 0;">
-              © Mental Health Support System — Khóa luận Tốt nghiệp 2026
+              © 2026 PSYTHALIA — Khóa luận Tốt nghiệp
             </p>
           </div>
         `,

@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 import { USER_REPOSITORY, IUserRepository } from '../../domain/repositories/user.repository.interface';
 import { ForgotPasswordDto } from '../dto/forgot-password.dto';
 import { MAIL_SERVICE, IMailService } from '../../../../infrastructure/mail/mail.service';
@@ -7,6 +7,8 @@ import * as crypto from 'crypto';
 
 @Injectable()
 export class RequestPasswordResetUseCase {
+  private readonly logger = new Logger(RequestPasswordResetUseCase.name);
+
   constructor(
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
@@ -29,9 +31,11 @@ export class RequestPasswordResetUseCase {
       });
 
       // Send real reset email
-      this.mailService.sendPasswordResetEmail(user.email, user.fullName, resetToken).catch(() => {
-        // Silently handle — user still sees generic message per UC-02
-      });
+      this.mailService
+        .sendPasswordResetEmail(user.email, user.fullName, resetToken)
+        .catch((err: Error) => {
+          this.logger.error(`Lỗi khi gửi email đặt lại mật khẩu đến ${user.email}: ${err?.message || err}`);
+        });
     }
 
     // Always return the same message regardless of whether user exists (UC-02 security)

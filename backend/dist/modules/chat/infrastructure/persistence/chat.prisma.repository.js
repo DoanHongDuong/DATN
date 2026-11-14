@@ -51,6 +51,16 @@ let ChatPrismaRepository = class ChatPrismaRepository {
         });
         return count > 0;
     }
+    async findAvailableVolunteerUserIds() {
+        const volunteers = await this.prisma.volunteerProfile.findMany({
+            where: {
+                isOnline: true,
+                isVerified: true,
+            },
+            select: { userId: true },
+        });
+        return volunteers.map((v) => v.userId);
+    }
     async isVolunteerVerified(volunteerId) {
         const profile = await this.prisma.volunteerProfile.findUnique({
             where: { userId: volunteerId },

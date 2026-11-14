@@ -8,18 +8,21 @@ const swagger_1 = require("@nestjs/swagger");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const configService = app.get(config_1.ConfigService);
+    const expressApp = app.getHttpAdapter().getInstance();
+    expressApp.set('trust proxy', 1);
     const frontendUrl = configService.get('FRONTEND_URL') || 'http://localhost:5173';
-    const allowedOrigins = frontendUrl.split(',').map((url) => url.trim());
+    const allowedOrigins = frontendUrl.split(',').map((url) => url.trim().replace(/\/+$/, ''));
     app.enableCors({
         origin: (origin, callback) => {
             if (!origin ||
                 allowedOrigins.includes(origin) ||
                 origin.endsWith('.vercel.app') ||
-                origin.includes('localhost')) {
+                origin.startsWith('http://localhost:') ||
+                origin.startsWith('http://127.0.0.1:')) {
                 callback(null, true);
             }
             else {
-                callback(null, true);
+                callback(null, false);
             }
         },
         credentials: true,

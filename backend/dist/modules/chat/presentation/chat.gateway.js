@@ -55,7 +55,10 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
             client.data.userId = payload.sub;
             client.data.role = payload.role;
             await client.join(`user:${payload.sub}`);
-            this.logger.log(`Socket connected: userId=${payload.sub}`);
+            if (payload.role === 'VOLUNTEER') {
+                await client.join('volunteers');
+            }
+            this.logger.log(`Socket connected: userId=${payload.sub}, role=${payload.role}`);
         }
         catch {
             this.logger.warn('Socket connection rejected: invalid token');
@@ -115,11 +118,24 @@ let ChatGateway = ChatGateway_1 = class ChatGateway {
             return { success: false, error: errorMessage };
         }
     }
+    emitNewWaitingSession(session) {
+        this.server.to('volunteers').emit('new_waiting_session', {
+            id: session.id,
+            priorityLevel: session.priorityLevel,
+            userId: session.userId,
+        });
+        this.server.to('volunteers').emit('new_notification');
+    }
     emitSessionAccepted(userId, session) {
         this.server.to(`user:${userId}`).emit('session_accepted', session);
+        this.server.to(`user:${userId}`).emit('new_notification');
+        this.server.to('volunteers').emit('waiting_session_accepted', { sessionId: session.id });
     }
     emitSessionEnded(sessionId, session) {
         this.server.to(`session:${sessionId}`).emit('session_ended', session);
+        if (session.userId) {
+            this.server.to(`user:${session.userId}`).emit('new_notification');
+        }
     }
     extractToken(client) {
         const authToken = client.handshake.auth?.token;

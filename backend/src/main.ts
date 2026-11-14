@@ -8,6 +8,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
+  // Trust proxy for reverse proxies (Render, Cloudflare, etc.) to get real client IP for ThrottlerGuard
+  const expressApp = app.getHttpAdapter().getInstance();
+  expressApp.set('trust proxy', 1);
+
   const frontendUrl = configService.get<string>('FRONTEND_URL') || 'http://localhost:5173';
   const allowedOrigins = frontendUrl.split(',').map((url) => url.trim().replace(/\/+$/, ''));
   app.enableCors({

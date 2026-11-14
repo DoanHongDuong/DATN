@@ -52,12 +52,21 @@ let EncryptionService = EncryptionService_1 = class EncryptionService {
     logger = new common_1.Logger(EncryptionService_1.name);
     algorithm = 'aes-256-gcm';
     key;
+    fallbackKey = null;
     constructor(configService) {
         this.configService = configService;
-        const rawKey = this.configService.get('ENCRYPTION_KEY') ||
+        const rawKey = this.configService.get('JOURNAL_ENCRYPTION_KEY') ||
+            this.configService.get('ENCRYPTION_KEY') ||
             this.configService.get('JWT_SECRET') ||
             'datn-secret-key-fallback-32b-length!';
         this.key = crypto.createHash('sha256').update(rawKey).digest();
+        const jwtSecret = this.configService.get('JWT_SECRET');
+        if (jwtSecret) {
+            const derivedJwtKey = crypto.createHash('sha256').update(jwtSecret).digest();
+            if (!this.key.equals(derivedJwtKey)) {
+                this.fallbackKey = derivedJwtKey;
+            }
+        }
     }
     encrypt(text) {
         if (!text)
@@ -74,6 +83,19 @@ let EncryptionService = EncryptionService_1 = class EncryptionService {
             throw error;
         }
     }
+    decryptWithKey(cipherText, key) {
+        const parts = cipherText.split(':');
+        if (parts.length !== 5) {
+            return cipherText;
+        }
+        const iv = Buffer.from(parts[2], 'hex');
+        const authTag = Buffer.from(parts[3], 'hex');
+        const encrypted = Buffer.from(parts[4], 'hex');
+        const decipher = crypto.createDecipheriv(this.algorithm, key, iv);
+        decipher.setAuthTag(authTag);
+        const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
+        return decrypted.toString('utf8');
+    }
     decrypt(cipherText) {
         if (!cipherText)
             return cipherText;
@@ -81,20 +103,17 @@ let EncryptionService = EncryptionService_1 = class EncryptionService {
             return cipherText;
         }
         try {
-            const parts = cipherText.split(':');
-            if (parts.length !== 5) {
-                return cipherText;
-            }
-            const iv = Buffer.from(parts[2], 'hex');
-            const authTag = Buffer.from(parts[3], 'hex');
-            const encrypted = Buffer.from(parts[4], 'hex');
-            const decipher = crypto.createDecipheriv(this.algorithm, this.key, iv);
-            decipher.setAuthTag(authTag);
-            const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
-            return decrypted.toString('utf8');
+            return this.decryptWithKey(cipherText, this.key);
         }
-        catch (error) {
-            this.logger.warn(`Decryption failed, returning text as-is: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        catch (primaryError) {
+            if (this.fallbackKey) {
+                try {
+                    return this.decryptWithKey(cipherText, this.fallbackKey);
+                }
+                catch {
+                }
+            }
+            this.logger.warn(`Decryption failed, returning text as-is: ${primaryError instanceof Error ? primaryError.message : 'Unknown error'}`);
             return cipherText;
         }
     }

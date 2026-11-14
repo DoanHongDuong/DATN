@@ -18,12 +18,15 @@ const config_1 = require("@nestjs/config");
 const client_1 = require("@prisma/client");
 const chat_repository_interface_1 = require("../../domain/repositories/chat.repository.interface");
 const priority_mapping_constant_1 = require("../../infrastructure/constants/priority-mapping.constant");
+const create_notification_use_case_1 = require("../../../notification/application/use-cases/create-notification.use-case");
 let RequestSupportUseCase = class RequestSupportUseCase {
     chatRepository;
     configService;
-    constructor(chatRepository, configService) {
+    createNotificationUseCase;
+    constructor(chatRepository, configService, createNotificationUseCase) {
         this.chatRepository = chatRepository;
         this.configService = configService;
+        this.createNotificationUseCase = createNotificationUseCase;
     }
     async execute(userId) {
         const existingSession = await this.chatRepository.findActiveOrWaitingSessionByUserId(userId);
@@ -46,6 +49,16 @@ let RequestSupportUseCase = class RequestSupportUseCase {
             priorityLevel,
             status: client_1.SessionStatus.WAITING,
         });
+        if (this.createNotificationUseCase) {
+            const volunteerUserIds = await this.chatRepository.findAvailableVolunteerUserIds();
+            const targetVolunteerIds = volunteerUserIds.filter((vId) => vId !== userId);
+            await Promise.allSettled(targetVolunteerIds.map((vId) => this.createNotificationUseCase.execute({
+                userId: vId,
+                title: 'Có sinh viên vào hàng đợi tư vấn',
+                content: `Một sinh viên vừa gửi yêu cầu hỗ trợ với mức ưu tiên: ${priorityLevel}. Hãy tiếp nhận phiên ngay.`,
+                type: 'NEW_WAITING_SESSION',
+            })));
+        }
         return {
             noVolunteerAvailable: false,
             session,
@@ -56,6 +69,8 @@ exports.RequestSupportUseCase = RequestSupportUseCase;
 exports.RequestSupportUseCase = RequestSupportUseCase = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(chat_repository_interface_1.CHAT_REPOSITORY)),
-    __metadata("design:paramtypes", [Object, config_1.ConfigService])
+    __param(2, (0, common_1.Optional)()),
+    __metadata("design:paramtypes", [Object, config_1.ConfigService,
+        create_notification_use_case_1.CreateNotificationUseCase])
 ], RequestSupportUseCase);
 //# sourceMappingURL=request-support.use-case.js.map
