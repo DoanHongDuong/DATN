@@ -109,18 +109,78 @@ let NodemailerMailService = NodemailerMailService_1 = class NodemailerMailServic
             this.logger.error('Khởi tạo nodemailer transport thất bại:', err);
         }
     }
-    async sendVerificationEmail(to, fullName, token) {
-        const verifyUrl = `${this.frontendUrl}/verify-email?token=${token}&email=${encodeURIComponent(to)}`;
-        if (!this.transporter) {
-            this.logger.warn(`[CHƯA CẤU HÌNH SMTP] Bỏ qua gửi email xác nhận đến: ${to}.\nLink xác nhận (dùng để test): ${verifyUrl}`);
+    async dispatchEmail(to, subject, html) {
+        const resendApiKey = cleanEnv(this.configService.get('RESEND_API_KEY'));
+        const brevoApiKey = cleanEnv(this.configService.get('BREVO_API_KEY'));
+        if (resendApiKey) {
+            this.logger.log(`Đang gửi email tới ${to} qua Resend HTTPS API (port 443)...`);
+            const res = await fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${resendApiKey}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    from: cleanEnv(this.configService.get('RESEND_FROM')) || 'PSYTHALIA <onboarding@resend.dev>',
+                    to: [to],
+                    subject,
+                    html,
+                }),
+            });
+            if (!res.ok) {
+                const errText = await res.text();
+                throw new Error(`Resend API error (${res.status}): ${errText}`);
+            }
+            this.logger.log(`Email đã được gửi thành công đến ${to} qua Resend HTTPS API.`);
             return;
         }
-        try {
-            await this.transporter.sendMail({
-                from: this.fromAddress,
-                to,
-                subject: 'Xác nhận tài khoản — PSYTHALIA',
-                html: `
+        if (brevoApiKey) {
+            this.logger.log(`Đang gửi email tới ${to} qua Brevo HTTPS API (port 443)...`);
+            const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+                method: 'POST',
+                headers: {
+                    accept: 'application/json',
+                    'api-key': brevoApiKey,
+                    'content-type': 'application/json',
+                },
+                body: JSON.stringify({
+                    sender: {
+                        name: 'PSYTHALIA',
+                        email: cleanEnv(this.configService.get('SMTP_USER')) || 'hongboi1505@gmail.com',
+                    },
+                    to: [{ email: to }],
+                    subject,
+                    htmlContent: html,
+                }),
+            });
+            if (!res.ok) {
+                const errText = await res.text();
+                throw new Error(`Brevo API error (${res.status}): ${errText}`);
+            }
+            this.logger.log(`Email đã được gửi thành công đến ${to} qua Brevo HTTPS API.`);
+            return;
+        }
+        if (!this.transporter) {
+            this.logger.warn(`Chưa cấu hình mail provider hoặc SMTP. Bỏ qua gửi email đến: ${to}`);
+            return;
+        }
+        await this.transporter.sendMail({
+            from: this.fromAddress,
+            to,
+            subject,
+            html,
+        });
+        this.logger.log(`Email đã được gửi thành công đến: ${to} qua Nodemailer SMTP.`);
+    }
+    async sendVerificationEmail(to, fullName, token) {
+        const verifyUrl = `${this.frontendUrl}/verify-email?token=${token}&email=${encodeURIComponent(to)}`;
+        const resendApiKey = cleanEnv(this.configService.get('RESEND_API_KEY'));
+        const brevoApiKey = cleanEnv(this.configService.get('BREVO_API_KEY'));
+        if (!resendApiKey && !brevoApiKey && !this.transporter) {
+            this.logger.warn(`[CHƯA CẤU HÌNH MAIL] Bỏ qua gửi email xác nhận đến: ${to}.\nLink xác nhận (dùng để test): ${verifyUrl}`);
+            return;
+        }
+        const html = `
           <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #edf2f7; border-radius: 12px; background: #ffffff;">
             <div style="text-align: center; margin-bottom: 24px;">
               <h1 style="color: #6c5ce7; margin-bottom: 8px;">✨ PSYTHALIA</h1>
@@ -151,9 +211,9 @@ let NodemailerMailService = NodemailerMailService_1 = class NodemailerMailServic
               © 2026 PSYTHALIA — Khóa luận Tốt nghiệp
             </p>
           </div>
-        `,
-            });
-            this.logger.log(`Email xác nhận đã được gửi thành công đến: ${to}`);
+        `;
+        try {
+            await this.dispatchEmail(to, 'Xác nhận tài khoản — PSYTHALIA', html);
         }
         catch (error) {
             this.logger.error(`Lỗi khi gửi email xác nhận đến ${to}:`, error);
@@ -162,16 +222,13 @@ let NodemailerMailService = NodemailerMailService_1 = class NodemailerMailServic
     }
     async sendPasswordResetEmail(to, fullName, token) {
         const resetUrl = `${this.frontendUrl}/reset-password?token=${token}&email=${encodeURIComponent(to)}`;
-        if (!this.transporter) {
-            this.logger.warn(`[CHƯA CẤU HÌNH SMTP] Bỏ qua gửi email đặt lại mật khẩu đến: ${to}.\nLink đặt lại mật khẩu (dùng để test): ${resetUrl}`);
+        const resendApiKey = cleanEnv(this.configService.get('RESEND_API_KEY'));
+        const brevoApiKey = cleanEnv(this.configService.get('BREVO_API_KEY'));
+        if (!resendApiKey && !brevoApiKey && !this.transporter) {
+            this.logger.warn(`[CHƯA CẤU HÌNH MAIL] Bỏ qua gửi email đặt lại mật khẩu đến: ${to}.\nLink đặt lại mật khẩu (dùng để test): ${resetUrl}`);
             return;
         }
-        try {
-            await this.transporter.sendMail({
-                from: this.fromAddress,
-                to,
-                subject: 'Đặt lại mật khẩu — PSYTHALIA',
-                html: `
+        const html = `
           <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #edf2f7; border-radius: 12px; background: #ffffff;">
             <div style="text-align: center; margin-bottom: 24px;">
               <h1 style="color: #6c5ce7; margin-bottom: 8px;">✨ PSYTHALIA</h1>
@@ -202,9 +259,9 @@ let NodemailerMailService = NodemailerMailService_1 = class NodemailerMailServic
               © 2026 PSYTHALIA — Khóa luận Tốt nghiệp
             </p>
           </div>
-        `,
-            });
-            this.logger.log(`Email đặt lại mật khẩu đã được gửi thành công đến: ${to}`);
+        `;
+        try {
+            await this.dispatchEmail(to, 'Đặt lại mật khẩu — PSYTHALIA', html);
         }
         catch (error) {
             this.logger.error(`Lỗi khi gửi email đặt lại mật khẩu đến ${to}:`, error);
