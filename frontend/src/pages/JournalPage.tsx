@@ -160,7 +160,7 @@ export const JournalPage: React.FC = () => {
 
       // Nhánh crisis: nếu là crisis thì thiết lập hotline
       if (created.sentimentLabel === 'crisis') {
-        setCrisisHotline(created.emergencyHotline || import.meta.env.VITE_EMERGENCY_HOTLINE || '1900 6789');
+        setCrisisHotline(created.emergencyHotline || import.meta.env.VITE_EMERGENCY_HOTLINE || '0979877220');
         setNoVolunteerAvailable(false);
       }
     } catch (err: unknown) {
@@ -503,7 +503,7 @@ export const JournalPage: React.FC = () => {
                 Đường dây nóng hỗ trợ khẩn cấp:
               </div>
               <div style={{ fontSize: '15px', fontWeight: 700, color: '#be123c', marginTop: '2px' }}>
-                {crisisHotline || import.meta.env.VITE_EMERGENCY_HOTLINE || '1900 6789'}
+                {crisisHotline || import.meta.env.VITE_EMERGENCY_HOTLINE || '0979877220'}
               </div>
             </div>
           </div>
@@ -636,7 +636,7 @@ export const JournalPage: React.FC = () => {
                       Đường dây nóng khẩn cấp:
                     </div>
                     <div style={{ fontSize: '15px', fontWeight: 800, color: '#be123c' }}>
-                      {crisisHotline || import.meta.env.VITE_EMERGENCY_HOTLINE || '1900 6789'}
+                      {crisisHotline || import.meta.env.VITE_EMERGENCY_HOTLINE || '0979877220'}
                     </div>
                   </div>
                 </div>

@@ -365,7 +365,7 @@ export const ChatPage: React.FC = () => {
       if (response.noVolunteerAvailable) {
         setNoVolunteerInfo({
           noVolunteer: true,
-          hotline: response.hotline || import.meta.env.VITE_EMERGENCY_HOTLINE || '1900 6789',
+          hotline: response.hotline || import.meta.env.VITE_EMERGENCY_HOTLINE || '0979877220',
         });
         return;
       }
@@ -855,7 +855,7 @@ export const ChatPage: React.FC = () => {
                 <p style={{ margin: 0 }}>
                   Trong trường hợp khẩn cấp hoặc cần hỗ trợ ngay lập tức, vui lòng liên hệ đường dây nóng:
                   <strong style={{ display: 'block', fontSize: '18px', color: 'var(--accent)', marginTop: '4px' }}>
-                    📞 {noVolunteerInfo.hotline || import.meta.env.VITE_EMERGENCY_HOTLINE || '1900 6789'}
+                    📞 {noVolunteerInfo.hotline || import.meta.env.VITE_EMERGENCY_HOTLINE || '0979877220'}
                   </strong>
                 </p>
               </div>

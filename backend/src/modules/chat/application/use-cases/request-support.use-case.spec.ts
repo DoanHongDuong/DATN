@@ -44,7 +44,7 @@ describe('RequestSupportUseCase', () => {
 
     configService = {
       get: jest.fn().mockImplementation((key: string) => {
-        if (key === 'EMERGENCY_HOTLINE') return '1900 6789';
+        if (key === 'EMERGENCY_HOTLINE') return '0979877220';
         return null;
       }),
     } as unknown as jest.Mocked<ConfigService>;
@@ -83,7 +83,7 @@ describe('RequestSupportUseCase', () => {
 
     expect(result).toEqual({
       noVolunteerAvailable: true,
-      hotline: '1900 6789',
+      hotline: '0979877220',
     });
     expect(chatRepo.createSession).not.toHaveBeenCalled();
     expect(createNotificationUseCase.execute).not.toHaveBeenCalled();

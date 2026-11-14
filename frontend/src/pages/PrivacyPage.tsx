@@ -54,7 +54,7 @@ export const PrivacyPage: React.FC = () => {
               Chính sách Quyền riêng tư & Bảo mật Dữ liệu
             </h1>
             <p style={{ margin: '4px 0 0 0', color: 'var(--text)', fontSize: '14px' }}>
-              Minh bạch tuyệt đối về cách MindCare bảo vệ dữ liệu sức khỏe tâm thần của sinh viên
+              Minh bạch tuyệt đối về cách PSYTHALIA bảo vệ dữ liệu sức khỏe tâm thần của sinh viên
             </p>
           </div>
         </div>
@@ -77,7 +77,7 @@ export const PrivacyPage: React.FC = () => {
                 Nguyên tắc bảo vệ dữ liệu nhạy cảm
               </h3>
               <p style={{ margin: '6px 0 0', fontSize: '14px', color: 'var(--text)', lineHeight: '1.6' }}>
-                Dữ liệu sức khỏe tâm thần và tâm sự cá nhân là thông tin đặc biệt nhạy cảm. Hệ thống MindCare được thiết kế tuân theo các cam kết bảo mật kỹ thuật cụ thể đã được kiểm chứng trực tiếp trong mã nguồn hệ thống.
+                Dữ liệu sức khỏe tâm thần và tâm sự cá nhân là thông tin đặc biệt nhạy cảm. Hệ thống PSYTHALIA được thiết kế tuân theo các cam kết bảo mật kỹ thuật cụ thể đã được kiểm chứng trực tiếp trong mã nguồn hệ thống.
               </p>
             </div>
           </div>

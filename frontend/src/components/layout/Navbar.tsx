@@ -72,7 +72,7 @@ export const Navbar: React.FC = () => {
         }}>
           💜
         </div>
-        <span>MindCare</span>
+        <span>PSYTHALIA</span>
       </Link>
 
       {!isAuthPage && isAuthenticated && (

@@ -39,7 +39,7 @@ export const GlobalSocketListener: React.FC = () => {
 
       // 2. Gửi thông báo trình duyệt nếu tab đang ẩn
       sendBrowserNotification(
-        '💜 MindCare: Đã kết nối Tình nguyện viên!',
+        '💜 PSYTHALIA: Đã kết nối Tình nguyện viên!',
         {
           body: 'Tình nguyện viên vừa tiếp nhận phiên hỗ trợ của bạn. Bấm để vào phòng trò chuyện ngay.',
           tag: 'session-accepted',

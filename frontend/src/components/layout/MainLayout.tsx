@@ -21,7 +21,7 @@ export const MainLayout: React.FC = () => {
         gap: '12px',
         flexWrap: 'wrap',
       }}>
-        <span>© {new Date().getFullYear()} MindCare - Hệ thống Hỗ trợ Sức khỏe Tâm thần Sinh viên.</span>
+        <span>© {new Date().getFullYear()} PSYTHALIA - Nền tảng Hỗ trợ Sức khỏe Tinh thần & Sơ cứu Tâm lý.</span>
         <span>•</span>
         <Link to="/privacy" style={{ color: 'var(--accent)', textDecoration: 'none' }}>
           Chính sách quyền riêng tư

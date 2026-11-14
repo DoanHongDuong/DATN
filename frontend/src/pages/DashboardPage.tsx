@@ -104,7 +104,7 @@ export const DashboardPage: React.FC = () => {
             </div>
             <div>
               <h4 style={{ margin: '0 0 4px 0', fontSize: '16px', color: 'var(--text-h)' }}>
-                Đồng hành cùng cộng đồng MindCare
+                Đồng hành cùng cộng đồng PSYTHALIA
               </h4>
               <p style={{ margin: 0, fontSize: '13px', color: 'var(--text)' }}>
                 Bạn có chuyên môn hoặc mong muốn lắng nghe, hỗ trợ tâm lý? Đăng ký trở thành Tình nguyện viên ngay hôm nay.
@@ -297,7 +297,7 @@ export const DashboardPage: React.FC = () => {
       }}>
         <ShieldAlert size={24} color="#ef4444" />
         <div style={{ fontSize: '14px', color: 'var(--text-h)' }}>
-          <strong>Khẩn cấp?</strong> Nếu bạn đang gặp khủng hoảng tâm lý nghiêm trọng, hãy gọi đường dây nóng hỗ trợ khẩn cấp: <strong>{import.meta.env.VITE_EMERGENCY_HOTLINE || '1900 6789'}</strong>.
+          <strong>Khẩn cấp?</strong> Nếu bạn đang gặp khủng hoảng tâm lý nghiêm trọng, hãy gọi đường dây nóng hỗ trợ khẩn cấp: <strong>{import.meta.env.VITE_EMERGENCY_HOTLINE || '0979877220'}</strong>.
         </div>
       </div>
     </div>

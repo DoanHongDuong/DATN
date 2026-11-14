@@ -581,7 +581,7 @@ export const VolunteerDashboard: React.FC = () => {
                   Hotline Hỗ trợ Khẩn cấp
                 </div>
                 <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-h)' }}>
-                  {import.meta.env.VITE_EMERGENCY_HOTLINE || '1900 6789'}
+                  {import.meta.env.VITE_EMERGENCY_HOTLINE || '0979877220'}
                 </div>
               </div>
             </div>

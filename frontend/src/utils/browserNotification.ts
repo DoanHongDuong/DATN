@@ -38,7 +38,7 @@ export const sendBrowserNotification = (
       const notif = new Notification(title, {
         body: options?.body,
         icon: options?.icon || '/favicon.ico',
-        tag: options?.tag || 'mindcare-alert',
+        tag: options?.tag || 'psythalia-alert',
       });
 
       notif.onclick = () => {
