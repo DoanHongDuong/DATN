@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Tag, Button, Alert, Tabs, Space, Typography, Row, Col } from 'antd';
+import { Card, Tag, Button, Tabs, Space, Typography, Row, Col } from 'antd';
 import {
   PhoneCall,
   Hospital,
@@ -168,34 +168,34 @@ export const HelpDirectory: React.FC = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
       {/* Crisis Warning Banner */}
-      <Alert
-        type="error"
-        showIcon
-        icon={<ShieldAlert size={24} style={{ color: '#ef4444' }} />}
-        message={
-          <span style={{ fontWeight: 700, fontSize: '16px', color: '#b91c1c' }}>
+      <div
+        style={{
+          borderRadius: '12px',
+          border: '1px solid rgba(239, 68, 68, 0.35)',
+          background: 'rgba(239, 68, 68, 0.08)',
+          padding: '18px 22px',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '14px',
+        }}
+      >
+        <ShieldAlert size={26} color="#ef4444" style={{ flexShrink: 0, marginTop: '2px' }} />
+        <div>
+          <div style={{ fontWeight: 700, fontSize: '16px', color: '#ef4444', marginBottom: '6px' }}>
             Thông báo Khẩn cấp & Chỉ dẫn Sơ cứu Tâm lý 24/7
-          </span>
-        }
-        description={
-          <div style={{ marginTop: '6px', fontSize: '14px', lineHeight: 1.6, color: '#7f1d1d' }}>
+          </div>
+          <div style={{ fontSize: '14px', lineHeight: 1.6, color: 'var(--text)' }}>
             Nếu bạn hoặc người thân đang trong trạng thái khủng hoảng tâm lý nghiêm trọng, có ý nghĩ tự hại hoặc gặp nguy hiểm tính mạng, xin vui lòng gọi ngay đến đường dây nóng khẩn cấp:{' '}
             <a
               href={`tel:${emergencyHotline.replace(/\s+/g, '')}`}
-              style={{ fontWeight: 700, color: '#b91c1c', textDecoration: 'underline' }}
+              style={{ fontWeight: 700, color: '#ef4444', textDecoration: 'underline' }}
             >
               {emergencyHotline}
             </a>{' '}
             hoặc đến phòng cấp cứu y tế gần nhất. Bạn không phải đơn độc vượt qua điều này!
           </div>
-        }
-        style={{
-          borderRadius: '12px',
-          border: '1px solid #fecaca',
-          background: 'rgba(254, 226, 226, 0.4)',
-          padding: '16px 20px',
-        }}
-      />
+        </div>
+      </div>
 
       {/* Section 1: Helplines */}
       <div>
@@ -429,8 +429,8 @@ export const HelpDirectory: React.FC = () => {
                       width: '24px',
                       height: '24px',
                       borderRadius: '50%',
-                      background: '#fef3c7',
-                      color: '#d97706',
+                      background: 'rgba(245, 158, 11, 0.18)',
+                      color: '#f59e0b',
                       fontWeight: 700,
                       fontSize: '12px',
                       display: 'flex',
@@ -452,7 +452,7 @@ export const HelpDirectory: React.FC = () => {
           ))}
         </Row>
 
-        <div style={{ marginTop: '20px', padding: '14px 18px', background: 'rgba(16, 185, 129, 0.08)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ marginTop: '20px', padding: '14px 18px', background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '12px' }}>
           <HeartHandshake size={24} style={{ color: '#10b981', flexShrink: 0 }} />
           <Text style={{ fontSize: '13px', color: 'var(--text)' }}>
             <strong>Thông điệp từ PSYTHALIA:</strong> Sức khỏe tinh thần cũng giống như sức khỏe thể chất — khi bị ốm, tìm kiếm bác sĩ là việc hoàn toàn tự nhiên và đúng đắn. Hãy cho bản thân cơ hội được giúp đỡ chuyên nghiệp để phục hồi trọn vẹn nhất.
