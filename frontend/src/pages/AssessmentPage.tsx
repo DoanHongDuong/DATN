@@ -217,7 +217,7 @@ export const AssessmentPage: React.FC = () => {
             <span>Thông điệp từ PSYTHALIA:</span>
           </div>
           <p style={{ margin: '0 0 8px 0', color: 'var(--text)' }}>
-            Bạn không cần phải trải qua mọi chuyện một mình. Việc bạn đã chủ động tham gia khảo sát và đối diện với cảm xúc thật của bản thân đã là một bước đi <strong>rất dũng cảm</strong>.
+            Bạn không cần phải trải qua mọi chuyện một mình. Việc bạn đã chủ động tham gia khảo sát và đối diện với cảm xúc thật của bản thân đã là một bước đi <strong>rất dũng cảm</strong>. Hi vọng bạn hãy để cho chúng tôi đồng hành cùng với bạn trong thời điểm mà bạn cần nhất.
           </p>
           <div style={{ fontSize: '12px', color: 'var(--text)', opacity: 0.85, borderTop: '1px dashed rgba(16, 185, 129, 0.3)', paddingTop: '6px' }}>
             PSYTHALIA cam kết nguyên tắc: <em>Tôn trọng – Bảo mật – Không phán xét – Đồng hành</em>.
