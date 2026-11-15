@@ -184,7 +184,7 @@ export const HelpDirectory: React.FC = () => {
           <div style={{ fontWeight: 700, fontSize: '16px', color: '#ef4444', marginBottom: '6px' }}>
             Thông báo Khẩn cấp & Chỉ dẫn Sơ cứu Tâm lý 24/7
           </div>
-          <div style={{ fontSize: '14px', lineHeight: 1.6, color: 'var(--text)' }}>
+          <div style={{ fontSize: '14px', lineHeight: 1.6, color: 'var(--text-h)' }}>
             Nếu bạn hoặc người thân đang trong trạng thái khủng hoảng tâm lý nghiêm trọng, có ý nghĩ tự hại hoặc gặp nguy hiểm tính mạng, xin vui lòng gọi ngay đến đường dây nóng khẩn cấp:{' '}
             <a
               href={`tel:${emergencyHotline.replace(/\s+/g, '')}`}

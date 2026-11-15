@@ -10,6 +10,7 @@ import {
   LogOut,
   Star,
   Heart,
+  Wind,
 } from 'lucide-react';
 import axios, { AxiosError } from 'axios';
 import {
@@ -776,19 +777,19 @@ export const ChatPage: React.FC = () => {
         {queuePosition !== null && (
           <div
             style={{
-              padding: '20px',
+              padding: '16px 20px',
               borderRadius: '12px',
               background: 'var(--bg)',
               border: '1px solid var(--border)',
-              marginBottom: '20px',
+              marginBottom: '18px',
             }}
           >
-            <div style={{ fontSize: '14px', color: 'var(--text)' }}>
-              Vị trí của bạn trong hàng đợi:
+            <div style={{ fontSize: '13px', color: 'var(--text)' }}>
+              Vị trí của bạn trong hàng đợi tiếp nhận:
             </div>
             <div
               style={{
-                fontSize: '36px',
+                fontSize: '32px',
                 fontWeight: 800,
                 color: 'var(--accent)',
               }}
@@ -797,6 +798,59 @@ export const ChatPage: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* Calming Breathing Pacer during queue wait (Gợi ý 2) */}
+        <div
+          style={{
+            padding: '18px 20px',
+            borderRadius: '14px',
+            background: 'rgba(99, 102, 241, 0.06)',
+            border: '1px solid rgba(99, 102, 241, 0.25)',
+            marginBottom: '18px',
+            textAlign: 'center',
+          }}
+        >
+          <div
+            style={{
+              fontSize: '13px',
+              fontWeight: 600,
+              color: 'var(--accent, #6366f1)',
+              marginBottom: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+            }}
+          >
+            <Wind size={16} />
+            <span>Xoa dịu cảm xúc trong lúc chờ đợi</span>
+          </div>
+
+          <div
+            style={{
+              width: '85px',
+              height: '85px',
+              margin: '0 auto 12px auto',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, rgba(99, 102, 241, 0.05) 70%)',
+              border: '2px solid rgba(99, 102, 241, 0.45)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--text-h)',
+              fontWeight: 600,
+              fontSize: '11px',
+              animation: 'pulseBreathing 6s ease-in-out infinite',
+              letterSpacing: '0.3px',
+            }}
+          >
+            Hít vào • Thở ra
+          </div>
+
+          <p style={{ margin: 0, fontSize: '13px', color: 'var(--text)', lineHeight: 1.5 }}>
+            Người lắng nghe đang trên đường đến với bạn. Hãy nhắm mắt lại, thử hít một hơi thật sâu bằng mũi và thở ra chậm rãi bằng miệng nhé...
+          </p>
+        </div>
 
         <div style={{ fontSize: '13px', color: 'var(--text)' }}>
           Trạng thái kết nối: {' '}

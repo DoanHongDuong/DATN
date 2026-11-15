@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { assessmentApi, type TestResultResponse } from '../api/assessment.api';
 import { journalApi, type JournalEntry } from '../api/journal.api';
-import { HeartPulse, BookOpen, MessageSquare, ShieldAlert, HeartHandshake } from 'lucide-react';
+import { HeartPulse, BookOpen, MessageSquare, ShieldAlert, HeartHandshake, Coffee, Wind, X } from 'lucide-react';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { getEmergencyHotline } from '../utils/hotline';
 import { VolunteerDashboard } from './volunteer/VolunteerDashboard';
@@ -27,6 +27,25 @@ export const DashboardPage: React.FC = () => {
   const [recentTests, setRecentTests] = useState<TestResultResponse[]>([]);
   const [recentJournals, setRecentJournals] = useState<JournalEntry[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [nudgeDismissed, setNudgeDismissed] = useState<boolean>(() => {
+    return sessionStorage.getItem('psy_empathy_nudge_dismissed') === 'true';
+  });
+
+  const handleDismissNudge = () => {
+    setNudgeDismissed(true);
+    sessionStorage.setItem('psy_empathy_nudge_dismissed', 'true');
+  };
+
+  const hasNegativeJournal = recentJournals.some(
+    (j) => j.sentimentLabel === 'negative' || j.sentimentLabel === 'crisis'
+  );
+  const hasHighStressTest = recentTests.some(
+    (t) =>
+      t.severityLevel === 'MODERATE' ||
+      t.severityLevel === 'MODERATELY_SEVERE' ||
+      t.severityLevel === 'SEVERE'
+  );
+  const showEmpathyNudge = !nudgeDismissed && (hasNegativeJournal || hasHighStressTest);
 
   useEffect(() => {
     if (isVolunteer) {
@@ -76,6 +95,103 @@ export const DashboardPage: React.FC = () => {
           Hôm nay cảm xúc của bạn thế nào? Hãy dành ít phút để kiểm tra tâm trạng hoặc thực hiện bài đánh giá nhé.
         </p>
       </div>
+
+      {/* Gentle Empathy Nudge (Gợi ý 3) */}
+      {showEmpathyNudge && (
+        <div
+          style={{
+            padding: '20px 24px',
+            borderRadius: '14px',
+            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(239, 68, 68, 0.05) 100%)',
+            border: '1px solid rgba(245, 158, 11, 0.28)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  background: 'rgba(245, 158, 11, 0.15)',
+                  color: '#f59e0b',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Coffee size={20} />
+              </div>
+              <h4 style={{ margin: 0, fontSize: '15px', color: 'var(--text-h)', fontWeight: 700 }}>
+                PSYTHALIA đang ở đây cùng bạn 🌿
+              </h4>
+            </div>
+            <button
+              onClick={handleDismissNudge}
+              title="Đóng thông báo"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'var(--text)',
+                opacity: 0.65,
+                padding: '4px',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          <p style={{ margin: 0, fontSize: '14px', color: 'var(--text)', lineHeight: 1.6 }}>
+            PSYTHALIA nhận thấy vài ngày qua có vẻ hơi nặng nề và căng thẳng với bạn. Hãy nhớ nghỉ ngơi một chút và uống một ngụm nước ấm nhé. Chúng mình luôn ở đây nếu bạn cần một người lắng nghe và sẻ chia.
+          </p>
+
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', paddingTop: '4px' }}>
+            <Link
+              to="/chat"
+              style={{
+                padding: '8px 16px',
+                borderRadius: '8px',
+                background: 'var(--accent)',
+                color: '#fff',
+                textDecoration: 'none',
+                fontSize: '13px',
+                fontWeight: 600,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <MessageSquare size={14} />
+              Tâm sự với Tình nguyện viên
+            </Link>
+            <Link
+              to="/resources"
+              style={{
+                padding: '8px 16px',
+                borderRadius: '8px',
+                background: 'var(--code-bg)',
+                border: '1px solid var(--border)',
+                color: 'var(--text-h)',
+                textDecoration: 'none',
+                fontSize: '13px',
+                fontWeight: 500,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <Wind size={14} />
+              Thư giãn & Thở sâu
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Volunteer Application Entry Point for USER */}
       {user?.role === 'USER' && (

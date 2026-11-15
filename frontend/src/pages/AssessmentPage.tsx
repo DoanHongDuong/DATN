@@ -3,7 +3,7 @@ import axios, { AxiosError } from 'axios';
 import { Link } from 'react-router-dom';
 import { assessmentApi, type AssessmentTest, type TestQuestion, type TestResultResponse } from '../api/assessment.api';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
-import { CheckCircle2, ArrowLeft, ClipboardList, History, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CheckCircle2, ArrowLeft, ClipboardList, History, RefreshCw, ChevronLeft, ChevronRight, HeartHandshake } from 'lucide-react';
 import { message } from 'antd';
 
 type ActiveTab = 'tests' | 'history';
@@ -195,9 +195,33 @@ export const AssessmentPage: React.FC = () => {
           </div>
         </div>
 
-        <div style={{ textAlign: 'left', padding: '18px 20px', borderRadius: '12px', background: 'var(--accent-bg)', color: 'var(--text-h)', fontSize: '14px', lineHeight: 1.6, marginBottom: '24px', border: '1px solid var(--accent-border)' }}>
+        <div style={{ textAlign: 'left', padding: '18px 20px', borderRadius: '12px', background: 'var(--accent-bg)', color: 'var(--text-h)', fontSize: '14px', lineHeight: 1.6, marginBottom: '16px', border: '1px solid var(--accent-border)' }}>
           <strong style={{ display: 'block', marginBottom: '6px', color: 'var(--accent)', fontSize: '15px' }}>💡 Khuyến nghị dành cho bạn:</strong>
           {finalRecommendation}
+        </div>
+
+        {/* Lời nhắn gửi nâng đỡ tinh thần & Cam kết nguyên tắc */}
+        <div style={{
+          textAlign: 'left',
+          padding: '16px 20px',
+          borderRadius: '12px',
+          background: 'rgba(16, 185, 129, 0.08)',
+          border: '1px solid rgba(16, 185, 129, 0.25)',
+          color: 'var(--text-h)',
+          fontSize: '14px',
+          lineHeight: 1.6,
+          marginBottom: '24px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', color: '#10b981', fontWeight: 700, fontSize: '15px' }}>
+            <HeartHandshake size={18} />
+            <span>Thông điệp từ PSYTHALIA:</span>
+          </div>
+          <p style={{ margin: '0 0 8px 0', color: 'var(--text)' }}>
+            Bạn không cần phải trải qua mọi chuyện một mình. Việc bạn đã chủ động tham gia lượng giá và đối diện với cảm xúc thật của bản thân đã là một bước đi <strong>rất dũng cảm</strong>.
+          </p>
+          <div style={{ fontSize: '12px', color: 'var(--text)', opacity: 0.85, borderTop: '1px dashed rgba(16, 185, 129, 0.3)', paddingTop: '6px' }}>
+            PSYTHALIA cam kết nguyên tắc: <em>Tôn trọng – Bảo mật – Không phán xét – Đồng hành</em>.
+          </div>
         </div>
 
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
