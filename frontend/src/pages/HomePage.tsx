@@ -25,7 +25,7 @@ export const HomePage: React.FC = () => {
         <span>Không gian an toàn cho sức khỏe tâm thần của bạn</span>
       </div>
 
-      <h1 style={{ fontSize: '48px', fontWeight: 800, margin: '0 0 16px 0', color: 'var(--text-h)', lineHeight: 1.35 }}>
+      <h1 style={{ fontSize: '44px', fontWeight: 700, margin: '0 0 16px 0', color: 'var(--text-h)', lineHeight: 1.4, letterSpacing: '-0.3px' }}>
         Đồng hành & Lắng nghe <br /> Mọi cảm xúc của bạn
       </h1>
 

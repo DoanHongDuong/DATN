@@ -124,5 +124,40 @@ describe('RequestSupportUseCase', () => {
       }),
     );
   });
+
+  it('should assign CRITICAL priority if latest severity is SEVERE', async () => {
+    chatRepo.findActiveOrWaitingSessionByUserId.mockResolvedValue(null);
+    chatRepo.hasAvailableVolunteer.mockResolvedValue(true);
+    chatRepo.findLatestSeverityByUserId.mockResolvedValue(SeverityLevel.SEVERE);
+    chatRepo.createSession.mockResolvedValue({
+      ...mockSession,
+      priorityLevel: PriorityLevel.CRITICAL,
+    });
+    chatRepo.findAvailableVolunteerUserIds.mockResolvedValue(['vol-1']);
+
+    await useCase.execute('student-1');
+
+    expect(chatRepo.createSession).toHaveBeenCalledWith({
+      userId: 'student-1',
+      priorityLevel: PriorityLevel.CRITICAL,
+      status: SessionStatus.WAITING,
+    });
+  });
+
+  it('should assign HIGH priority by default if user has no prior test results', async () => {
+    chatRepo.findActiveOrWaitingSessionByUserId.mockResolvedValue(null);
+    chatRepo.hasAvailableVolunteer.mockResolvedValue(true);
+    chatRepo.findLatestSeverityByUserId.mockResolvedValue(null);
+    chatRepo.createSession.mockResolvedValue(mockSession);
+    chatRepo.findAvailableVolunteerUserIds.mockResolvedValue(['vol-1']);
+
+    await useCase.execute('student-1');
+
+    expect(chatRepo.createSession).toHaveBeenCalledWith({
+      userId: 'student-1',
+      priorityLevel: PriorityLevel.HIGH,
+      status: SessionStatus.WAITING,
+    });
+  });
 });
 
