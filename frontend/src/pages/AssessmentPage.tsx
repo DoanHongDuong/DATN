@@ -141,12 +141,12 @@ export const AssessmentPage: React.FC = () => {
   // ---- Helper dùng chung cho cả result screen và history ----
   const getSeverityInfo = (level: string) => {
     switch (level) {
-      case 'MINIMAL':   return { label: 'Bình thường / Ổn định',   color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)' };
-      case 'MILD':      return { label: 'Mức độ nhẹ',              color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.12)' };
-      case 'MODERATE':  return { label: 'Mức độ vừa phải',         color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)' };
+      case 'MINIMAL': return { label: 'Bình thường / Ổn định', color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)' };
+      case 'MILD': return { label: 'Mức độ nhẹ', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.12)' };
+      case 'MODERATE': return { label: 'Mức độ vừa phải', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)' };
       case 'MODERATELY_SEVERE': return { label: 'Khá nghiêm trọng', color: '#f97316', bg: 'rgba(249, 115, 22, 0.12)' };
-      case 'SEVERE':    return { label: 'Nghiêm trọng',             color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)' };
-      default:          return { label: level,                       color: 'var(--accent)', bg: 'var(--accent-bg)' };
+      case 'SEVERE': return { label: 'Nghiêm trọng', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)' };
+      default: return { label: level, color: 'var(--accent)', bg: 'var(--accent-bg)' };
     }
   };
 
@@ -185,7 +185,7 @@ export const AssessmentPage: React.FC = () => {
       <div style={{ maxWidth: '640px', margin: '20px auto', padding: '32px', borderRadius: '16px', border: '1px solid var(--border)', background: 'var(--code-bg)', textAlign: 'center' }}>
         <CheckCircle2 size={52} color="#10b981" style={{ marginBottom: '16px' }} />
         <h2 style={{ margin: '0 0 16px 0', color: 'var(--text-h)' }}>Kết quả Đánh giá</h2>
-        
+
         <div style={{ padding: '24px', borderRadius: '12px', background: 'var(--bg)', border: '1px solid var(--border)', marginBottom: '20px' }}>
           <div style={{ fontSize: '15px', color: 'var(--text)', marginBottom: '8px' }}>
             Tổng số điểm: <strong style={{ fontSize: '32px', color: 'var(--accent)', marginLeft: '6px' }}>{finalScore}</strong>
@@ -217,7 +217,7 @@ export const AssessmentPage: React.FC = () => {
             <span>Thông điệp từ PSYTHALIA:</span>
           </div>
           <p style={{ margin: '0 0 8px 0', color: 'var(--text)' }}>
-            Bạn không cần phải trải qua mọi chuyện một mình. Việc bạn đã chủ động tham gia lượng giá và đối diện với cảm xúc thật của bản thân đã là một bước đi <strong>rất dũng cảm</strong>.
+            Bạn không cần phải trải qua mọi chuyện một mình. Việc bạn đã chủ động tham gia khảo sát và đối diện với cảm xúc thật của bản thân đã là một bước đi <strong>rất dũng cảm</strong>.
           </p>
           <div style={{ fontSize: '12px', color: 'var(--text)', opacity: 0.85, borderTop: '1px dashed rgba(16, 185, 129, 0.3)', paddingTop: '6px' }}>
             PSYTHALIA cam kết nguyên tắc: <em>Tôn trọng – Bảo mật – Không phán xét – Đồng hành</em>.
