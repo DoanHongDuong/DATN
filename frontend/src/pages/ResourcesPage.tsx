@@ -18,16 +18,22 @@ import {
 } from 'lucide-react';
 import { resourceApi, type RelaxationResource } from '../api/resource.api';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { HelpDirectory } from '../components/resources/HelpDirectory';
 
 const { Title, Paragraph, Text } = Typography;
 
 export const ResourcesPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const openParam = searchParams.get('open');
+  const tabParam = searchParams.get('tab');
 
   const [resources, setResources] = useState<RelaxationResource[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [activeTab, setActiveTab] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState<string>(
+    tabParam || (openParam === 'directory' ? 'directory' : 'all'),
+  );
+  const [loading, setLoading] = useState<boolean>(
+    (tabParam || openParam) !== 'directory',
+  );
 
   // Breathing Modal State
   const [breathingModalOpen, setBreathingModalOpen] = useState<boolean>(false);
@@ -66,9 +72,12 @@ export const ResourcesPage: React.FC = () => {
   };
 
   useEffect(() => {
+    if (activeTab === 'directory') return;
+
     let isMounted = true;
     const load = async () => {
       try {
+        setLoading(true);
         const data = await resourceApi.getAll(activeTab);
         if (isMounted) {
           setResources(data);
@@ -381,10 +390,13 @@ export const ResourcesPage: React.FC = () => {
           { key: 'music', label: '🎧 Nhạc & Âm thanh thư giãn' },
           { key: 'meditation', label: '🧘 Thiền định' },
           { key: 'mindfulness', label: '🌿 Kỹ thuật giải tỏa lo âu' },
+          { key: 'directory', label: '🏥 Nguồn trợ giúp & Cơ sở Y tế' },
         ]}
       />
 
-      {loading ? (
+      {activeTab === 'directory' ? (
+        <HelpDirectory />
+      ) : loading ? (
         <LoadingSpinner message="Đang tải thư viện thư giãn..." />
       ) : (
         <div
