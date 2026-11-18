@@ -13,6 +13,7 @@ import { ResendVerificationEmailUseCase } from '../application/use-cases/resend-
 import { ChangePasswordUseCase } from '../application/use-cases/change-password.use-case';
 import { UserPrismaRepository } from './persistence/user.prisma.repository';
 import { USER_REPOSITORY } from '../domain/repositories/user.repository.interface';
+import { VerifiedEmailGuard } from '../presentation/guards/verified-email.guard';
 
 @Module({
   imports: [
@@ -43,7 +44,8 @@ import { USER_REPOSITORY } from '../domain/repositories/user.repository.interfac
     VerifyEmailUseCase,
     ResendVerificationEmailUseCase,
     ChangePasswordUseCase,
+    VerifiedEmailGuard,
   ],
-  exports: [JwtModule],
+  exports: [JwtModule, VerifiedEmailGuard],
 })
 export class AuthModule {}

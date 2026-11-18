@@ -4,7 +4,7 @@ import { MainLayout } from '../components/layout/MainLayout';
 import { ProtectedRoute } from '../components/common/ProtectedRoute';
 import { PublicOnlyRoute } from '../components/common/PublicOnlyRoute';
 import { HomePage } from '../pages/HomePage';
-import { LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage } from '../pages/auth';
+import { LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage, VerifyEmailPage } from '../pages/auth';
 import { DashboardPage } from '../pages/DashboardPage';
 import { AssessmentPage } from '../pages/AssessmentPage';
 import { JournalPage } from '../pages/JournalPage';
@@ -31,7 +31,7 @@ export const AppRouter: React.FC = () => {
           {/* Public General Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
-          <Route path="/verify-email" element={<Navigate to="/login" replace />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
 
           {/* Guest-only Routes (Redirect to app if already authenticated) */}
           <Route element={<PublicOnlyRoute />}>

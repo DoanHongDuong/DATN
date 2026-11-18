@@ -51,9 +51,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const parsedUser = currentUserJson ? JSON.parse(currentUserJson) : null;
             const updatedUser: User = {
               id: profile.userId,
-              email: parsedUser?.email || '',
-              fullName: parsedUser?.fullName || 'Người dùng',
+              email: profile.email || parsedUser?.email || '',
+              fullName: profile.fullName || parsedUser?.fullName || 'Người dùng',
               role: profile.role,
+              emailVerified: profile.emailVerified ?? parsedUser?.emailVerified ?? false,
             };
             setUser(updatedUser);
             localStorage.setItem('user', JSON.stringify(updatedUser));

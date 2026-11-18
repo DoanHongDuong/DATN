@@ -20,6 +20,7 @@ export interface AuthResponse {
     email: string;
     fullName: string;
     role: string;
+    emailVerified?: boolean;
   };
 }
 
@@ -30,6 +31,7 @@ export interface RegisterResponse {
     email: string;
     fullName: string;
     role: string;
+    emailVerified?: boolean;
   };
   message: string;
 }
@@ -37,6 +39,9 @@ export interface RegisterResponse {
 export interface UserProfile {
   userId: string;
   role: string;
+  email?: string;
+  fullName?: string;
+  emailVerified?: boolean;
 }
 
 export interface VerifyEmailPayload {
@@ -78,8 +83,8 @@ export const authApi = {
     return res.data;
   },
 
-  resendVerification: async (email: string): Promise<{ message: string }> => {
-    const res = await apiClient.post('/auth/resend-verification', { email });
+  resendVerification: async (email?: string): Promise<{ message: string }> => {
+    const res = await apiClient.post('/auth/resend-verification', email ? { email } : {});
     return res.data;
   },
 

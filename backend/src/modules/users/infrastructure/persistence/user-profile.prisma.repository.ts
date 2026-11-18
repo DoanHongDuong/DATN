@@ -19,6 +19,7 @@ export class UserProfilePrismaRepository implements IUserProfileRepository {
         email: true,
         phone: true,
         role: true,
+        emailVerified: true,
         createdAt: true,
       },
     });
@@ -37,6 +38,7 @@ export class UserProfilePrismaRepository implements IUserProfileRepository {
         email: true,
         phone: true,
         role: true,
+        emailVerified: true,
         createdAt: true,
       },
     });

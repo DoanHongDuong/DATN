@@ -14,6 +14,7 @@ describe('User Profile Use Cases', () => {
     email: 'nguyenvana@gmail.com',
     phone: '0912345678',
     role: 'USER',
+    emailVerified: false,
     createdAt: new Date('2026-01-01'),
   };
 

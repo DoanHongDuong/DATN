@@ -1,11 +1,13 @@
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import { Navbar } from './Navbar';
+import { EmailVerificationBanner } from '../common/EmailVerificationBanner';
 
 export const MainLayout: React.FC = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'var(--bg)' }}>
       <Navbar />
+      <EmailVerificationBanner />
       <main className="app-main-content">
         <Outlet />
       </main>

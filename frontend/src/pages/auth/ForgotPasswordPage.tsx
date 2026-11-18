@@ -73,7 +73,7 @@ export const ForgotPasswordPage: React.FC = () => {
               type="success"
               showIcon
               message="Yêu cầu đã được ghi nhận"
-              description="Nếu email tồn tại trong hệ thống, hướng dẫn đặt lại mật khẩu đã được gửi đến hộp thư của bạn."
+              description="Nếu email tồn tại trong hệ thống và đã hoàn tất xác thực, hướng dẫn đặt lại mật khẩu đã được gửi đến hộp thư của bạn."
             />
             <div style={{ textAlign: 'center', marginTop: '12px' }}>
               <Link
@@ -92,8 +92,16 @@ export const ForgotPasswordPage: React.FC = () => {
           </div>
         ) : (
           /* Form */
-          <Form
-            form={form}
+          <>
+            <Alert
+              type="info"
+              showIcon
+              style={{ marginBottom: 20 }}
+              message="Lưu ý về bảo mật tài khoản"
+              description="Để bảo vệ thông tin sức khỏe tinh thần của bạn, liên kết đặt lại mật khẩu chỉ được gửi đến địa chỉ email đã hoàn tất xác nhận."
+            />
+            <Form
+              form={form}
             layout="vertical"
             onFinish={onFinish}
             requiredMark={false}
@@ -125,6 +133,7 @@ export const ForgotPasswordPage: React.FC = () => {
               </Button>
             </Form.Item>
           </Form>
+          </>
         )}
 
         {/* Footer */}

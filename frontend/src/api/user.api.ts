@@ -6,6 +6,7 @@ export interface UserDetail {
   email: string;
   phone: string | null;
   role: string;
+  emailVerified: boolean;
   createdAt: string;
 }
 

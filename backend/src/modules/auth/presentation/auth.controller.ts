@@ -1,6 +1,7 @@
-import { Controller, Post, Body, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, Req, UseGuards, Inject, BadRequestException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { Request } from 'express';
+import { JwtService } from '@nestjs/jwt';
 import { RegisterUserUseCase } from '../application/use-cases/register-user.use-case';
 import { LoginUserUseCase } from '../application/use-cases/login-user.use-case';
 import { RequestPasswordResetUseCase } from '../application/use-cases/request-password-reset.use-case';
@@ -16,6 +17,7 @@ import { ChangePasswordDto } from '../application/dto/change-password.dto';
 import { ChangePasswordUseCase } from '../application/use-cases/change-password.use-case';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { USER_REPOSITORY, IUserRepository } from '../domain/repositories/user.repository.interface';
 
 interface AuthenticatedRequest extends Request {
   user: { userId: string; role: string };
@@ -32,6 +34,9 @@ export class AuthController {
     private readonly verifyEmailUseCase: VerifyEmailUseCase,
     private readonly resendVerificationEmailUseCase: ResendVerificationEmailUseCase,
     private readonly changePasswordUseCase: ChangePasswordUseCase,
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: IUserRepository,
+    private readonly jwtService: JwtService,
   ) { }
 
   @ApiOperation({ summary: 'Đăng ký tài khoản mới' })
@@ -56,12 +61,34 @@ export class AuthController {
     return this.verifyEmailUseCase.execute(dto);
   }
 
-  @ApiOperation({ summary: 'Gửi lại email xác minh' })
+  @ApiOperation({ summary: 'Gửi lại email xác minh (Giới hạn 3 lần/giờ)' })
   @UseGuards(ThrottlerGuard)
-  @Throttle({ default: { limit: 5, ttl: 900000 } })
+  @Throttle({ default: { limit: 3, ttl: 3600000 } })
   @Post('resend-verification')
-  resendVerification(@Body() dto: ForgotPasswordDto) {
-    return this.resendVerificationEmailUseCase.execute(dto.email);
+  async resendVerification(
+    @Req() req: Request,
+    @Body() dto?: ForgotPasswordDto,
+  ) {
+    // 1. Kiểm tra nếu người dùng đã đăng nhập (Bearer Token)
+    const authHeader = req.headers.authorization;
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      try {
+        const payload = this.jwtService.decode(token) as { sub?: string };
+        if (payload?.sub) {
+          return this.resendVerificationEmailUseCase.execute({ userId: payload.sub });
+        }
+      } catch {
+        // Tiếp tục kiểm tra email trong body
+      }
+    }
+
+    // 2. Nếu không có token, yêu cầu email từ body
+    if (dto?.email) {
+      return this.resendVerificationEmailUseCase.execute({ email: dto.email });
+    }
+
+    throw new BadRequestException('Vui lòng cung cấp địa chỉ email hoặc đăng nhập để gửi lại email xác thực');
   }
 
   @ApiOperation({ summary: 'Yêu cầu khôi phục mật khẩu' })
@@ -96,7 +123,14 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  getProfile(@Req() req: AuthenticatedRequest) {
-    return req.user;
+  async getProfile(@Req() req: AuthenticatedRequest) {
+    const user = await this.userRepository.findById(req.user.userId);
+    return {
+      userId: req.user.userId,
+      role: req.user.role,
+      email: user?.email || '',
+      fullName: user?.fullName || '',
+      emailVerified: user?.emailVerified ?? false,
+    };
   }
 }

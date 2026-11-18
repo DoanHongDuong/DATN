@@ -6,6 +6,7 @@ export interface User {
   email: string;
   fullName: string;
   role: string;
+  emailVerified?: boolean;
 }
 
 export interface AuthContextType {
