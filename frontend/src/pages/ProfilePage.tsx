@@ -103,7 +103,7 @@ export const ProfilePage: React.FC = () => {
   const roleTagConfig = {
     ADMIN: { color: 'purple', label: 'Quản trị viên (Admin)' },
     VOLUNTEER: { color: 'green', label: 'Tình nguyện viên' },
-    USER: { color: 'blue', label: 'Người dùng sinh viên' },
+    USER: { color: 'blue', label: 'Người dùng' },
   }[profile?.role || 'USER'] || { color: 'default', label: profile?.role };
 
   return (
