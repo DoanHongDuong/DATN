@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios, { AxiosError } from 'axios';
-import { Modal, Button, Alert, message } from 'antd';
+import { Modal, Button, Alert, message, Input } from 'antd';
 import { journalApi, type JournalEntry, type RelaxationResource } from '../api/journal.api';
 import { chatApi } from '../api/chat.api';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { getEmergencyHotline } from '../utils/hotline';
-import { Sparkles, Trash2, Smile, HeartHandshake, PhoneCall, PlayCircle, ExternalLink, Compass } from 'lucide-react';
+import { Sparkles, Trash2, Smile, HeartHandshake, PhoneCall, PlayCircle, ExternalLink, Compass, RefreshCw } from 'lucide-react';
 
 const EMOJI_OPTIONS = ['😊', '😢', '😐', '😡', '😰', '🥰', '😴', '🤯'];
 
@@ -131,9 +131,12 @@ export const JournalPage: React.FC = () => {
     }
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!content.trim()) return;
+  const handleCreate = async (e?: React.FormEvent) => {
+    if (e?.preventDefault) e.preventDefault();
+    if (!content.trim()) {
+      message.warning('Vui lòng nhập nội dung nhật ký');
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -239,14 +242,23 @@ export const JournalPage: React.FC = () => {
     navigate(`/resources?open=${encodeURIComponent(r.id)}`);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Bạn có chắc chắn muốn xóa bài nhật ký này?')) return;
-    try {
-      await journalApi.delete(id);
-      setEntries((prev) => prev.filter((item) => item.id !== id));
-    } catch {
-      message.error('Không thể xóa bài nhật ký');
-    }
+  const handleDelete = (id: string) => {
+    Modal.confirm({
+      title: 'Xóa bài nhật ký',
+      content: 'Bạn có chắc chắn muốn xóa bài nhật ký này? Hành động này không thể hoàn tác.',
+      okText: 'Xóa bài',
+      okType: 'danger',
+      cancelText: 'Hủy',
+      onOk: async () => {
+        try {
+          await journalApi.delete(id);
+          setEntries((prev) => prev.filter((item) => item.id !== id));
+          message.success('Đã xóa bài nhật ký thành công');
+        } catch {
+          message.error('Không thể xóa bài nhật ký');
+        }
+      },
+    });
   };
 
   return (
@@ -259,7 +271,7 @@ export const JournalPage: React.FC = () => {
             <Smile size={20} color="var(--accent)" /> Viết Nhật ký Cá nhân
           </h3>
 
-          <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px', color: 'var(--text)' }}>
                 Tâm trạng hiện tại của bạn:
@@ -286,61 +298,51 @@ export const JournalPage: React.FC = () => {
             </div>
 
             <div>
-              <textarea
-                required
+              <Input.TextArea
                 rows={5}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="Chia sẻ những suy nghĩ, cảm xúc hay câu chuyện hôm nay của bạn... (Nội dung được mã hóa bảo mật)"
+                placeholder="Chia sẻ những suy nghĩ, cảm xúc hay câu chuyện hôm nay của bạn... (Nội dung được tự động mã hóa bảo mật AES-256-GCM)"
+                maxLength={2000}
+                showCount
                 style={{
-                  width: '100%',
-                  padding: '12px',
                   borderRadius: '10px',
-                  border: '1px solid var(--border)',
-                  background: 'var(--bg)',
-                  color: 'var(--text-h)',
                   fontSize: '14px',
-                  boxSizing: 'border-box',
-                  resize: 'vertical'
                 }}
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
+            <Button
+              type="primary"
+              size="large"
+              loading={isSubmitting}
+              onClick={() => handleCreate()}
+              icon={<Sparkles size={18} />}
               style={{
-                padding: '12px',
+                width: '100%',
+                height: '46px',
                 borderRadius: '8px',
-                border: 'none',
-                background: 'var(--accent)',
-                color: '#fff',
                 fontWeight: 600,
                 fontSize: '15px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                opacity: isSubmitting ? 0.7 : 1
               }}
             >
-              <Sparkles size={18} />
               {isSubmitting ? 'Đang mã hóa & Phân tích AI...' : 'Lưu nhật ký'}
-            </button>
-          </form>
+            </Button>
+          </div>
         </div>
 
         {/* Entries List */}
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
             <h3 style={{ margin: 0, color: 'var(--text-h)', fontSize: '18px' }}>Lịch sử Nhật ký</h3>
-            <button
+            <Button
+              icon={<RefreshCw size={14} />}
               onClick={fetchJournalEntries}
-              style={{ padding: '6px 14px', fontSize: '13px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', cursor: 'pointer' }}
+              size="small"
+              style={{ borderRadius: '6px' }}
             >
               Làm mới
-            </button>
+            </Button>
           </div>
 
           {loading ? (

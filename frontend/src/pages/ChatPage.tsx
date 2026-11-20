@@ -328,33 +328,40 @@ export const ChatPage: React.FC = () => {
   };
 
   // Xử lý Kết thúc phiên (TNV hoặc User)
-  const handleEndSession = async () => {
+  const handleEndSession = () => {
     if (!activeSession) return;
-    if (!confirm('Bạn có chắc chắn muốn kết thúc phiên tư vấn này?')) return;
+    Modal.confirm({
+      title: 'Kết thúc phiên tư vấn',
+      content: 'Bạn có chắc chắn muốn kết thúc phiên tư vấn này?',
+      okText: 'Kết thúc',
+      okType: 'danger',
+      cancelText: 'Tiếp tục trò chuyện',
+      onOk: async () => {
+        try {
+          // 1. Gọi HTTP API chắc chắn cập nhật DB thành CLOSED
+          await chatApi.endSession(activeSession.id);
 
-    try {
-      // 1. Gọi HTTP API chắc chắn cập nhật DB thành CLOSED
-      await chatApi.endSession(activeSession.id);
+          // 2. Gửi socket emit để realtime cho bên kia
+          if (socket) {
+            socket.emit('end_session', { sessionId: activeSession.id });
+          }
 
-      // 2. Gửi socket emit để realtime cho bên kia
-      if (socket) {
-        socket.emit('end_session', { sessionId: activeSession.id });
-      }
-
-      setActiveSession(null);
-      setMessages([]);
-      message.success('Đã kết thúc phiên hỗ trợ.');
-      if (isVolunteer) {
-        fetchWaitingSessions();
-      }
-    } catch (err: unknown) {
-      let msg = 'Không thể kết thúc phiên hỗ trợ';
-      if (axios.isAxiosError(err)) {
-        const axiosErr = err as AxiosError<{ message?: string }>;
-        msg = axiosErr.response?.data?.message || msg;
-      }
-      message.error(msg);
-    }
+          setActiveSession(null);
+          setMessages([]);
+          message.success('Đã kết thúc phiên hỗ trợ.');
+          if (isVolunteer) {
+            fetchWaitingSessions();
+          }
+        } catch (err: unknown) {
+          let msg = 'Không thể kết thúc phiên hỗ trợ';
+          if (axios.isAxiosError(err)) {
+            const axiosErr = err as AxiosError<{ message?: string }>;
+            msg = axiosErr.response?.data?.message || msg;
+          }
+          message.error(msg);
+        }
+      },
+    });
   };
 
   // Xử lý User: Gửi yêu cầu hỗ trợ
@@ -605,41 +612,35 @@ export const ChatPage: React.FC = () => {
             background: 'var(--code-bg)',
             display: 'flex',
             gap: '10px',
+            alignItems: 'center',
           }}
         >
-          <input
-            type="text"
+          <Input
+            size="large"
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            placeholder="Nhập tin nhắn..."
+            onPressEnter={handleSendMessage}
+            placeholder="Nhập tin nhắn... (Nhấn Enter để gửi)"
             style={{
               flex: 1,
-              padding: '10px 14px',
               borderRadius: '8px',
-              border: '1px solid var(--border)',
-              background: 'var(--bg)',
-              color: 'var(--text-h)',
-              fontSize: '14px',
-              outline: 'none',
             }}
           />
-          <button
-            type="submit"
+          <Button
+            type="primary"
+            size="large"
+            htmlType="submit"
+            icon={<Send size={16} />}
             style={{
-              padding: '10px 20px',
               borderRadius: '8px',
-              border: 'none',
-              background: 'var(--accent)',
-              color: '#fff',
-              cursor: 'pointer',
+              fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              fontWeight: 600,
             }}
           >
-            <Send size={16} /> Gửi
-          </button>
+            Gửi
+          </Button>
         </form>
       </div>
     );

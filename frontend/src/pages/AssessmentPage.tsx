@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { assessmentApi, type AssessmentTest, type TestQuestion, type TestResultResponse } from '../api/assessment.api';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { CheckCircle2, ArrowLeft, ClipboardList, History, RefreshCw, ChevronLeft, ChevronRight, HeartHandshake } from 'lucide-react';
-import { message } from 'antd';
+import { message, Button, Radio } from 'antd';
 
 type ActiveTab = 'tests' | 'history';
 
@@ -263,12 +263,13 @@ export const AssessmentPage: React.FC = () => {
             </Link>
           )}
 
-          <button
+          <Button
+            size="large"
             onClick={() => { setSelectedTest(null); setResult(null); }}
-            style={{ padding: '10px 24px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text-h)', fontWeight: 600, cursor: 'pointer', fontSize: '14px' }}
+            style={{ borderRadius: '8px', fontWeight: 600, fontSize: '14px' }}
           >
             Hoàn thành
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -280,12 +281,14 @@ export const AssessmentPage: React.FC = () => {
   if (selectedTest) {
     return (
       <div style={{ maxWidth: '720px', margin: '0 auto' }}>
-        <button
+        <Button
+          type="link"
+          icon={<ArrowLeft size={18} />}
           onClick={() => setSelectedTest(null)}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', border: 'none', background: 'transparent', color: 'var(--accent)', fontWeight: 600, cursor: 'pointer', marginBottom: '16px' }}
+          style={{ padding: 0, fontWeight: 600, marginBottom: '16px', color: 'var(--accent)' }}
         >
-          <ArrowLeft size={18} /> Quay lại danh sách
-        </button>
+          Quay lại danh sách
+        </Button>
 
         <h2 style={{ margin: '0 0 8px 0', color: 'var(--text-h)' }}>{selectedTest.name || selectedTest.title}</h2>
         <p style={{ color: 'var(--text)', fontSize: '14px', marginBottom: '24px' }}>{selectedTest.description}</p>
@@ -296,49 +299,56 @@ export const AssessmentPage: React.FC = () => {
               <h4 style={{ margin: '0 0 12px 0', color: 'var(--text-h)', fontSize: '16px' }}>
                 Câu {idx + 1}: {q.content}
               </h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <Radio.Group
+                value={answers[q.id]}
+                onChange={(e) => handleOptionSelect(q.id, e.target.value)}
+                style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}
+              >
                 {(q.options || []).map((opt) => {
                   const isChecked = answers[q.id] === opt.id;
                   return (
-                    <label
+                    <div
                       key={opt.id}
+                      onClick={() => handleOptionSelect(q.id, opt.id)}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '10px',
                         padding: '10px 14px',
                         borderRadius: '8px',
                         border: isChecked ? '2px solid var(--accent)' : '1px solid var(--border)',
                         background: isChecked ? 'var(--accent-bg)' : 'var(--bg)',
                         cursor: 'pointer',
                         fontSize: '14px',
-                        color: 'var(--text-h)'
+                        color: 'var(--text-h)',
+                        transition: 'all 0.15s ease',
                       }}
                     >
-                      <input
-                        type="radio"
-                        name={`question-${q.id}`}
-                        checked={isChecked}
-                        onChange={() => handleOptionSelect(q.id, opt.id)}
-                        style={{ accentColor: 'var(--accent)' }}
-                      />
-                      <span>{opt.content || opt.text}</span>
-                    </label>
+                      <Radio value={opt.id} style={{ marginRight: '8px' }} />
+                      <span style={{ userSelect: 'none' }}>{opt.content || opt.text}</span>
+                    </div>
                   );
                 })}
-              </div>
+              </Radio.Group>
             </div>
           ))}
         </div>
 
         <div style={{ marginTop: '28px', textAlign: 'right' }}>
-          <button
+          <Button
+            type="primary"
+            size="large"
             onClick={handleSubmit}
-            disabled={submitting}
-            style={{ padding: '12px 32px', borderRadius: '8px', border: 'none', background: 'var(--accent)', color: '#fff', fontWeight: 600, fontSize: '16px', cursor: 'pointer', opacity: submitting ? 0.7 : 1 }}
+            loading={submitting}
+            style={{
+              padding: '0 36px',
+              height: '46px',
+              borderRadius: '8px',
+              fontWeight: 600,
+              fontSize: '15px',
+            }}
           >
             {submitting ? 'Đang chấm điểm...' : 'Nộp bài đánh giá'}
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -380,12 +390,14 @@ export const AssessmentPage: React.FC = () => {
               <h3 style={{ margin: '0 0 8px 0', color: 'var(--text-h)' }}>{t.name || t.title}</h3>
               <p style={{ margin: 0, color: 'var(--text)', fontSize: '14px', lineHeight: 1.5 }}>{t.description}</p>
             </div>
-            <button
+            <Button
+              type="primary"
+              size="middle"
               onClick={() => handleStartTest(t)}
-              style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', background: 'var(--accent)', color: '#fff', fontWeight: 600, cursor: 'pointer', fontSize: '14px' }}
+              style={{ borderRadius: '8px', fontWeight: 600, alignSelf: 'flex-start' }}
             >
               Làm bài trắc nghiệm
-            </button>
+            </Button>
           </div>
         ))}
       </div>
@@ -404,14 +416,15 @@ export const AssessmentPage: React.FC = () => {
         <p style={{ color: 'var(--text)', fontSize: '14px', margin: 0 }}>
           Tổng cộng <strong style={{ color: 'var(--text-h)' }}>{historyTotal}</strong> lần kiểm tra đã thực hiện.
         </p>
-        <button
+        <Button
           onClick={() => fetchHistory(historyPage)}
-          disabled={loadingHistory}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'transparent', color: 'var(--text)', cursor: 'pointer', fontSize: '13px' }}
+          loading={loadingHistory}
+          icon={<RefreshCw size={14} />}
+          size="small"
+          style={{ borderRadius: '8px' }}
         >
-          <RefreshCw size={14} style={{ animation: loadingHistory ? 'spin 1s linear infinite' : 'none' }} />
           Làm mới
-        </button>
+        </Button>
       </div>
 
       {loadingHistory ? (
@@ -420,12 +433,14 @@ export const AssessmentPage: React.FC = () => {
         <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--text)' }}>
           <div style={{ fontSize: '40px', marginBottom: '12px' }}>📋</div>
           <p style={{ margin: 0, fontSize: '15px' }}>Bạn chưa thực hiện bài kiểm tra nào.</p>
-          <button
+          <Button
+            type="primary"
+            size="large"
             onClick={() => setActiveTab('tests')}
-            style={{ marginTop: '16px', padding: '10px 24px', borderRadius: '8px', border: 'none', background: 'var(--accent)', color: '#fff', fontWeight: 600, cursor: 'pointer', fontSize: '14px' }}
+            style={{ marginTop: '16px', borderRadius: '8px', fontWeight: 600 }}
           >
             Bắt đầu kiểm tra ngay
-          </button>
+          </Button>
         </div>
       ) : (
         <>
