@@ -1,12 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IAssessmentRepository } from '../../domain/repositories/assessment.repository.interface';
+import { getRecommendation } from '../../infrastructure/constants/severity-thresholds.constant';
 
 @Injectable()
 export class GetTestHistoryUseCase {
   constructor(
     @Inject('IAssessmentRepository')
     private readonly repository: IAssessmentRepository,
-  ) {}
+  ) { }
 
   async execute(userId: string, page: number = 1, limit: number = 10) {
     const skip = (page - 1) * limit;
@@ -15,8 +16,13 @@ export class GetTestHistoryUseCase {
       this.repository.countTestHistoryByUserId(userId),
     ]);
 
+    const enrichedData = data.map((item: any) => ({
+      ...item,
+      recommendation: getRecommendation(item.test?.code || '', item.severityLevel),
+    }));
+
     return {
-      data,
+      data: enrichedData,
       meta: {
         total,
         page,
