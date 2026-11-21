@@ -36,16 +36,20 @@ export const Navbar: React.FC = () => {
     navigate('/login', { replace: true });
   };
 
-  const navItems = [
-    { label: 'Tổng quan', path: '/dashboard', icon: LayoutDashboard },
-    { label: 'Đánh giá tâm lý', path: '/assessments', icon: HeartPulse },
-    { label: 'Nhật ký cá nhân', path: '/journal', icon: BookOpen },
-    { label: 'Thư giãn', path: '/resources', icon: Sparkles },
-    { label: 'Tư vấn trực tiếp', path: '/chat', icon: MessageSquare },
-    ...(user?.role === 'ADMIN'
-      ? [{ label: 'Quản trị', path: '/admin', icon: ShieldCheck }]
-      : []),
-  ];
+  const navItems = user?.role === 'ADMIN'
+    ? [
+        { label: 'Cổng Quản trị', path: '/admin', icon: ShieldCheck },
+        { label: 'Thống kê & Giám sát', path: '/admin/stats', icon: LayoutDashboard },
+        { label: 'Đánh giá tâm lý', path: '/assessments', icon: HeartPulse },
+        { label: 'Thư giãn', path: '/resources', icon: Sparkles },
+      ]
+    : [
+        { label: user?.role === 'VOLUNTEER' ? 'Bàn trực TNV' : 'Tổng quan', path: '/dashboard', icon: LayoutDashboard },
+        { label: 'Đánh giá tâm lý', path: '/assessments', icon: HeartPulse },
+        { label: 'Nhật ký cá nhân', path: '/journal', icon: BookOpen },
+        { label: 'Thư giãn', path: '/resources', icon: Sparkles },
+        { label: user?.role === 'VOLUNTEER' ? 'Phòng tư vấn' : 'Tư vấn trực tiếp', path: '/chat', icon: MessageSquare },
+      ];
 
   return (
     <header className="app-header">

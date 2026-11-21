@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, Button, Tag, Card, Alert, Space, message, Typography, Switch, Popconfirm, Modal, Rate, Input } from 'antd';
 import {
   MessageSquare,
@@ -11,6 +12,7 @@ import {
   Star,
   Heart,
   Wind,
+  ShieldCheck,
 } from 'lucide-react';
 import axios, { AxiosError } from 'axios';
 import {
@@ -51,6 +53,7 @@ const RATING_DESC = [
 
 export const ChatPage: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { socket, isConnected } = useSocket();
 
   const isVolunteer = user?.role === 'VOLUNTEER';
@@ -642,6 +645,80 @@ export const ChatPage: React.FC = () => {
             Gửi
           </Button>
         </form>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // VIEW: ADMIN ROLE NOTICE
+  // ==========================================
+  if (user?.role === 'ADMIN') {
+    return (
+      <div
+        style={{
+          maxWidth: '680px',
+          margin: '40px auto',
+          padding: '36px',
+          borderRadius: '16px',
+          border: '1px solid var(--border)',
+          background: 'var(--code-bg)',
+          textAlign: 'center',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+        }}
+      >
+        <div
+          style={{
+            width: '64px',
+            height: '64px',
+            borderRadius: '16px',
+            background: 'var(--accent-bg)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 20px',
+            color: 'var(--accent)',
+          }}
+        >
+          <ShieldCheck size={36} />
+        </div>
+        <h2 style={{ margin: '0 0 12px 0', color: 'var(--text-h)' }}>
+          Cổng Giám sát Kênh Tư vấn Trực tuyến
+        </h2>
+        <Alert
+          type="info"
+          showIcon
+          message="Phân tách vai trò Quản trị viên (Separation of Duties)"
+          description={
+            <div style={{ textAlign: 'left', lineHeight: 1.6, marginTop: '8px' }}>
+              <p style={{ margin: '0 0 8px 0' }}>
+                Bạn đang đăng nhập với tư cách <strong>Quản trị viên hệ thống (ADMIN)</strong>. Theo nguyên tắc phân tách trách nhiệm và chuẩn mực đạo đức sơ cứu tâm lý (PFA):
+              </p>
+              <ul style={{ margin: '0 0 8px 0', paddingLeft: '20px' }}>
+                <li>Tài khoản Quản trị không tham gia vào hàng đợi tiếp nhận để yêu cầu tư vấn với Tình nguyện viên do chính mình quản lý.</li>
+                <li>Để kiểm thử luồng Người dùng (học sinh/sinh viên gửi yêu cầu hỗ trợ và trao đổi 1-1 với TNV), vui lòng sử dụng tài khoản thử nghiệm có vai trò <strong>USER</strong>.</li>
+              </ul>
+            </div>
+          }
+          style={{ marginBottom: '24px', textAlign: 'left' }}
+        />
+
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Button
+            type="primary"
+            size="large"
+            onClick={() => navigate('/admin')}
+            style={{ borderRadius: '8px', fontWeight: 600 }}
+          >
+            Quản trị hệ thống
+          </Button>
+          <Button
+            size="large"
+            onClick={() => navigate('/admin/stats')}
+            style={{ borderRadius: '8px', fontWeight: 600 }}
+          >
+            Thống kê phiên tư vấn
+          </Button>
+        </div>
       </div>
     );
   }

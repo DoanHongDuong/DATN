@@ -1,5 +1,5 @@
-import { ConflictException } from '@nestjs/common';
-import { SessionStatus, PriorityLevel, SeverityLevel } from '@prisma/client';
+import { ConflictException, ForbiddenException } from '@nestjs/common';
+import { SessionStatus, PriorityLevel, SeverityLevel, Role } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { RequestSupportUseCase } from './request-support.use-case';
 import { IChatRepository } from '../../domain/repositories/chat.repository.interface';
@@ -66,6 +66,12 @@ describe('RequestSupportUseCase', () => {
       configService,
       createNotificationUseCase,
     );
+  });
+
+  it('should throw ForbiddenException if user has role ADMIN or VOLUNTEER', async () => {
+    await expect(useCase.execute('admin-1', Role.ADMIN)).rejects.toThrow(ForbiddenException);
+    await expect(useCase.execute('vol-1', Role.VOLUNTEER)).rejects.toThrow(ForbiddenException);
+    expect(chatRepo.createSession).not.toHaveBeenCalled();
   });
 
   it('should throw ConflictException if user already has an active or waiting session', async () => {

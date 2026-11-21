@@ -1,6 +1,6 @@
-import { Injectable, Inject, ConflictException, Optional } from '@nestjs/common';
+import { Injectable, Inject, ConflictException, ForbiddenException, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { SessionStatus } from '@prisma/client';
+import { SessionStatus, Role } from '@prisma/client';
 import {
   CHAT_REPOSITORY,
   IChatRepository,
@@ -15,11 +15,12 @@ import { CreateNotificationUseCase } from '../../../notification/application/use
  * UC-06 — Yêu cầu hỗ trợ tâm lý (REST, không phải Socket)
  *
  * Flow:
- * 1. Kiểm tra user không có phiên WAITING/ACTIVE (1 user = 1 phiên tại 1 thời điểm)
- * 2. Kiểm tra có TNV online & verified hay không
+ * 1. Phân tách vai trò (SoD): Chỉ USER mới được tạo yêu cầu tư vấn. ADMIN và VOLUNTEER bị chặn.
+ * 2. Kiểm tra user không có phiên WAITING/ACTIVE (1 user = 1 phiên tại 1 thời điểm)
+ * 3. Kiểm tra có TNV online & verified hay không
  *    - KHÔNG → trả về { noVolunteerAvailable: true, hotline }
  *    - CÓ    → map severity → priority, tạo session status=WAITING
- * 3. Tạo thông báo cho các TNV đang trực tuyến
+ * 4. Tạo thông báo cho các TNV đang trực tuyến
  */
 @Injectable()
 export class RequestSupportUseCase {
@@ -31,7 +32,14 @@ export class RequestSupportUseCase {
     private readonly createNotificationUseCase?: CreateNotificationUseCase,
   ) {}
 
-  async execute(userId: string) {
+  async execute(userId: string, role?: string) {
+    // Business rule: Phân tách vai trò (Separation of Duties). Chỉ sinh viên/người dùng (USER) mới tạo phiên tư vấn.
+    if (role && (role === Role.ADMIN || role === Role.VOLUNTEER)) {
+      throw new ForbiddenException(
+        'Tài khoản Quản trị viên và Tình nguyện viên không thể tạo yêu cầu tư vấn trên kênh sinh viên. Vui lòng sử dụng tài khoản Người dùng (USER) để thử nghiệm.',
+      );
+    }
+
     // Business rule: 1 người chỉ 1 phiên tại 1 thời điểm
     const existingSession =
       await this.chatRepository.findActiveOrWaitingSessionByUserId(userId);
