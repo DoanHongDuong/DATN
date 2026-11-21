@@ -48,6 +48,17 @@ export interface TestResultResponse {
   };
 }
 
+export interface GetHistoryResponse {
+  data: TestResultResponse[];
+  meta?: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+  total?: number;
+}
+
 export const assessmentApi = {
   listTests: async (): Promise<AssessmentTest[]> => {
     const res = await apiClient.get('/assessments');
@@ -64,7 +75,7 @@ export const assessmentApi = {
     return res.data;
   },
 
-  getHistory: async (page = 1, limit = 10): Promise<{ data: TestResultResponse[]; total: number }> => {
+  getHistory: async (page = 1, limit = 10): Promise<GetHistoryResponse> => {
     const res = await apiClient.get('/assessments/history', { params: { page, limit } });
     return res.data;
   },

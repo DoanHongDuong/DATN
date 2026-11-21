@@ -3,8 +3,8 @@ import axios, { AxiosError } from 'axios';
 import { Link } from 'react-router-dom';
 import { assessmentApi, type AssessmentTest, type TestQuestion, type TestResultResponse } from '../api/assessment.api';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
-import { CheckCircle2, ArrowLeft, ClipboardList, History, RefreshCw, ChevronLeft, ChevronRight, HeartHandshake } from 'lucide-react';
-import { message, Button, Radio } from 'antd';
+import { CheckCircle2, ArrowLeft, ClipboardList, History, RefreshCw, ChevronLeft, ChevronRight, HeartHandshake, Eye } from 'lucide-react';
+import { message, Button, Radio, Modal } from 'antd';
 
 type ActiveTab = 'tests' | 'history';
 
@@ -25,6 +25,7 @@ export const AssessmentPage: React.FC = () => {
   const [historyTotal, setHistoryTotal] = useState<number>(0);
   const [historyPage, setHistoryPage] = useState<number>(1);
   const [loadingHistory, setLoadingHistory] = useState<boolean>(false);
+  const [selectedHistoryItem, setSelectedHistoryItem] = useState<TestResultResponse | null>(null);
   const HISTORY_LIMIT = 8;
 
   useEffect(() => {
@@ -54,8 +55,10 @@ export const AssessmentPage: React.FC = () => {
     setLoadingHistory(true);
     try {
       const res = await assessmentApi.getHistory(page, HISTORY_LIMIT);
-      setHistory(res.data || []);
-      setHistoryTotal(res.total || 0);
+      const list = res.data || [];
+      const total = res.meta?.total ?? res.total ?? list.length;
+      setHistory(list);
+      setHistoryTotal(total);
     } catch (err) {
       console.error('Failed to load assessment history:', err);
     } finally {
@@ -72,8 +75,10 @@ export const AssessmentPage: React.FC = () => {
       try {
         const res = await assessmentApi.getHistory(historyPage, HISTORY_LIMIT);
         if (!cancelled) {
-          setHistory(res.data || []);
-          setHistoryTotal(res.total || 0);
+          const list = res.data || [];
+          const total = res.meta?.total ?? res.total ?? list.length;
+          setHistory(list);
+          setHistoryTotal(total);
         }
       } catch (err) {
         console.error('Failed to load assessment history:', err);
@@ -150,6 +155,24 @@ export const AssessmentPage: React.FC = () => {
     }
   };
 
+  const getRecommendationText = (level: string, customRec?: string): string => {
+    if (customRec && customRec.trim().length > 0) return customRec;
+    switch (level) {
+      case 'MINIMAL':
+        return 'Tình trạng tâm lý của bạn hiện ở mức bình thường và ổn định (triệu chứng ở mức tối thiểu). Hãy tiếp tục duy trì lối sống điều độ, ngủ đủ giấc và vận động thể thao để giữ tinh thần luôn thoải mái.';
+      case 'MILD':
+        return 'Bạn đang có dấu hiệu căng thẳng hoặc lo âu nhẹ. Hãy dành thời gian nghỉ ngơi, thực hành các bài tập nhịp thở 4-7-8, nghe âm thanh thư giãn hoặc viết nhật ký để giải tỏa áp lực.';
+      case 'MODERATE':
+        return 'Bạn đang có biểu hiện lo âu / căng thẳng ở mức độ vừa. Khuyến nghị bạn thực hành thư giãn đều đặn hàng ngày và cân nhắc kết nối trực tuyến với Tình nguyện viên của PSYTHALIA để được lắng nghe và hỗ trợ.';
+      case 'MODERATELY_SEVERE':
+        return 'Mức độ căng thẳng / trầm cảm của bạn khá cao và có thể ảnh hưởng đến học tập, sinh hoạt. Hãy liên hệ ngay với Tình nguyện viên tâm lý hoặc tìm kiếm tư vấn từ chuyên gia tâm lý.';
+      case 'SEVERE':
+        return 'Mức độ nghiêm trọng. Bạn cần tìm kiếm sự hỗ trợ chuyên môn từ bác sĩ hoặc chuyên gia tâm lý sớm nhất có thể. Trong trường hợp khẩn cấp, vui lòng liên hệ ngay hotline 24/7.';
+      default:
+        return 'Hãy tiếp tục theo dõi cảm xúc thường xuyên và kết nối với chúng tôi khi bạn cần hỗ trợ.';
+    }
+  };
+
   // Render Result Screen
   if (result) {
     const rawResult = result as unknown as {
@@ -162,24 +185,7 @@ export const AssessmentPage: React.FC = () => {
     const finalScore = result.totalScore ?? rawResult.result?.totalScore ?? 0;
     const finalLevel = result.severityLevel ?? rawResult.result?.severityLevel ?? 'MINIMAL';
     const severityInfo = getSeverityInfo(finalLevel);
-
-    const defaultRecommendation = () => {
-      if (finalLevel === 'MINIMAL') {
-        return 'Tình trạng tâm lý của bạn hiện ở mức bình thường và ổn định (triệu chứng ở mức tối thiểu). Hãy tiếp tục duy trì lối sống điều độ, ngủ đủ giấc và vận động thể thao để giữ tinh thần luôn thoải mái.';
-      }
-      if (finalLevel === 'MILD') {
-        return 'Bạn đang có dấu hiệu căng thẳng hoặc lo âu nhẹ. Hãy dành thời gian nghỉ ngơi, thực hành các bài tập nhịp thở 4-7-8, nghe âm thanh thư giãn hoặc viết nhật ký để giải tỏa áp lực.';
-      }
-      if (finalLevel === 'MODERATE') {
-        return 'Bạn đang có biểu hiện lo âu / căng thẳng ở mức độ vừa. Khuyến nghị bạn thực hành thư giãn đều đặn hàng ngày và cân nhắc kết nối trực tuyến với Tình nguyện viên của PSYTHALIA để được lắng nghe và hỗ trợ.';
-      }
-      if (finalLevel === 'MODERATELY_SEVERE') {
-        return 'Mức độ căng thẳng / trầm cảm của bạn khá cao và có thể ảnh hưởng đến học tập, sinh hoạt. Hãy liên hệ ngay với Tình nguyện viên tâm lý hoặc tìm kiếm tư vấn từ chuyên gia tâm lý.';
-      }
-      return 'Mức độ nghiêm trọng. Bạn cần tìm kiếm sự hỗ trợ chuyên môn từ bác sĩ hoặc chuyên gia tâm lý sớm nhất có thể. Trong trường hợp khẩn cấp, vui lòng liên hệ ngay hotline 24/7.';
-    };
-
-    const finalRecommendation = result.recommendation || defaultRecommendation();
+    const finalRecommendation = getRecommendationText(finalLevel, result.recommendation);
 
     return (
       <div style={{ maxWidth: '640px', margin: '20px auto', padding: '32px', borderRadius: '16px', border: '1px solid var(--border)', background: 'var(--code-bg)', textAlign: 'center' }}>
@@ -445,69 +451,102 @@ export const AssessmentPage: React.FC = () => {
       ) : (
         <>
           {/* History list */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {history.map((item, idx) => {
               const info = getSeverityInfo(item.severityLevel);
               const ordinal = (historyPage - 1) * HISTORY_LIMIT + idx + 1;
+              const recText = getRecommendationText(item.severityLevel, item.recommendation);
+              const testTitle = item.test?.name || (item.testId.includes('phq') || (item.test?.code || '').includes('PHQ') ? 'PHQ-9 (Đánh giá Trầm cảm)' : 'GAD-7 (Đánh giá Lo âu)');
+
               return (
                 <div
                   key={item.id}
                   style={{
-                    display: 'grid',
-                    gridTemplateColumns: '32px 1fr auto',
-                    alignItems: 'center',
-                    gap: '16px',
-                    padding: '16px 20px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px',
+                    padding: '18px 20px',
                     borderRadius: '12px',
                     border: '1px solid var(--border)',
                     background: 'var(--code-bg)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
                   }}
                 >
-                  {/* Số thứ tự */}
-                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--accent-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '13px', color: 'var(--accent)' }}>
-                    {ordinal}
-                  </div>
-
-                  {/* Info */}
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
-                      {item.test?.name && (
-                        <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-h)' }}>
-                          {item.test.name}
-                        </span>
-                      )}
-                      <span style={{ display: 'inline-block', padding: '2px 10px', borderRadius: '12px', background: info.bg, color: info.color, fontWeight: 700, fontSize: '12px' }}>
+                  {/* Top line: STT, Title, Badge, Score, Date */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                      <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'var(--accent-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '13px', color: 'var(--accent)' }}>
+                        {ordinal}
+                      </div>
+                      <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-h)' }}>
+                        {testTitle}
+                      </span>
+                      <span style={{ display: 'inline-block', padding: '3px 12px', borderRadius: '12px', background: info.bg, color: info.color, fontWeight: 700, fontSize: '12px' }}>
                         {info.label}
                       </span>
                       <span style={{ fontSize: '13px', color: 'var(--text)', fontWeight: 600 }}>
-                        Điểm: <strong style={{ color: 'var(--accent)' }}>{item.totalScore}</strong>
+                        Điểm: <strong style={{ color: 'var(--accent)', fontSize: '15px' }}>{item.totalScore}</strong>
                       </span>
                     </div>
-                    {item.recommendation && (
-                      <p style={{ margin: 0, fontSize: '13px', color: 'var(--text)', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-                        {item.recommendation}
-                      </p>
-                    )}
+
+                    {/* Date */}
+                    <div style={{ fontSize: '12px', color: 'var(--text)', opacity: 0.85, whiteSpace: 'nowrap' }}>
+                      {(() => {
+                        const rawDate = item.takenAt || item.createdAt;
+                        if (!rawDate) return null;
+                        const validDate = new Date(rawDate);
+                        return `${validDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })} ${validDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`;
+                      })()}
+                    </div>
                   </div>
 
-                  {/* Ngày */}
-                  <div style={{ fontSize: '12px', color: 'var(--text)', whiteSpace: 'nowrap', textAlign: 'right' }}>
-                    {(() => {
-                      const rawDate = item.takenAt || item.createdAt;
-                      if (!rawDate) return null;
-                      const validDate = new Date(rawDate);
-                      return (
-                        <>
-                          {validDate.toLocaleDateString('vi-VN', {
-                            day: '2-digit', month: '2-digit', year: 'numeric',
-                          })}
-                          <br />
-                          <span style={{ opacity: 0.7 }}>
-                            {validDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                        </>
-                      );
-                    })()}
+                  {/* Recommendation quote box */}
+                  <div style={{
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    background: 'var(--bg)',
+                    border: '1px solid var(--border)',
+                    fontSize: '13px',
+                    lineHeight: 1.6,
+                    color: 'var(--text)'
+                  }}>
+                    <div style={{ fontWeight: 600, color: 'var(--accent)', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span>💡 Khuyến nghị y khoa (DSM-5):</span>
+                    </div>
+                    <p style={{ margin: 0, color: 'var(--text-h)' }}>
+                      {recText}
+                    </p>
+                  </div>
+
+                  {/* Actions */}
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', alignItems: 'center', paddingTop: '4px' }}>
+                    <Button
+                      size="small"
+                      icon={<Eye size={14} />}
+                      onClick={() => setSelectedHistoryItem(item)}
+                      style={{ borderRadius: '6px', fontWeight: 600 }}
+                    >
+                      Xem chi tiết & Phân tích
+                    </Button>
+                    {(item.severityLevel === 'MODERATE' || item.severityLevel === 'MODERATELY_SEVERE' || item.severityLevel === 'SEVERE') && (
+                      <Link
+                        to="/chat"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          padding: '4px 12px',
+                          borderRadius: '6px',
+                          background: '#10b981',
+                          color: '#fff',
+                          fontSize: '12px',
+                          fontWeight: 600,
+                          textDecoration: 'none',
+                        }}
+                      >
+                        💬 Hỗ trợ trực tiếp
+                      </Link>
+                    )}
                   </div>
                 </div>
               );
@@ -516,7 +555,7 @@ export const AssessmentPage: React.FC = () => {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', marginTop: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', marginTop: '12px' }}>
               <button
                 onClick={() => setHistoryPage((p) => Math.max(1, p - 1))}
                 disabled={historyPage <= 1}
@@ -585,6 +624,136 @@ export const AssessmentPage: React.FC = () => {
 
       {/* Tab content */}
       {activeTab === 'tests' ? renderTestsTab() : renderHistoryTab()}
+
+      {/* Modal chi tiết kết quả đánh giá */}
+      <Modal
+        open={Boolean(selectedHistoryItem)}
+        onCancel={() => setSelectedHistoryItem(null)}
+        footer={null}
+        width={600}
+        centered
+        title={<span style={{ color: 'var(--text-h)' }}>Chi tiết kết quả đánh giá lâm sàng</span>}
+      >
+        {selectedHistoryItem && (() => {
+          const mInfo = getSeverityInfo(selectedHistoryItem.severityLevel);
+          const mRec = getRecommendationText(selectedHistoryItem.severityLevel, selectedHistoryItem.recommendation);
+          const testName = selectedHistoryItem.test?.name || (selectedHistoryItem.testId.includes('phq') || (selectedHistoryItem.test?.code || '').includes('PHQ') ? 'PHQ-9 (Đánh giá Trầm cảm)' : 'GAD-7 (Đánh giá Lo âu)');
+          const isPhq = (selectedHistoryItem.test?.code || '').includes('PHQ') || (selectedHistoryItem.test?.name || '').includes('PHQ');
+
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingTop: '10px' }}>
+              <div style={{ textAlign: 'center' }}>
+                <CheckCircle2 size={44} color="#10b981" style={{ marginBottom: '8px' }} />
+                <h3 style={{ margin: '0 0 6px 0', color: 'var(--text-h)', fontSize: '18px' }}>{testName}</h3>
+                <p style={{ margin: 0, fontSize: '13px', color: 'var(--text)' }}>
+                  Ngày thực hiện: {new Date(selectedHistoryItem.takenAt || selectedHistoryItem.createdAt || '').toLocaleString('vi-VN')}
+                </p>
+              </div>
+
+              {/* Score box */}
+              <div style={{ padding: '16px', borderRadius: '12px', background: 'var(--code-bg)', border: '1px solid var(--border)', textAlign: 'center' }}>
+                <div style={{ fontSize: '14px', color: 'var(--text)', marginBottom: '4px' }}>
+                  Tổng số điểm: <strong style={{ fontSize: '28px', color: 'var(--accent)', marginLeft: '6px' }}>{selectedHistoryItem.totalScore}</strong>
+                </div>
+                <div style={{ display: 'inline-block', padding: '4px 14px', borderRadius: '16px', background: mInfo.bg, color: mInfo.color, fontWeight: 700, fontSize: '13px' }}>
+                  {mInfo.label} ({selectedHistoryItem.severityLevel})
+                </div>
+              </div>
+
+              {/* Phân loại DSM-5 */}
+              <div style={{ padding: '12px 16px', borderRadius: '10px', background: 'var(--bg)', border: '1px solid var(--border)', fontSize: '13px', lineHeight: 1.6 }}>
+                <strong style={{ color: 'var(--text-h)', display: 'block', marginBottom: '4px' }}>
+                  📋 Thang đo chuẩn hóa DSM-5:
+                </strong>
+                <p style={{ margin: 0, color: 'var(--text)' }}>
+                  {isPhq ? (
+                    <>Bài kiểm tra <strong>PHQ-9</strong> (Patient Health Questionnaire-9) lượng giá 9 triệu chứng trầm cảm theo Cẩm nang Chẩn đoán DSM-5: 0–4 (Tối thiểu), 5–9 (Nhẹ), 10–14 (Vừa), 15–19 (Khá nặng), 20–27 (Nặng).</>
+                  ) : (
+                    <>Bài kiểm tra <strong>GAD-7</strong> (Generalized Anxiety Disorder-7) lượng giá 7 triệu chứng lo âu lan tỏa theo chuẩn DSM-5: 0–4 (Tối thiểu), 5–9 (Nhẹ), 10–14 (Vừa), 15–21 (Nặng).</>
+                  )}
+                </p>
+              </div>
+
+              {/* Khuyến nghị chi tiết */}
+              <div style={{ padding: '14px 16px', borderRadius: '10px', background: 'var(--accent-bg)', border: '1px solid var(--accent-border)', fontSize: '14px', lineHeight: 1.6 }}>
+                <strong style={{ color: 'var(--accent)', display: 'block', marginBottom: '6px' }}>
+                  💡 Khuyến nghị y khoa dành cho bạn:
+                </strong>
+                <p style={{ margin: 0, color: 'var(--text-h)' }}>
+                  {mRec}
+                </p>
+              </div>
+
+              {/* Thông điệp từ PSYTHALIA */}
+              <div style={{
+                padding: '12px 16px',
+                borderRadius: '10px',
+                background: 'rgba(16, 185, 129, 0.08)',
+                border: '1px solid rgba(16, 185, 129, 0.25)',
+                fontSize: '13px',
+                lineHeight: 1.5,
+                color: 'var(--text)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#10b981', fontWeight: 700, marginBottom: '4px' }}>
+                  <HeartHandshake size={16} />
+                  <span>Đồng hành từ PSYTHALIA:</span>
+                </div>
+                <p style={{ margin: 0 }}>
+                  Chúng tôi luôn ở đây để lắng nghe bạn. PSYTHALIA cam kết nguyên tắc: <em>Tôn trọng – Bảo mật – Không phán xét – Đồng hành</em>.
+                </p>
+              </div>
+
+              {/* Modal footer buttons */}
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', flexWrap: 'wrap', marginTop: '8px' }}>
+                <Link
+                  to="/resources"
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    background: '#3b82f6',
+                    color: '#fff',
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                    fontSize: '13px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  🌿 Bài tập thư giãn
+                </Link>
+
+                {(selectedHistoryItem.severityLevel === 'MODERATE' || selectedHistoryItem.severityLevel === 'MODERATELY_SEVERE' || selectedHistoryItem.severityLevel === 'SEVERE') && (
+                  <Link
+                    to="/chat"
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: '8px',
+                      background: '#10b981',
+                      color: '#fff',
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      fontSize: '13px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    💬 Trò chuyện với TNV
+                  </Link>
+                )}
+
+                <Button
+                  onClick={() => setSelectedHistoryItem(null)}
+                  style={{ borderRadius: '8px', fontWeight: 600 }}
+                >
+                  Đóng
+                </Button>
+              </div>
+            </div>
+          );
+        })()}
+      </Modal>
     </div>
   );
 };

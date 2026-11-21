@@ -175,7 +175,7 @@ export const VolunteerApplyPage: React.FC = () => {
             type="info"
             showIcon
             message="Thông báo tiếp nhận"
-            description="Ban quản trị MindCare sẽ đối soát thông tin và chứng chỉ chuyên môn của bạn. Vui lòng quay lại kiểm tra trạng thái sau."
+            description="Ban quản trị PSYTHALIA sẽ đối soát thông tin và chứng chỉ chuyên môn của bạn. Vui lòng quay lại kiểm tra trạng thái sau."
             style={{ marginBottom: '24px' }}
           />
 
@@ -276,7 +276,7 @@ export const VolunteerApplyPage: React.FC = () => {
             <HeartHandshake size={32} />
           </div>
           <h2 style={{ margin: '0 0 8px 0', color: 'var(--text-h)' }}>
-            Đăng ký làm Tình nguyện viên MindCare
+            Đăng ký làm Tình nguyện viên PSYTHALIA
           </h2>
           <p style={{ color: 'var(--text)', fontSize: '14px', margin: 0 }}>
             Cùng chúng tôi lắng nghe, sẻ chia và đồng hành hỗ trợ tâm lý cho cộng đồng

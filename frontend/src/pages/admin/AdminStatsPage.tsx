@@ -87,7 +87,7 @@ export const AdminStatsPage: React.FC = () => {
             Thống kê & Giám sát Hoạt động Toàn hệ thống
           </h3>
           <p style={{ margin: 0, fontSize: '13px', color: 'var(--text)' }}>
-            Dữ liệu tổng hợp thời gian thực từ cơ sở dữ liệu MindCare
+            Dữ liệu tổng hợp thời gian thực từ cơ sở dữ liệu PSYTHALIA
           </p>
         </div>
         <button

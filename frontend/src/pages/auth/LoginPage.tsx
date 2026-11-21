@@ -72,7 +72,7 @@ export const LoginPage: React.FC = () => {
         <div className="auth-card__header">
           <div className="auth-card__icon">🔐</div>
           <h2 className="auth-card__title">Đăng nhập</h2>
-          <p className="auth-card__subtitle">Chào mừng bạn đến với MindCare</p>
+          <p className="auth-card__subtitle">Chào mừng bạn đến với PSYTHALIA</p>
         </div>
 
         {/* Form */}
