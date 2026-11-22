@@ -5,6 +5,7 @@ import {
   SessionStatus,
   PriorityLevel,
   SeverityLevel,
+  AccountStatus,
 } from '@prisma/client';
 import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
 import { IChatRepository } from '../../domain/repositories/chat.repository.interface';
@@ -56,6 +57,7 @@ export class ChatPrismaRepository implements IChatRepository {
       where: {
         isOnline: true,
         isVerified: true,
+        user: { status: AccountStatus.ACTIVE },
       },
     });
     return count > 0;
@@ -66,6 +68,7 @@ export class ChatPrismaRepository implements IChatRepository {
       where: {
         isOnline: true,
         isVerified: true,
+        user: { status: AccountStatus.ACTIVE },
       },
       select: { userId: true },
     });

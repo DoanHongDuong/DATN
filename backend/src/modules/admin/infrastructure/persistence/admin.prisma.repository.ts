@@ -191,6 +191,14 @@ export class AdminPrismaRepository implements IAdminRepository {
         },
       });
 
+      // Khi khoá tài khoản TNV → buộc offline để không nhận phiên mới
+      if (status === AccountStatus.SUSPENDED && updated.role === Role.VOLUNTEER) {
+        await tx.volunteerProfile.updateMany({
+          where: { userId: targetUserId },
+          data: { isOnline: false },
+        });
+      }
+
       await tx.auditLog.create({
         data: {
           actorId,
