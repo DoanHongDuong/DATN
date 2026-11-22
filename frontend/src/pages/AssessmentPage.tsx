@@ -205,6 +205,14 @@ export const AssessmentPage: React.FC = () => {
           <strong style={{ display: 'block', marginBottom: '6px', color: 'var(--accent)', fontSize: '15px' }}>💡 Khuyến nghị dành cho bạn:</strong>
           {finalRecommendation}
         </div>
+        {finalLevel === 'SEVERE' && (
+          <div style={{ marginBottom: '16px', textAlign: 'center' }}>
+            <a href="tel:115" style={{ display: 'inline-block', padding: '8px 16px', borderRadius: '8px', background: '#ef4444', color: '#fff', fontWeight: 600, textDecoration: 'none' }}>📞 Gọi Hotline 115 ngay</a>
+            <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--text)' }}>
+              Các cơ sở hỗ trợ: <a href="https://maps.google.com/?q=Bệnh+viện+1" target="_blank" rel="noopener noreferrer">Bệnh viện 1</a>, <a href="https://maps.google.com/?q=Bệnh+viện+2" target="_blank" rel="noopener noreferrer">Bệnh viện 2</a>
+            </div>
+          </div>
+        )}
 
         {/* Lời nhắn gửi nâng đỡ tinh thần & Cam kết nguyên tắc */}
         <div style={{
