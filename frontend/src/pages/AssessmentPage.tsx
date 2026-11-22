@@ -206,10 +206,34 @@ export const AssessmentPage: React.FC = () => {
           {finalRecommendation}
         </div>
         {finalLevel === 'SEVERE' && (
-          <div style={{ marginBottom: '16px', textAlign: 'center' }}>
-            <a href="tel:115" style={{ display: 'inline-block', padding: '8px 16px', borderRadius: '8px', background: '#ef4444', color: '#fff', fontWeight: 600, textDecoration: 'none' }}>📞 Gọi Hotline 115 ngay</a>
-            <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--text)' }}>
-              Các cơ sở hỗ trợ: <a href="https://maps.google.com/?q=Bệnh+viện+1" target="_blank" rel="noopener noreferrer">Bệnh viện 1</a>, <a href="https://maps.google.com/?q=Bệnh+viện+2" target="_blank" rel="noopener noreferrer">Bệnh viện 2</a>
+          <div style={{ marginBottom: '16px', padding: '16px 20px', borderRadius: '12px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+            <div style={{ fontWeight: 700, fontSize: '15px', color: '#ef4444', marginBottom: '12px', textAlign: 'center' }}>
+              🆘 Đường dây hỗ trợ khẩn cấp
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '14px' }}>
+              <a href="tel:19001267" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', borderRadius: '8px', background: '#ef4444', color: '#fff', fontWeight: 600, textDecoration: 'none', fontSize: '14px' }}>
+                📞 1900 1267 – Cấp cứu Trầm cảm & Sức khỏe Tâm thần (24/7)
+              </a>
+              <a href="tel:0963061414" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', borderRadius: '8px', background: '#dc2626', color: '#fff', fontWeight: 600, textDecoration: 'none', fontSize: '14px' }}>
+                📞 096 306 1414 – Đường dây nóng "Ngày Mai"
+              </a>
+              <a href="tel:0865044400" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', borderRadius: '8px', background: '#b91c1c', color: '#fff', fontWeight: 600, textDecoration: 'none', fontSize: '14px' }}>
+                📞 086 504 4400 – HOPE (Phòng chống tự tử)
+              </a>
+            </div>
+            <div style={{ fontSize: '13px', color: 'var(--text)', lineHeight: 1.6, textAlign: 'left' }}>
+              <strong style={{ display: 'block', marginBottom: '6px', color: 'var(--text-h)' }}>🏥 Cơ sở y tế chuyên khoa:</strong>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <a href="https://maps.google.com/?q=Viện+Sức+khỏe+Tâm+thần+Bệnh+viện+Bạch+Mai+78+Giải+Phóng+Hà+Nội" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6' }}>
+                  📍 Viện Sức khỏe Tâm thần – BV Bạch Mai (Hà Nội) – (024) 3576 5344
+                </a>
+                <a href="https://maps.google.com/?q=Bệnh+viện+Tâm+thần+Trung+ương+1+Thường+Tín+Hà+Nội" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6' }}>
+                  📍 BV Tâm thần Trung ương 1 (Hà Nội) – (024) 3385 3227
+                </a>
+                <a href="https://maps.google.com/?q=Bệnh+viện+Tâm+thần+TP.HCM+190+Hàm+Tử+Quận+5" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6' }}>
+                  📍 BV Tâm thần TP.HCM (Q.5) – (028) 3923 4675
+                </a>
+              </div>
             </div>
           </div>
         )}
