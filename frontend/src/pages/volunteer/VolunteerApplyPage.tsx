@@ -299,24 +299,42 @@ export const VolunteerApplyPage: React.FC = () => {
           </p>
         </div>
 
-        {rejectionNotice && (
-          <Alert
-            type="error"
-            showIcon
-            message="Hồ sơ ứng tuyển trước đó chưa được duyệt"
-            description={
-              <div>
-                <div style={{ marginTop: '4px', fontSize: '13px', lineHeight: 1.5 }}>
-                  {rejectionNotice}
+        {rejectionNotice && (() => {
+          const match = rejectionNotice.match(/Lý do(?: từ chối)?:\s*(.*)/is);
+          const reasonText = match && match[1] ? match[1].trim() : rejectionNotice;
+
+          return (
+            <Alert
+              type="error"
+              showIcon
+              message={<span style={{ fontWeight: 700, fontSize: '15px' }}>Hồ sơ ứng tuyển trước đó chưa được duyệt</span>}
+              description={
+                <div style={{ marginTop: '8px' }}>
+                  <div
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: '8px',
+                      background: 'rgba(239, 68, 68, 0.12)',
+                      border: '1px solid rgba(239, 68, 68, 0.25)',
+                      marginBottom: '10px',
+                    }}
+                  >
+                    <div style={{ fontWeight: 700, color: '#ef4444', fontSize: '13px', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <span>📌 Lý do từ chối từ Ban quản trị:</span>
+                    </div>
+                    <div style={{ fontSize: '13px', color: 'var(--text-h)', lineHeight: 1.5, fontWeight: 500 }}>
+                      {reasonText}
+                    </div>
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--text)', opacity: 0.9 }}>
+                    💡 Bạn có thể hoàn thiện thông tin, bổ sung chứng chỉ theo góp ý trên và nộp lại hồ sơ bên dưới.
+                  </div>
                 </div>
-                <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--text)', opacity: 0.9 }}>
-                  💡 Bạn có thể hoàn thiện thông tin, bổ sung chứng chỉ theo góp ý trên và nộp lại hồ sơ bên dưới.
-                </div>
-              </div>
-            }
-            style={{ marginBottom: '24px', borderRadius: '10px' }}
-          />
-        )}
+              }
+              style={{ marginBottom: '24px', borderRadius: '12px' }}
+            />
+          );
+        })()}
 
         <Form
           form={form}
