@@ -22,9 +22,8 @@ export class RejectVolunteerUseCase {
     await this.adminRepo.rejectVolunteer(actorId, profile.id, targetUserId, cleanReason);
 
     if (this.createNotificationUseCase) {
-      const content = cleanReason
-        ? `Rất tiếc, hồ sơ đăng ký làm Tình nguyện viên của bạn chưa được duyệt. Lý do: ${cleanReason}`
-        : 'Rất tiếc, hồ sơ đăng ký làm Tình nguyện viên của bạn chưa đáp ứng đủ tiêu chuẩn xét duyệt đợt này.';
+      const reasonText = cleanReason || 'Chưa đáp ứng đủ tiêu chuẩn xét duyệt đợt này (vui lòng bổ sung chứng chỉ PFA hoặc cập nhật kinh nghiệm).';
+      const content = `Hồ sơ đăng ký làm Tình nguyện viên của bạn chưa được duyệt.\nLý do từ chối: ${reasonText}`;
 
       await this.createNotificationUseCase.execute({
         userId: targetUserId,
