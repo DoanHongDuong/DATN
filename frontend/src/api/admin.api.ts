@@ -73,12 +73,12 @@ export const adminApi = {
     return res.data;
   },
 
-  rejectVolunteer: async (profileId: string): Promise<{ message: string }> => {
-    const res = await apiClient.post<{ message: string }>(`/admin/volunteers/${profileId}/reject`);
+  rejectVolunteer: async (profileId: string, reason?: string): Promise<{ message: string }> => {
+    const res = await apiClient.post<{ message: string }>(`/admin/volunteers/${profileId}/reject`, { reason });
     return res.data;
   },
 
-  getUsers: async (params?: { page?: number; limit?: number; search?: string }): Promise<PaginatedUsers> => {
+  getUsers: async (params?: { page?: number; limit?: number; search?: string; role?: string }): Promise<PaginatedUsers> => {
     const res = await apiClient.get<PaginatedUsers>('/admin/users', { params });
     return res.data;
   },

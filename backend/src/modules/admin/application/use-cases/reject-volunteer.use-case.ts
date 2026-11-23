@@ -11,20 +11,25 @@ export class RejectVolunteerUseCase {
     private readonly createNotificationUseCase?: CreateNotificationUseCase,
   ) {}
 
-  async execute(actorId: string, profileId: string): Promise<{ message: string }> {
+  async execute(actorId: string, profileId: string, reason?: string): Promise<{ message: string }> {
     const profile = await this.adminRepo.findVolunteerProfileById(profileId);
     if (!profile) {
       throw new NotFoundException('Không tìm thấy hồ sơ tình nguyện viên');
     }
 
     const targetUserId = profile.userId;
-    await this.adminRepo.rejectVolunteer(actorId, profile.id, targetUserId);
+    const cleanReason = reason?.trim();
+    await this.adminRepo.rejectVolunteer(actorId, profile.id, targetUserId, cleanReason);
 
     if (this.createNotificationUseCase) {
+      const content = cleanReason
+        ? `Rất tiếc, hồ sơ đăng ký làm Tình nguyện viên của bạn chưa được duyệt. Lý do: ${cleanReason}`
+        : 'Rất tiếc, hồ sơ đăng ký làm Tình nguyện viên của bạn chưa đáp ứng đủ tiêu chuẩn xét duyệt đợt này.';
+
       await this.createNotificationUseCase.execute({
         userId: targetUserId,
         title: 'Cập nhật hồ sơ tình nguyện viên',
-        content: 'Rất tiếc, hồ sơ đăng ký làm Tình nguyện viên của bạn chưa đáp ứng đủ tiêu chuẩn xét duyệt đợt này.',
+        content,
         type: 'VOLUNTEER_REJECTED',
       }).catch(() => null);
     }

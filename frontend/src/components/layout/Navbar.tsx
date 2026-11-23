@@ -39,7 +39,6 @@ export const Navbar: React.FC = () => {
   const navItems = user?.role === 'ADMIN'
     ? [
         { label: 'Cổng Quản trị', path: '/admin', icon: ShieldCheck },
-        { label: 'Thống kê & Giám sát', path: '/admin/stats', icon: LayoutDashboard },
         { label: 'Đánh giá tâm lý', path: '/assessments', icon: HeartPulse },
         { label: 'Thư giãn', path: '/resources', icon: Sparkles },
       ]

@@ -17,7 +17,7 @@ export const AdminHeaderNav: React.FC = () => {
       icon: UserCheck,
     },
     {
-      label: 'Quản lý người dùng',
+      label: 'Quản lý tài khoản & TNV',
       path: '/admin/users',
       icon: Users,
     },

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Table, Button, Space, Popconfirm, message, Card, Typography } from 'antd';
+import { Table, Button, Space, Popconfirm, message, Card, Typography, Modal, Input, Alert, Tag } from 'antd';
 import { ExternalLink, Check, X, RefreshCw, UserCheck } from 'lucide-react';
 import { adminApi, type PendingVolunteer } from '../../api/admin.api';
 import { AdminHeaderNav } from './AdminHeaderNav';
@@ -11,6 +11,12 @@ export const AdminVolunteersPage: React.FC = () => {
   const [volunteers, setVolunteers] = useState<PendingVolunteer[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [actionId, setActionId] = useState<string | null>(null);
+
+  // State cho Modal từ chối hồ sơ
+  const [rejectModalOpen, setRejectModalOpen] = useState<boolean>(false);
+  const [selectedVolunteer, setSelectedVolunteer] = useState<PendingVolunteer | null>(null);
+  const [rejectReason, setRejectReason] = useState<string>('');
+  const [isRejecting, setIsRejecting] = useState<boolean>(false);
 
   const fetchPendingVolunteers = useCallback(async () => {
     try {
@@ -69,11 +75,21 @@ export const AdminVolunteersPage: React.FC = () => {
     }
   };
 
-  const handleReject = async (profileId: string) => {
-    setActionId(profileId);
+  const handleOpenRejectModal = (record: PendingVolunteer) => {
+    setSelectedVolunteer(record);
+    setRejectReason('');
+    setRejectModalOpen(true);
+  };
+
+  const handleConfirmReject = async () => {
+    if (!selectedVolunteer) return;
+    setIsRejecting(true);
     try {
-      const res = await adminApi.rejectVolunteer(profileId);
+      const res = await adminApi.rejectVolunteer(selectedVolunteer.id, rejectReason.trim() || undefined);
       message.success(res.message || 'Đã từ chối và xoá hồ sơ tình nguyện viên!');
+      setRejectModalOpen(false);
+      setSelectedVolunteer(null);
+      setRejectReason('');
       fetchPendingVolunteers();
     } catch (err: unknown) {
       let msg = 'Từ chối thất bại';
@@ -83,7 +99,7 @@ export const AdminVolunteersPage: React.FC = () => {
       }
       message.error(msg);
     } finally {
-      setActionId(null);
+      setIsRejecting(false);
     }
   };
 
@@ -202,24 +218,15 @@ export const AdminVolunteersPage: React.FC = () => {
               </Button>
             </Popconfirm>
 
-            <Popconfirm
-              title="Từ chối hồ sơ?"
-              description={`Bạn có chắc muốn từ chối hồ sơ của ${record.user?.fullName}? Hồ sơ sẽ bị xoá và người dùng có thể nộp lại.`}
-              onConfirm={() => handleReject(record.id)}
-              okText="Từ chối hồ sơ"
-              okType="danger"
-              cancelText="Huỷ"
-              okButtonProps={{ loading: isBusy }}
+            <Button
+              danger
+              size="small"
+              icon={<X size={14} />}
+              loading={isBusy}
+              onClick={() => handleOpenRejectModal(record)}
             >
-              <Button
-                danger
-                size="small"
-                icon={<X size={14} />}
-                loading={isBusy}
-              >
-                Từ chối
-              </Button>
-            </Popconfirm>
+              Từ chối
+            </Button>
           </Space>
         );
       },
@@ -265,6 +272,87 @@ export const AdminVolunteersPage: React.FC = () => {
           pagination={{ pageSize: 10 }}
         />
       </Card>
+
+      {/* Modal từ chối hồ sơ TNV kèm nhập lý do */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ef4444' }}>
+            <X size={20} />
+            <span>Từ chối hồ sơ Tình nguyện viên</span>
+          </div>
+        }
+        open={rejectModalOpen}
+        onCancel={() => {
+          if (!isRejecting) {
+            setRejectModalOpen(false);
+            setSelectedVolunteer(null);
+          }
+        }}
+        footer={[
+          <Button key="cancel" onClick={() => setRejectModalOpen(false)} disabled={isRejecting}>
+            Huỷ bỏ
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            danger
+            loading={isRejecting}
+            onClick={handleConfirmReject}
+          >
+            Xác nhận từ chối
+          </Button>,
+        ]}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '10px' }}>
+          <Alert
+            type="warning"
+            showIcon
+            message="Xác nhận từ chối hồ sơ"
+            description={
+              <span>
+                Bạn đang từ chối hồ sơ ứng tuyển của <strong>{selectedVolunteer?.user?.fullName}</strong> ({selectedVolunteer?.user?.email}). Hồ sơ sẽ bị xoá và ứng viên sẽ nhận được thông báo kèm lý do cụ thể.
+              </span>
+            }
+          />
+
+          <div>
+            <label style={{ display: 'block', fontWeight: 600, fontSize: '13px', marginBottom: '6px', color: 'var(--text-h)' }}>
+              Lý do từ chối (Gửi tới ứng viên):
+            </label>
+            <Input.TextArea
+              rows={4}
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              placeholder="Nhập lý do từ chối (Ví dụ: Chưa cung cấp đủ chứng chỉ sơ cứu tâm lý PFA, thông tin chuyên môn chưa rõ ràng...)"
+              maxLength={500}
+              showCount
+              disabled={isRejecting}
+            />
+          </div>
+
+          <div>
+            <div style={{ fontSize: '12px', color: 'var(--text)', marginBottom: '6px' }}>
+              Gợi ý lý do nhanh:
+            </div>
+            <Space wrap size={[6, 6]}>
+              {[
+                'Chứng chỉ sơ cứu tâm lý (PFA) chưa hợp lệ hoặc thiếu chứng thực.',
+                'Thông tin chuyên môn và kinh nghiệm hỗ trợ chưa đạt yêu cầu.',
+                'Ảnh chụp chứng chỉ bị mờ, không xác minh được danh tính.',
+                'Chưa đáp ứng tiêu chuẩn xét duyệt tình nguyện viên đợt này.',
+              ].map((reason) => (
+                <Tag
+                  key={reason}
+                  style={{ cursor: 'pointer', padding: '4px 8px', fontSize: '12px' }}
+                  onClick={() => setRejectReason(reason)}
+                >
+                  + {reason}
+                </Tag>
+              ))}
+            </Space>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

@@ -80,7 +80,7 @@ export class AdminPrismaRepository implements IAdminRepository {
     });
   }
 
-  async rejectVolunteer(actorId: string, profileId: string, userId: string): Promise<void> {
+  async rejectVolunteer(actorId: string, profileId: string, userId: string, reason?: string): Promise<void> {
     await this.prisma.$transaction(async (tx) => {
       await tx.volunteerProfile.delete({
         where: { id: profileId },
@@ -90,21 +90,26 @@ export class AdminPrismaRepository implements IAdminRepository {
           actorId,
           action: 'REJECT_VOLUNTEER',
           targetId: userId,
-          description: 'Từ chối hồ sơ tình nguyện viên',
+          description: reason
+            ? `Từ chối hồ sơ tình nguyện viên. Lý do: ${reason}`
+            : 'Từ chối hồ sơ tình nguyện viên',
         },
       });
     });
   }
 
-  async getUsers(page: number, limit: number, search?: string): Promise<PaginatedUsersResult> {
-    const where: Prisma.UserWhereInput = search
-      ? {
-          OR: [
-            { fullName: { contains: search, mode: 'insensitive' } },
-            { email: { contains: search, mode: 'insensitive' } },
-          ],
-        }
-      : {};
+  async getUsers(page: number, limit: number, search?: string, role?: string): Promise<PaginatedUsersResult> {
+    const where: Prisma.UserWhereInput = {
+      ...(role ? { role: role as Role } : {}),
+      ...(search
+        ? {
+            OR: [
+              { fullName: { contains: search, mode: 'insensitive' } },
+              { email: { contains: search, mode: 'insensitive' } },
+            ],
+          }
+        : {}),
+    };
 
     const [total, items] = await Promise.all([
       this.prisma.user.count({ where }),

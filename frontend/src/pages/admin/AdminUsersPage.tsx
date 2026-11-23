@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Table, Button, Tag, Space, Popconfirm, Input, message, Card, Typography } from 'antd';
-import { Lock, Unlock, Search, RefreshCw, Users } from 'lucide-react';
+import { Table, Button, Tag, Space, Popconfirm, Input, message, Card, Typography, Tabs } from 'antd';
+import { Lock, Unlock, Search, RefreshCw, Users, User, UserCheck, Shield } from 'lucide-react';
 import { adminApi, type AdminUser } from '../../api/admin.api';
 import { useAuth } from '../../hooks/useAuth';
 import { AdminHeaderNav } from './AdminHeaderNav';
@@ -16,14 +16,17 @@ export const AdminUsersPage: React.FC = () => {
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [roleFilter, setRoleFilter] = useState<string>('ALL');
   const [actionId, setActionId] = useState<string | null>(null);
 
-  const fetchUsers = useCallback(async (p: number, limit: number, search?: string) => {
+  const fetchUsers = useCallback(async (p: number, limit: number, search?: string, role?: string) => {
     try {
+      setLoading(true);
       const data = await adminApi.getUsers({
         page: p,
         limit,
         search: search || undefined,
+        role: role && role !== 'ALL' ? role : undefined,
       });
       setUsers(data.items);
       setTotal(data.total);
@@ -44,10 +47,12 @@ export const AdminUsersPage: React.FC = () => {
     let isMounted = true;
     const load = async () => {
       try {
+        setLoading(true);
         const data = await adminApi.getUsers({
           page,
           limit: pageSize,
           search: searchTerm || undefined,
+          role: roleFilter !== 'ALL' ? roleFilter : undefined,
         });
         if (isMounted) {
           setUsers(data.items);
@@ -65,7 +70,7 @@ export const AdminUsersPage: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [page, pageSize, searchTerm]);
+  }, [page, pageSize, searchTerm, roleFilter]);
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
@@ -82,7 +87,7 @@ export const AdminUsersPage: React.FC = () => {
           ? `Đã khoá tài khoản của ${record.fullName}`
           : `Đã mở khoá tài khoản cho ${record.fullName}`,
       );
-      fetchUsers(page, pageSize, searchTerm);
+      fetchUsers(page, pageSize, searchTerm, roleFilter);
     } catch (err: unknown) {
       let msg = 'Cập nhật trạng thái người dùng thất bại';
       if (axios.isAxiosError(err)) {
@@ -217,6 +222,41 @@ export const AdminUsersPage: React.FC = () => {
     },
   ];
 
+  const roleTabItems = [
+    {
+      key: 'ALL',
+      label: (
+        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <Users size={15} /> Tất cả tài khoản
+        </span>
+      ),
+    },
+    {
+      key: 'USER',
+      label: (
+        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <User size={15} /> Người dùng (Sinh viên)
+        </span>
+      ),
+    },
+    {
+      key: 'VOLUNTEER',
+      label: (
+        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <UserCheck size={15} /> Tình nguyện viên (TNV)
+        </span>
+      ),
+    },
+    {
+      key: 'ADMIN',
+      label: (
+        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <Shield size={15} /> Quản trị viên
+        </span>
+      ),
+    },
+  ];
+
   return (
     <div>
       <AdminHeaderNav />
@@ -231,7 +271,16 @@ export const AdminUsersPage: React.FC = () => {
         title={
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Users size={18} color="var(--accent)" />
-            <span>Danh sách người dùng ({total})</span>
+            <span>
+              {roleFilter === 'USER'
+                ? 'Danh sách Người dùng / Sinh viên'
+                : roleFilter === 'VOLUNTEER'
+                ? 'Danh sách Tình nguyện viên'
+                : roleFilter === 'ADMIN'
+                ? 'Danh sách Quản trị viên'
+                : 'Danh sách tất cả tài khoản'}{' '}
+              ({total})
+            </span>
           </div>
         }
         extra={
@@ -246,13 +295,23 @@ export const AdminUsersPage: React.FC = () => {
             <Button
               icon={<RefreshCw size={14} />}
               loading={loading}
-              onClick={() => fetchUsers(page, pageSize, searchTerm)}
+              onClick={() => fetchUsers(page, pageSize, searchTerm, roleFilter)}
             >
               Làm mới
             </Button>
           </Space>
         }
       >
+        <Tabs
+          activeKey={roleFilter}
+          onChange={(key) => {
+            setRoleFilter(key);
+            setPage(1);
+          }}
+          items={roleTabItems}
+          style={{ marginBottom: '16px' }}
+        />
+
         <Table
           dataSource={users}
           columns={columns}

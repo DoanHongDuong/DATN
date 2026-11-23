@@ -13,6 +13,6 @@ export class GetUsersUseCase {
   async execute(query: GetUsersQueryDto): Promise<PaginatedUsersResult> {
     const page = query.page && query.page > 0 ? query.page : 1;
     const limit = query.limit && query.limit > 0 ? query.limit : 10;
-    return this.adminRepo.getUsers(page, limit, query.search?.trim());
+    return this.adminRepo.getUsers(page, limit, query.search?.trim(), query.role);
   }
 }

@@ -23,6 +23,7 @@ import { RejectVolunteerUseCase } from '../application/use-cases/reject-voluntee
 import { GetUsersUseCase } from '../application/use-cases/get-users.use-case';
 import { UpdateUserStatusUseCase } from '../application/use-cases/update-user-status.use-case';
 import { UpdateUserStatusDto } from '../application/dto/update-user-status.dto';
+import { RejectVolunteerDto } from '../application/dto/reject-volunteer.dto';
 import { GetUsersQueryDto } from '../application/dto/get-users-query.dto';
 import { GetAdminResourcesUseCase } from '../application/use-cases/get-admin-resources.use-case';
 import { CreateResourceUseCase } from '../application/use-cases/create-resource.use-case';
@@ -87,8 +88,9 @@ export class AdminController {
   async rejectVolunteer(
     @Req() req: AuthenticatedRequest,
     @Param('profileId') profileId: string,
+    @Body() dto?: RejectVolunteerDto,
   ) {
-    return this.rejectVolunteerUseCase.execute(req.user.userId, profileId);
+    return this.rejectVolunteerUseCase.execute(req.user.userId, profileId, dto?.reason);
   }
 
   @ApiOperation({ summary: 'Lấy danh sách người dùng có phân trang và tìm kiếm' })
