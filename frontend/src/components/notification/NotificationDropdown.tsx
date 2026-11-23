@@ -137,6 +137,8 @@ export const NotificationDropdown: React.FC = () => {
       navigate('/chat');
     } else if (item.type === 'VOLUNTEER_APPROVED') {
       navigate('/chat');
+    } else if (item.type === 'VOLUNTEER_REJECTED') {
+      navigate('/volunteer/apply');
     } else if (item.type === 'CRISIS_ALERT') {
       navigate('/resources');
     }

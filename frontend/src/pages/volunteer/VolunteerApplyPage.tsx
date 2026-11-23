@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, Card, Alert, Result, message, Typography, Tag } from 'antd';
 import { HeartHandshake, LogOut, CheckCircle2, Clock, ExternalLink, ArrowRight } from 'lucide-react';
 import { volunteerApi, type VolunteerProfile, type ApplyVolunteerPayload } from '../../api/volunteer.api';
+import { notificationApi } from '../../api/notification.api';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
@@ -13,6 +14,7 @@ export const VolunteerApplyPage: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<VolunteerProfile | null>(null);
+  const [rejectionNotice, setRejectionNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [form] = Form.useForm<ApplyVolunteerPayload>();
@@ -24,6 +26,20 @@ export const VolunteerApplyPage: React.FC = () => {
         const data = await volunteerApi.getMyProfile();
         if (isMounted) {
           setProfile(data);
+          // Nếu chưa có profile hoặc profile đã bị từ chối/xoá, kiểm tra thông báo từ chối gần nhất
+          if (!data) {
+            try {
+              const notifRes = await notificationApi.getNotifications(1, 10);
+              const rejectNotif = notifRes.notifications.find(
+                (n) => n.type === 'VOLUNTEER_REJECTED'
+              );
+              if (rejectNotif && isMounted) {
+                setRejectionNotice(rejectNotif.content);
+              }
+            } catch {
+              // Ignore notification check error
+            }
+          }
         }
       } catch (err) {
         console.error('Failed to load volunteer profile:', err);
@@ -282,6 +298,25 @@ export const VolunteerApplyPage: React.FC = () => {
             Cùng chúng tôi lắng nghe, sẻ chia và đồng hành hỗ trợ tâm lý cho cộng đồng
           </p>
         </div>
+
+        {rejectionNotice && (
+          <Alert
+            type="error"
+            showIcon
+            message="Hồ sơ ứng tuyển trước đó chưa được duyệt"
+            description={
+              <div>
+                <div style={{ marginTop: '4px', fontSize: '13px', lineHeight: 1.5 }}>
+                  {rejectionNotice}
+                </div>
+                <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--text)', opacity: 0.9 }}>
+                  💡 Bạn có thể hoàn thiện thông tin, bổ sung chứng chỉ theo góp ý trên và nộp lại hồ sơ bên dưới.
+                </div>
+              </div>
+            }
+            style={{ marginBottom: '24px', borderRadius: '10px' }}
+          />
+        )}
 
         <Form
           form={form}
