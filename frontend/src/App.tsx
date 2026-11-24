@@ -33,18 +33,76 @@ const useIsDarkMode = () => {
 export const App: React.FC = () => {
   const isDark = useIsDarkMode();
 
-  /** Antd theme tokens aligned with the CSS custom properties in index.css */
+  /** Antd theme tokens aligned with Warm Sanctuary (Refined Edition) design system */
   const antdTheme = {
     algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
     token: {
-      colorPrimary: isDark ? '#c084fc' : '#aa3bff',
+      colorPrimary: isDark ? '#BFA8F2' : '#6750A4',
+      colorPrimaryHover: isDark ? '#D5C4F7' : '#533F85',
+      colorPrimaryActive: isDark ? '#A88EE8' : '#42326D',
+      colorSuccess: isDark ? '#7DC29F' : '#3A7558',
+      colorWarning: isDark ? '#DF9B63' : '#A14F40',
+      colorError: isDark ? '#E27668' : '#A63228',
+      colorInfo: isDark ? '#82AECF' : '#426B8A',
+      colorBgBase: isDark ? '#18181C' : '#F7F5F0',
+      colorBgContainer: isDark ? '#222228' : '#FFFFFF',
+      colorBgElevated: isDark ? '#2C2C34' : '#FFFFFF',
+      colorBorder: isDark ? '#454352' : '#C7C1B8',
+      colorBorderSecondary: isDark ? '#2F2E38' : '#E5E0D8',
+      colorText: isDark ? '#EDEAF2' : '#2D2A32',
+      colorTextSecondary: isDark ? '#A9A4B4' : '#595563',
+      colorTextHeading: isDark ? '#EDEAF2' : '#2D2A32',
+      colorTextDisabled: isDark ? '#696575' : '#8C8797',
+      fontFamily: "'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      fontSize: 14,
       borderRadius: 8,
-      fontFamily: "system-ui, 'Segoe UI', Roboto, sans-serif",
-      colorBgContainer: isDark ? '#1f2028' : '#ffffff',
-      colorBgElevated: isDark ? '#282932' : '#ffffff',
-      colorBorder: isDark ? '#2e303a' : '#e5e4e7',
-      colorText: isDark ? '#9ca3af' : '#6b6375',
-      colorTextHeading: isDark ? '#f3f4f6' : '#08060d',
+      controlHeight: 40,
+    },
+    components: {
+      Button: {
+        controlHeight: 40,
+        borderRadius: 8,
+        fontWeight: 500,
+      },
+      Card: {
+        borderRadiusLG: 12,
+        colorBgContainer: isDark ? '#222228' : '#FFFFFF',
+        colorBorderSecondary: isDark ? '#2F2E38' : '#E5E0D8',
+      },
+      Input: {
+        controlHeight: 40,
+        borderRadius: 8,
+        colorBorder: isDark ? '#454352' : '#C7C1B8',
+      },
+      Select: {
+        controlHeight: 40,
+        borderRadius: 8,
+      },
+      Table: {
+        borderRadiusLG: 8,
+        headerBg: isDark ? '#2C2C34' : '#F7F5F0',
+        headerColor: isDark ? '#EDEAF2' : '#2D2A32',
+        borderColor: isDark ? '#2F2E38' : '#E5E0D8',
+      },
+      Modal: {
+        borderRadiusLG: 16,
+        colorBgElevated: isDark ? '#2C2C34' : '#FFFFFF',
+      },
+      Tabs: {
+        colorPrimary: isDark ? '#BFA8F2' : '#6750A4',
+        itemSelectedColor: isDark ? '#BFA8F2' : '#6750A4',
+        itemHoverColor: isDark ? '#D5C4F7' : '#533F85',
+        titleFontSize: 14,
+      },
+      Radio: {
+        colorPrimary: isDark ? '#BFA8F2' : '#6750A4',
+      },
+      Checkbox: {
+        colorPrimary: isDark ? '#BFA8F2' : '#6750A4',
+      },
+      Alert: {
+        borderRadiusLG: 8,
+      },
     },
   };
 

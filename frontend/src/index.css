@@ -1,52 +1,150 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   PSYTHALIA DESIGN SYSTEM — WARM SANCTUARY (REFINED EDITION)
+   WCAG 2.2 AA / AAA Compliant Design Tokens & Variables
+   ══════════════════════════════════════════════════════════════════════════ */
+
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  /* ─── Typography System ─── */
+  --sans: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --heading: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  /* ─── Color Tokens: Canvas, Surface & Elevated (Light Mode) ─── */
+  --bg-canvas: #F7F5F0;             /* Warm Neutral dịu mắt, chống chói */
+  --bg-surface: #FFFFFF;            /* Nền thẻ Card, Form, Bảng */
+  --bg-elevated: #FFFFFF;           /* Nền Modal, Drawer, Dropdown Menu */
 
-  font: 18px/1.45 var(--sans);
-  letter-spacing: 0.18px;
+  /* ─── Color Tokens: Brand & Semantic Accents (Light Mode) ─── */
+  --color-primary: #6750A4;         /* Muted Violet — Hành động chính, Active */
+  --color-primary-hover: #533F85;   /* Tím đậm hơn khi Hover */
+  --color-primary-active: #42326D;  /* Tím khi bấm giữ */
+  --color-secondary: #3F7667;       /* Grounded Sage — Bài tập thở, An toàn */
+  --color-secondary-hover: #325E52; /* Sage đậm hơn khi Hover */
+  --color-info: #426B8A;            /* Muted Blue — Hướng dẫn y tế, Số đếm */
+  --color-success: #3A7558;         /* Xanh lá dịu — Hoàn thành bài test, Duyệt */
+  --color-warning: #A14F40;         /* Muted Terracotta — Mức độ vừa, Nhắc nhở */
+  --color-crisis: #A63228;          /* Deep Crimson — Hotline 24/7, Cảnh báo C9 */
+
+  /* ─── Color Tokens: Soft Tints & Section Highlights (Light Mode) ─── */
+  --tint-lavender: #EAE4F4;         /* Nền bài test tâm lý, Banner chào mừng */
+  --tint-sage: #E5F0EC;             /* Nền bài tập thở, Mẹo tự chăm sóc */
+  --tint-blue: #E7EEF4;             /* Nền tài nguyên y tế, Danh bạ */
+  --tint-terracotta: #F8EBE8;       /* Nền cảnh báo chú ý nhẹ */
+  --tint-crimson: #FCEBE9;          /* Nền khung Hotline khẩn cấp */
+
+  /* ─── Color Tokens: Typography (Light Mode) ─── */
+  --text-primary: #2D2A32;          /* Tiêu đề h1-h4, nội dung bài test, chữ chính */
+  --text-secondary: #595563;        /* Mô tả phụ, nhãn phụ, ngày giờ, hướng dẫn */
+  --text-disabled: #8C8797;         /* Chữ bị vô hiệu hóa (contrast >= 3:1) */
+  --text-on-primary: #FFFFFF;       /* Chữ trắng trên nền nút Primary / Secondary / Crisis */
+
+  /* ─── Color Tokens: Borders & Focus Rings (Light Mode) ─── */
+  --border-subtle: #E5E0D8;         /* Đường kẻ phân cách, viền thẻ nhẹ */
+  --border-strong: #C7C1B8;         /* Viền ô Input, viền khung bảng */
+  --ring-focus: #6750A4;            /* Vòng sáng focus bàn phím */
+
+  /* ─── Spacing Scale (Bội số 4px & 8px) ─── */
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+
+  /* ─── Shadows (Đổ bóng thấu cảm, dịu mắt) ─── */
+  --shadow-sm: 0 1px 3px rgba(45, 42, 50, 0.05);
+  --shadow-card: 0 2px 12px -2px rgba(45, 42, 50, 0.06);
+  --shadow-elevated: 0 12px 32px -4px rgba(45, 42, 50, 0.12);
+
+  /* ─── Backward-Compatible Aliases (Bảo vệ các trang cũ chưa migrate) ─── */
+  --bg: var(--bg-canvas);
+  --code-bg: var(--bg-surface);
+  --border: var(--border-subtle);
+  --text: var(--text-secondary);
+  --text-h: var(--text-primary);
+  --accent: var(--color-primary);
+  --accent-bg: var(--tint-lavender);
+  --accent-border: rgba(103, 80, 164, 0.35);
+  --social-bg: rgba(234, 228, 244, 0.4);
+  --shadow: var(--shadow-card);
+
+  /* ─── Base Element Setup ─── */
+  font: 14px/1.5 var(--sans);
+  letter-spacing: -0.005em;
   color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
+  color: var(--text-primary);
+  background: var(--bg-canvas);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
   @media (max-width: 1024px) {
-    font-size: 16px;
+    font-size: 14px;
   }
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   DARK MODE — WARM SANCTUARY (REFINED EDITION)
+   Không dùng #000000, bảo vệ thị giác người dùng ban đêm
+   ══════════════════════════════════════════════════════════════════════════ */
 @media (prefers-color-scheme: dark) {
   :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+    /* ─── Canvas & Surfaces (Dark Mode) ─── */
+    --bg-canvas: #18181C;           /* Nền than nhung trầm, giảm mỏi mắt tuyệt đối */
+    --bg-surface: #222228;          /* Nền thẻ Card, Form, Bảng dữ liệu */
+    --bg-elevated: #2C2C34;         /* Nền Modal, Drawer, Dropdown Menu */
+
+    /* ─── Brand & Semantic Accents (Dark Mode) ─── */
+    --color-primary: #BFA8F2;       /* Tím Lilac phấn êm dịu, nổi bật ban đêm */
+    --color-primary-hover: #D5C4F7;
+    --color-primary-active: #A88EE8;
+    --color-secondary: #7EBAA8;     /* Xanh Sage phấn, êm dịu cho bài tập thở */
+    --color-secondary-hover: #96CEBD;
+    --color-info: #82AECF;          /* Lam phấn trung tính */
+    --color-success: #7DC29F;       /* Xanh lá dịu, báo thành công */
+    --color-warning: #DF9B63;       /* Tông đất ấm nhạt, thông báo chú ý */
+    --color-crisis: #E27668;        /* Đỏ san hô nhạt, hiển thị hotline rõ ràng */
+
+    /* ─── Soft Tints (Dark Mode) ─── */
+    --tint-lavender: rgba(191, 168, 242, 0.12);
+    --tint-sage: rgba(126, 186, 168, 0.12);
+    --tint-blue: rgba(130, 174, 207, 0.12);
+    --tint-terracotta: rgba(223, 155, 99, 0.12);
+    --tint-crimson: rgba(226, 118, 104, 0.14);
+
+    /* ─── Typography (Dark Mode) ─── */
+    --text-primary: #EDEAF2;        /* Soft Off-White ánh tím, không dùng #FFF chói */
+    --text-secondary: #A9A4B4;      /* Chữ mô tả phụ, hướng dẫn */
+    --text-disabled: #696575;       /* Chữ vô hiệu hóa */
+    --text-on-primary: #18181C;     /* Chữ tối màu trên nút Lilac Dark */
+
+    /* ─── Borders & Focus Rings (Dark Mode) ─── */
+    --border-subtle: #2F2E38;       /* Viền thẻ nhẹ trong bóng tối */
+    --border-strong: #454352;       /* Viền ô input, viền bảng */
+    --ring-focus: #BFA8F2;
+
+    /* ─── Shadows (Dark Mode) ─── */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+    --shadow-card: 0 4px 16px -2px rgba(0, 0, 0, 0.45);
+    --shadow-elevated: 0 16px 36px -4px rgba(0, 0, 0, 0.6);
+
+    /* ─── Backward-Compatible Aliases (Dark Mode) ─── */
+    --bg: var(--bg-canvas);
+    --code-bg: var(--bg-surface);
+    --border: var(--border-subtle);
+    --text: var(--text-secondary);
+    --text-h: var(--text-primary);
+    --accent: var(--color-primary);
+    --accent-bg: var(--tint-lavender);
+    --accent-border: rgba(191, 168, 242, 0.35);
+    --social-bg: rgba(44, 44, 52, 0.6);
+    --shadow: var(--shadow-card);
   }
 
   #social .button-icon {
-    filter: invert(1) brightness(2);
+    filter: invert(1) brightness(1.5);
   }
 }
 
@@ -69,30 +167,43 @@ body {
 }
 
 h1,
-h2 {
+h2,
+h3,
+h4 {
   font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 h1 {
-  font-size: 56px;
-  line-height: 1.25;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
+  font-size: 32px;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  margin: 24px 0 16px;
   @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
+    font-size: 26px;
+    margin: 16px 0 12px;
   }
 }
 h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
+  font-size: 22px;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  margin: 0 0 12px;
   @media (max-width: 1024px) {
-    font-size: 20px;
+    font-size: 19px;
   }
+}
+h3 {
+  font-size: 17px;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  margin: 0 0 8px;
+}
+h4 {
+  font-size: 15px;
+  line-height: 1.45;
+  margin: 0 0 6px;
 }
 p {
   margin: 0;
