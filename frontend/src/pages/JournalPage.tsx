@@ -6,9 +6,33 @@ import { journalApi, type JournalEntry, type RelaxationResource } from '../api/j
 import { chatApi } from '../api/chat.api';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { getEmergencyHotline } from '../utils/hotline';
-import { Sparkles, Trash2, Smile, HeartHandshake, PhoneCall, PlayCircle, ExternalLink, Compass, RefreshCw } from 'lucide-react';
+import {
+  Sparkles,
+  Trash2,
+  HeartHandshake,
+  PhoneCall,
+  PlayCircle,
+  ExternalLink,
+  Compass,
+  RefreshCw,
+  BookOpen,
+  ShieldCheck,
+  Lock,
+  ArrowRight,
+} from 'lucide-react';
+import './journal.css';
 
-const EMOJI_OPTIONS = ['😊', '😢', '😐', '😡', '😰', '🥰', '😴', '🤯'];
+const EMOJI_OPTIONS = [
+  { emoji: '😊', label: 'Vui vẻ' },
+  { emoji: '🥰', label: 'Biết ơn' },
+  { emoji: '😌', label: 'Bình yên' },
+  { emoji: '😐', label: 'Bình thường' },
+  { emoji: '😴', label: 'Mệt mỏi' },
+  { emoji: '😰', label: 'Lo âu' },
+  { emoji: '😢', label: 'Buồn bã' },
+  { emoji: '😡', label: 'Tức giận' },
+  { emoji: '🤯', label: 'Quá tải' },
+];
 
 export const JournalPage: React.FC = () => {
   const navigate = useNavigate();
@@ -60,7 +84,7 @@ export const JournalPage: React.FC = () => {
       }
     };
 
-    loadData();
+    void loadData();
     return () => {
       isMounted = false;
     };
@@ -71,45 +95,45 @@ export const JournalPage: React.FC = () => {
       case 'positive':
         return {
           title: 'Tích cực & Lạc quan',
-          color: '#10b981',
-          bg: 'rgba(16, 185, 129, 0.12)',
-          border: 'rgba(16, 185, 129, 0.3)',
+          color: 'var(--color-success)',
+          bg: 'var(--tint-sage)',
+          border: 'rgba(58, 117, 88, 0.25)',
           icon: '😊',
           desc: 'Tâm trạng của bạn rất tốt! Những suy nghĩ tươi sáng này sẽ là nguồn năng lượng tuyệt vời giúp bạn vượt qua mọi thử thách.',
         };
       case 'neutral':
         return {
           title: 'Bình yên & Cân bằng',
-          color: '#3b82f6',
-          bg: 'rgba(59, 130, 246, 0.12)',
-          border: 'rgba(59, 130, 246, 0.3)',
+          color: 'var(--color-info)',
+          bg: 'var(--tint-blue)',
+          border: 'rgba(66, 107, 138, 0.25)',
           icon: '😌',
           desc: 'Cảm xúc của bạn đang ở trạng thái hài hòa, cân bằng. Tiếp tục duy trì nhịp sống nhẹ nhàng và lắng nghe bản thân nhé.',
         };
       case 'negative':
         return {
           title: 'Căng thẳng & Mệt mỏi',
-          color: '#f59e0b',
-          bg: 'rgba(245, 158, 11, 0.12)',
-          border: 'rgba(245, 158, 11, 0.3)',
+          color: 'var(--color-warning)',
+          bg: 'var(--tint-terracotta)',
+          border: 'rgba(161, 79, 64, 0.25)',
           icon: '😔',
           desc: 'Hệ thống nhận thấy bạn có thể đang cảm thấy áp lực hoặc mệt mỏi. Hãy dành vài phút thả lỏng tâm trí cùng các gợi ý thư giãn bên dưới nhé.',
         };
       case 'crisis':
         return {
           title: 'Cần hỗ trợ tinh thần',
-          color: '#ef4444',
-          bg: 'rgba(239, 68, 68, 0.12)',
-          border: 'rgba(239, 68, 68, 0.3)',
+          color: 'var(--color-crisis)',
+          bg: 'var(--tint-crimson)',
+          border: 'rgba(166, 50, 40, 0.3)',
           icon: '🆘',
           desc: 'Bạn đang trải qua cảm xúc căng thẳng tột độ. Đừng chịu đựng một mình, chúng mình luôn ở đây sẵn sàng lắng nghe và đồng hành cùng bạn.',
         };
       default:
         return {
           title: 'Đã lưu trữ an toàn',
-          color: '#8b5cf6',
-          bg: 'rgba(139, 92, 246, 0.12)',
-          border: 'rgba(139, 92, 246, 0.3)',
+          color: 'var(--color-primary)',
+          bg: 'var(--tint-lavender)',
+          border: 'rgba(103, 80, 164, 0.25)',
           icon: '📝',
           desc: 'Bài viết của bạn đã được mã hóa bảo mật và lưu vào nhật ký cá nhân thành công.',
         };
@@ -134,7 +158,7 @@ export const JournalPage: React.FC = () => {
   const handleCreate = async (e?: React.FormEvent) => {
     if (e?.preventDefault) e.preventDefault();
     if (!content.trim()) {
-      message.warning('Vui lòng nhập nội dung nhật ký');
+      message.warning('Vui lòng chia sẻ đôi lời cảm xúc hoặc suy nghĩ của bạn');
       return;
     }
 
@@ -168,7 +192,7 @@ export const JournalPage: React.FC = () => {
         setNoVolunteerAvailable(false);
       }
     } catch (err: unknown) {
-      let msg = 'Không thể tạo bài nhật ký';
+      let msg = 'Không thể lưu bài nhật ký. Vui lòng thử lại sau.';
       if (axios.isAxiosError(err)) {
         const axiosErr = err as AxiosError<{ message?: string }>;
         msg = axiosErr.response?.data?.message || msg;
@@ -196,7 +220,6 @@ export const JournalPage: React.FC = () => {
       navigate('/chat');
     } catch (err: unknown) {
       if (axios.isAxiosError(err) && err.response?.status === 409) {
-        // Nếu user đã có phiên WAITING/ACTIVE thì điều hướng sang /chat
         setCrisisModalOpen(false);
         navigate('/chat');
         return;
@@ -227,7 +250,6 @@ export const JournalPage: React.FC = () => {
   };
 
   const handleResourceClick = (r: RelaxationResource) => {
-    // Nếu là link web bài viết bên ngoài (không phải file media r2 và không phải mã nội bộ)
     if (
       r.url.startsWith('http') &&
       !r.url.includes('.mp3') &&
@@ -238,7 +260,6 @@ export const JournalPage: React.FC = () => {
       window.open(r.url, '_blank', 'noreferrer');
       return;
     }
-    // Điều hướng đến trang tài nguyên và tự động mở modal/trình phát tương ứng
     navigate(`/resources?open=${encodeURIComponent(r.id)}`);
   };
 
@@ -249,6 +270,7 @@ export const JournalPage: React.FC = () => {
       okText: 'Xóa bài',
       okType: 'danger',
       cancelText: 'Hủy',
+      centered: true,
       onOk: async () => {
         try {
           await journalApi.delete(id);
@@ -262,202 +284,262 @@ export const JournalPage: React.FC = () => {
   };
 
   return (
-    <div className="journal-layout-grid">
-      {/* Left Column: Create & Entries List */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        {/* Write Form */}
-        <div style={{ padding: '20px', borderRadius: '16px', border: '1px solid var(--border)', background: 'var(--code-bg)' }}>
-          <h3 style={{ margin: '0 0 16px 0', color: 'var(--text-h)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '18px' }}>
-            <Smile size={20} color="var(--accent)" /> Viết Nhật ký Cá nhân
-          </h3>
+    <div className="journal-container">
+      {/* ─── Page Header ─── */}
+      <div className="journal-header">
+        <div className="journal-header__content">
+          <h1 className="journal-header__title">
+            <span className="journal-header__title-icon">
+              <BookOpen size={26} />
+            </span>
+            Không gian dành cho cảm xúc của bạn
+          </h1>
+          <p className="journal-header__subtitle">
+            Ghi lại những suy nghĩ, cảm xúc hay bất kỳ điều gì bạn muốn chia sẻ theo nhịp độ riêng của mình. Không gian này hoàn toàn an toàn và riêng tư.
+          </p>
+        </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px', color: 'var(--text)' }}>
-                Tâm trạng hiện tại của bạn:
-              </label>
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                {EMOJI_OPTIONS.map((e) => (
-                  <button
-                    key={e}
-                    type="button"
-                    onClick={() => setMoodEmoji(e)}
-                    style={{
-                      fontSize: '20px',
-                      padding: '6px 12px',
-                      borderRadius: '8px',
-                      border: moodEmoji === e ? '2px solid var(--accent)' : '1px solid var(--border)',
-                      background: moodEmoji === e ? 'var(--accent-bg)' : 'var(--bg)',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {e}
-                  </button>
-                ))}
+        <div className="journal-header__security-badge" title="Nội dung nhật ký được mã hóa bằng thuật toán AES-256-GCM trước khi lưu vào cơ sở dữ liệu">
+          <ShieldCheck size={16} />
+          <span>Bảo mật AES-256-GCM</span>
+        </div>
+      </div>
+
+      {/* ─── Main Grid Layout ─── */}
+      <div className="journal-layout-grid">
+        {/* Left Column: Create Form & History */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+          {/* Write Form Card */}
+          <div className="journal-write-card">
+            <div className="journal-write-card__heading">
+              <h2 className="journal-write-card__title">
+                <Sparkles size={18} color="var(--color-primary)" />
+                Viết suy nghĩ hôm nay
+              </h2>
+              <span className="journal-write-card__privacy-tag">
+                <Lock size={13} /> Riêng tư tuyệt đối
+              </span>
+            </div>
+
+            {/* Mood Selector */}
+            <div className="journal-mood-section">
+              <span className="journal-mood-label">
+                Tâm trạng hiện tại của bạn thế nào?
+              </span>
+              <div className="journal-mood-options" role="radiogroup" aria-label="Chọn tâm trạng hiện tại">
+                {EMOJI_OPTIONS.map((item) => {
+                  const isSelected = moodEmoji === item.emoji;
+                  return (
+                    <button
+                      key={item.emoji}
+                      type="button"
+                      role="radio"
+                      aria-checked={isSelected}
+                      aria-label={item.label}
+                      title={item.label}
+                      onClick={() => setMoodEmoji(item.emoji)}
+                      className={`journal-mood-btn ${isSelected ? 'journal-mood-btn--active' : ''}`}
+                    >
+                      {item.emoji}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            <div>
+            {/* Textarea Writing Pad */}
+            <div className="journal-textarea-wrapper">
               <Input.TextArea
                 rows={5}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="Chia sẻ những suy nghĩ, cảm xúc hay câu chuyện hôm nay của bạn... (Nội dung được tự động mã hóa bảo mật AES-256-GCM)"
+                placeholder="Chia sẻ những cảm xúc, băn khoăn hay câu chuyện hôm nay của bạn... Không có đúng hay sai, hãy viết một cách tự nhiên nhất."
                 maxLength={2000}
                 showCount
-                style={{
-                  borderRadius: '10px',
-                  fontSize: '14px',
-                }}
+                className="journal-textarea"
+                aria-label="Nội dung nhật ký cá nhân"
               />
             </div>
 
+            {/* Save Journal CTA */}
             <Button
               type="primary"
               size="large"
               loading={isSubmitting}
               onClick={() => handleCreate()}
-              icon={<Sparkles size={18} />}
-              style={{
-                width: '100%',
-                height: '46px',
-                borderRadius: '8px',
-                fontWeight: 600,
-                fontSize: '15px',
-              }}
+              icon={<Sparkles size={17} />}
+              className="journal-submit-btn"
             >
               {isSubmitting ? 'Đang mã hóa & Phân tích AI...' : 'Lưu nhật ký'}
             </Button>
           </div>
+
+          {/* History Section */}
+          <div className="journal-history-section">
+            <div className="journal-history-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h2 className="journal-history-title">
+                  Lịch sử Nhật ký
+                </h2>
+                {entries.length > 0 && (
+                  <span className="journal-history-badge">
+                    {entries.length} bài viết
+                  </span>
+                )}
+              </div>
+              <Button
+                icon={<RefreshCw size={14} />}
+                onClick={fetchJournalEntries}
+                size="small"
+                style={{ borderRadius: '6px' }}
+              >
+                Làm mới
+              </Button>
+            </div>
+
+            {loading ? (
+              <LoadingSpinner message="Đang tải nhật ký của bạn..." />
+            ) : entries.length === 0 ? (
+              <div className="journal-empty-box">
+                <div className="journal-empty-box__icon">
+                  <BookOpen size={24} />
+                </div>
+                <p className="journal-empty-box__text">
+                  Chưa có bài viết nhật ký nào. Hãy dành một vài phút viết ra những suy nghĩ đầu tiên của bạn ở khung phía trên nhé.
+                </p>
+              </div>
+            ) : (
+              <div className="journal-entries-list">
+                {entries.map((item) => {
+                  const sentiment = item.sentimentLabel?.toLowerCase();
+                  const sentimentDisplay = getSentimentDisplay(item.sentimentLabel);
+                  return (
+                    <div key={item.id} className="journal-entry-card">
+                      <div className="journal-entry-header">
+                        <div className="journal-entry-meta">
+                          <span className="journal-entry-mood" role="img" aria-label="Tâm trạng">
+                            {item.moodEmoji || '📝'}
+                          </span>
+                          <span className="journal-entry-date">
+                            {new Date(item.createdAt).toLocaleString('vi-VN', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric',
+                            })}
+                          </span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(item.id)}
+                          className="journal-entry-delete-btn"
+                          aria-label="Xóa bài nhật ký này"
+                          title="Xóa bài nhật ký"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+
+                      <p className="journal-entry-content">
+                        {item.content}
+                      </p>
+
+                      {item.sentimentLabel && (
+                        <div className="journal-entry-footer">
+                          <div
+                            className={`journal-sentiment-pill journal-sentiment-pill--${
+                              sentiment === 'positive'
+                                ? 'positive'
+                                : sentiment === 'neutral'
+                                ? 'neutral'
+                                : sentiment === 'negative'
+                                ? 'negative'
+                                : sentiment === 'crisis'
+                                ? 'crisis'
+                                : 'neutral'
+                            }`}
+                          >
+                            <Sparkles size={13} />
+                            <span>
+                              {sentimentDisplay.title}
+                              {item.sentimentScore !== null && item.sentimentScore !== undefined
+                                ? ` (${(item.sentimentScore * 100).toFixed(0)}%)`
+                                : ''}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Entries List */}
+        {/* Right Column: Suggested Relaxation Resources */}
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
-            <h3 style={{ margin: 0, color: 'var(--text-h)', fontSize: '18px' }}>Lịch sử Nhật ký</h3>
-            <Button
-              icon={<RefreshCw size={14} />}
-              onClick={fetchJournalEntries}
-              size="small"
-              style={{ borderRadius: '6px' }}
-            >
-              Làm mới
-            </Button>
-          </div>
+          <div className="journal-suggested-panel">
+            <div className="journal-suggested-heading">
+              <div className="journal-suggested-icon">
+                <Sparkles size={20} />
+              </div>
+              <div>
+                <h3 className="journal-suggested-title">Gợi ý Thư giãn từ AI</h3>
+              </div>
+            </div>
 
-          {loading ? (
-            <LoadingSpinner message="Đang tải nhật ký..." />
-          ) : entries.length === 0 ? (
-            <p style={{ color: 'var(--text)', fontSize: '14px' }}>Chưa có bài viết nhật ký nào.</p>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {entries.map((item) => (
-                <div key={item.id} style={{ padding: '16px', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--bg)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '20px' }}>{item.moodEmoji || '📝'}</span>
-                      <span style={{ fontSize: '12px', color: 'var(--text)' }}>
-                        {new Date(item.createdAt).toLocaleString('vi-VN')}
+            <p className="journal-suggested-desc">
+              Dựa trên cảm xúc bài viết gần nhất của bạn, hệ thống gợi ý các phương pháp thư giãn phù hợp:
+            </p>
+
+            {resources.length === 0 ? (
+              <div className="journal-suggested-empty">
+                Viết một bài nhật ký mới để nhận những gợi ý thư giãn được cá nhân hóa cho bạn nhé!
+              </div>
+            ) : (
+              <div className="journal-suggested-list">
+                {resources.map((r) => (
+                  <div
+                    key={r.id}
+                    onClick={() => handleResourceClick(r)}
+                    className="journal-suggested-card"
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') handleResourceClick(r);
+                    }}
+                  >
+                    <div className="journal-suggested-card__header">
+                      <span className="journal-suggested-card__title">
+                        {r.title}
+                      </span>
+                      <span className="journal-suggested-card__action">
+                        Mở <ArrowRight size={13} />
                       </span>
                     </div>
 
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      style={{ border: 'none', background: 'transparent', color: '#ef4444', cursor: 'pointer', padding: '4px' }}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-
-                  <p style={{ margin: '0 0 10px 0', color: 'var(--text-h)', fontSize: '14px', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-                    {item.content}
-                  </p>
-
-                  {item.sentimentLabel && (
-                    <div
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        padding: '4px 10px',
-                        borderRadius: '6px',
-                        background: item.sentimentLabel === 'crisis' ? '#fee2e2' : 'var(--code-bg)',
-                        fontSize: '12px',
-                        color: item.sentimentLabel === 'crisis' ? '#dc2626' : 'var(--accent)',
-                        fontWeight: 600,
-                      }}
-                    >
-                      <Sparkles size={14} /> AI Sentiment: {item.sentimentLabel} ({item.sentimentScore})
+                    <div className="journal-suggested-card__meta">
+                      <span>{getCategoryDisplay(r.category).label}</span>
+                      {r.durationSeconds && <span>⏱ {Math.round(r.durationSeconds / 60)} phút</span>}
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Right Column: Suggested Relaxation Resources */}
-      <div>
-        <div style={{ padding: '24px', borderRadius: '16px', border: '1px solid var(--border)', background: 'var(--code-bg)', position: 'sticky', top: '80px' }}>
-          <h3 style={{ margin: '0 0 12px 0', color: 'var(--text-h)' }}>🌱 Gợi ý Thư giãn từ AI</h3>
-          <p style={{ color: 'var(--text)', fontSize: '13px', marginBottom: '16px' }}>
-            Dựa trên phân tích cảm xúc bài viết mới nhất, AI gợi ý các tài nguyên giúp bạn cân bằng cảm xúc:
-          </p>
-
-          {resources.length === 0 ? (
-            <div style={{ padding: '16px', borderRadius: '8px', background: 'var(--bg)', color: 'var(--text)', fontSize: '13px', textAlign: 'center' }}>
-              Hãy viết một nhật ký mới để nhận gợi ý thư giãn cá nhân hóa!
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {resources.map((r) => (
-                <div
-                  key={r.id}
-                  onClick={() => handleResourceClick(r)}
-                  style={{
-                    padding: '12px 14px',
-                    borderRadius: '10px',
-                    border: '1px solid var(--border)',
-                    background: 'var(--bg)',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    display: 'block',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--accent)';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--border)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                    <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-h)' }}>
-                      {r.title}
-                    </div>
-                    <span style={{ fontSize: '12px', color: 'var(--accent)', fontWeight: 500 }}>
-                      Xem ngay →
-                    </span>
-                  </div>
-                  <div style={{ fontSize: '12px', color: 'var(--text)', display: 'flex', justifyContent: 'space-between' }}>
-                    <span>Danh mục: {r.category}</span>
-                    {r.durationSeconds && <span>⏱ {Math.round(r.durationSeconds / 60)} phút</span>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Modal Hỗ trợ khẩn cấp khi nhận diện tâm trạng crisis */}
+      {/* ─── Modal 1: Hỗ trợ khẩn cấp khi nhận diện tâm trạng crisis ─── */}
       <Modal
         open={crisisModalOpen}
         onCancel={() => setCrisisModalOpen(false)}
         closable={true}
         maskClosable={false}
+        centered
         footer={[
           <Button
             key="close"
@@ -478,34 +560,26 @@ export const JournalPage: React.FC = () => {
           </Button>,
         ]}
         title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#dc2626', fontSize: '18px' }}>
-            <HeartHandshake size={24} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-crisis)', fontSize: '18px' }}>
+            <HeartHandshake size={22} />
             <span>Hỗ trợ tinh thần</span>
           </div>
         }
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '12px 0 8px 0' }}>
-          <p style={{ margin: 0, fontSize: '15px', lineHeight: 1.6, color: 'var(--text-h)' }}>
-            Mình rất tiếc khi bạn đang cảm thấy như vậy. Bạn không phải một mình, và có người sẵn sàng lắng nghe bạn.
+          <p style={{ margin: 0, fontSize: '15px', lineHeight: 1.6, color: 'var(--text-primary)' }}>
+            Mình rất tiếc khi bạn đang cảm thấy như vậy. Bạn không phải một mình, và luôn có người sẵn sàng lắng nghe bạn.
           </p>
 
-          <div
-            style={{
-              padding: '14px 16px',
-              borderRadius: '10px',
-              border: '1px solid #fecaca',
-              background: '#fff1f2',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-            }}
-          >
-            <PhoneCall size={20} color="#e11d48" />
+          <div className="journal-hotline-box">
+            <div className="journal-hotline-box__icon">
+              <PhoneCall size={20} />
+            </div>
             <div>
-              <div style={{ fontSize: '12px', color: '#9f1239', fontWeight: 500 }}>
-                Đường dây nóng hỗ trợ khẩn cấp:
+              <div className="journal-hotline-box__label">
+                Đường dây nóng hỗ trợ khẩn cấp 24/7:
               </div>
-              <div style={{ fontSize: '15px', fontWeight: 700, color: '#be123c', marginTop: '2px' }}>
+              <div className="journal-hotline-box__number">
                 {getEmergencyHotline(crisisHotline)}
               </div>
             </div>
@@ -519,7 +593,7 @@ export const JournalPage: React.FC = () => {
               description={
                 <span>
                   Bạn vui lòng liên hệ trực tiếp đường dây nóng khẩn cấp:{' '}
-                  <strong style={{ color: '#be123c' }}>{crisisHotline}</strong> để được hỗ trợ kịp thời.
+                  <strong style={{ color: 'var(--color-crisis)' }}>{crisisHotline}</strong> để được hỗ trợ kịp thời.
                 </span>
               }
             />
@@ -527,7 +601,7 @@ export const JournalPage: React.FC = () => {
         </div>
       </Modal>
 
-      {/* Modal Popup Kết quả Phân tích AI & Danh mục Gợi ý Thư giãn */}
+      {/* ─── Modal 2: Popup Kết quả Phân tích AI & Danh mục Gợi ý Thư giãn ─── */}
       <Modal
         open={analysisModalOpen}
         onCancel={() => setAnalysisModalOpen(false)}
@@ -535,9 +609,9 @@ export const JournalPage: React.FC = () => {
         style={{ maxWidth: 'calc(100vw - 24px)' }}
         centered
         title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px', color: 'var(--text-h)' }}>
-            <Sparkles size={20} color="var(--accent)" />
-            <span>Kết quả Phân tích Cảm xúc AI & Gợi ý Thư giãn</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px', color: 'var(--text-primary)' }}>
+            <Sparkles size={20} color="var(--color-primary)" />
+            <span>Kết quả Phân tích Cảm xúc & Gợi ý Thư giãn</span>
           </div>
         }
         footer={[
@@ -556,7 +630,7 @@ export const JournalPage: React.FC = () => {
               setAnalysisModalOpen(false);
               navigate('/resources');
             }}
-            style={{ borderRadius: '8px', background: 'var(--accent)', borderColor: 'var(--accent)' }}
+            style={{ borderRadius: '8px' }}
           >
             Kho bài tập thư giãn
           </Button>,
@@ -569,21 +643,17 @@ export const JournalPage: React.FC = () => {
               const sentiment = getSentimentDisplay(latestAnalysis.entry.sentimentLabel);
               return (
                 <div
+                  className="journal-analysis-sentiment-card"
                   style={{
-                    padding: '16px 18px',
-                    borderRadius: '12px',
                     background: sentiment.bg,
-                    border: `1px solid ${sentiment.border}`,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '10px',
+                    borderColor: sentiment.border,
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                  <div className="journal-analysis-sentiment-header">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <span style={{ fontSize: '28px' }}>{sentiment.icon}</span>
                       <div>
-                        <div style={{ fontSize: '11px', color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>
+                        <div style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>
                           Trạng thái tâm trạng
                         </div>
                         <div style={{ fontSize: '16px', fontWeight: 700, color: sentiment.color }}>
@@ -593,24 +663,14 @@ export const JournalPage: React.FC = () => {
                     </div>
 
                     {latestAnalysis.entry.sentimentScore !== null && latestAnalysis.entry.sentimentScore !== undefined && (
-                      <span
-                        style={{
-                          fontSize: '12px',
-                          fontWeight: 600,
-                          padding: '4px 10px',
-                          borderRadius: '16px',
-                          background: 'var(--bg)',
-                          border: '1px solid var(--border)',
-                          color: 'var(--text-h)',
-                        }}
-                      >
+                      <span className="journal-analysis-score-badge">
                         Chỉ số: {latestAnalysis.entry.sentimentScore > 0 ? '+' : ''}
                         {(latestAnalysis.entry.sentimentScore * 100).toFixed(0)}%
                       </span>
                     )}
                   </div>
 
-                  <p style={{ margin: 0, fontSize: '13px', lineHeight: 1.6, color: 'var(--text-h)' }}>
+                  <p style={{ margin: 0, fontSize: '13.5px', lineHeight: 1.6, color: 'var(--text-primary)' }}>
                     {sentiment.desc}
                   </p>
                 </div>
@@ -622,9 +682,9 @@ export const JournalPage: React.FC = () => {
               <div
                 style={{
                   padding: '14px 16px',
-                  borderRadius: '10px',
-                  border: '1px solid #fecaca',
-                  background: '#fff1f2',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(166, 50, 40, 0.25)',
+                  background: 'var(--tint-crimson)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
@@ -633,12 +693,12 @@ export const JournalPage: React.FC = () => {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <PhoneCall size={20} color="#e11d48" />
+                  <PhoneCall size={20} color="var(--color-crisis)" />
                   <div>
-                    <div style={{ fontSize: '12px', color: '#9f1239', fontWeight: 600 }}>
+                    <div style={{ fontSize: '12px', color: 'var(--color-crisis)', fontWeight: 600 }}>
                       Đường dây nóng khẩn cấp:
                     </div>
-                    <div style={{ fontSize: '15px', fontWeight: 800, color: '#be123c' }}>
+                    <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--color-crisis)' }}>
                       {getEmergencyHotline(crisisHotline)}
                     </div>
                   </div>
@@ -663,7 +723,7 @@ export const JournalPage: React.FC = () => {
             {/* Khối Danh mục & Danh sách tài nguyên gợi ý */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '6px' }}>
-                <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-h)' }}>
+                <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>
                   {getCategoryDisplay(latestAnalysis.entry.suggestedResourceCategory).icon}{' '}
                   Gợi ý: {getCategoryDisplay(latestAnalysis.entry.suggestedResourceCategory).label}
                 </span>
@@ -673,8 +733,8 @@ export const JournalPage: React.FC = () => {
                     fontWeight: 600,
                     padding: '2px 8px',
                     borderRadius: '6px',
-                    background: 'var(--accent-bg)',
-                    color: 'var(--accent)',
+                    background: 'var(--tint-lavender)',
+                    color: 'var(--color-primary)',
                   }}
                 >
                   {getCategoryDisplay(latestAnalysis.entry.suggestedResourceCategory).badge}
@@ -687,61 +747,49 @@ export const JournalPage: React.FC = () => {
                     <div
                       key={r.id}
                       onClick={() => handleResourceClick(r)}
-                      style={{
-                        padding: '12px 14px',
-                        borderRadius: '10px',
-                        border: '1px solid var(--border)',
-                        background: 'var(--code-bg)',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: '12px',
-                        transition: 'all 0.2s ease',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = 'var(--accent)';
-                        e.currentTarget.style.transform = 'translateY(-1px)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = 'var(--border)';
-                        e.currentTarget.style.transform = 'translateY(0)';
+                      className="journal-suggested-card"
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') handleResourceClick(r);
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
-                        <PlayCircle size={20} color="var(--accent)" style={{ flexShrink: 0 }} />
-                        <div style={{ minWidth: 0 }}>
-                          <div
-                            style={{
-                              fontWeight: 600,
-                              fontSize: '13px',
-                              color: 'var(--text-h)',
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                            }}
-                          >
-                            {r.title}
-                          </div>
-                          <div style={{ fontSize: '11px', color: 'var(--text)', marginTop: '2px' }}>
-                            {r.type === 'AUDIO' ? 'Âm thanh' : r.type === 'VIDEO' ? 'Video' : 'Bài viết'}
-                            {r.durationSeconds && ` • ${Math.round(r.durationSeconds / 60)} phút`}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
+                          <PlayCircle size={20} color="var(--color-primary)" style={{ flexShrink: 0 }} />
+                          <div style={{ minWidth: 0 }}>
+                            <div
+                              style={{
+                                fontWeight: 600,
+                                fontSize: '13.5px',
+                                color: 'var(--text-primary)',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                              }}
+                            >
+                              {r.title}
+                            </div>
+                            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                              {r.type === 'AUDIO' ? 'Âm thanh' : r.type === 'VIDEO' ? 'Video' : 'Bài viết'}
+                              {r.durationSeconds && ` • ${Math.round(r.durationSeconds / 60)} phút`}
+                            </div>
                           </div>
                         </div>
+                        <span
+                          style={{
+                            fontSize: '12px',
+                            color: 'var(--color-primary)',
+                            fontWeight: 600,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            flexShrink: 0,
+                          }}
+                        >
+                          Mở ngay <ExternalLink size={12} />
+                        </span>
                       </div>
-                      <span
-                        style={{
-                          fontSize: '12px',
-                          color: 'var(--accent)',
-                          fontWeight: 600,
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          flexShrink: 0,
-                        }}
-                      >
-                        Mở ngay <ExternalLink size={12} />
-                      </span>
                     </div>
                   ))}
                 </div>
@@ -750,15 +798,15 @@ export const JournalPage: React.FC = () => {
                   style={{
                     padding: '16px',
                     borderRadius: '10px',
-                    border: '1px dashed var(--border)',
-                    background: 'var(--code-bg)',
+                    border: '1px dashed var(--border-subtle)',
+                    background: 'var(--bg-canvas)',
                     textAlign: 'center',
-                    color: 'var(--text)',
+                    color: 'var(--text-secondary)',
                     fontSize: '13px',
                     lineHeight: 1.5,
                   }}
                 >
-                  🌱 Tâm trạng của bạn đang rất cân bằng và ổn định. Hãy duy trì năng lượng tích cực này hoặc ghé thăm kho tài nguyên để khám phá thêm các bài nghe thư giãn nhé!
+                  🌱 Cảm xúc của bạn đang rất cân bằng và ổn định. Hãy tiếp tục lắng nghe bản thân hoặc ghé thăm kho tài nguyên để trải nghiệm các bài tập thư giãn nhé!
                 </div>
               )}
             </div>

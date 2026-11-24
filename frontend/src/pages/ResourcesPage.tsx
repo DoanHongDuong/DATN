@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Card, Tag, Button, Modal, Tabs, Space, Typography } from 'antd';
+import { Button, Modal, Tabs, Space, Tag } from 'antd';
 import {
   Wind,
   Headphones,
@@ -15,12 +15,12 @@ import {
   Ear,
   Smile,
   Coffee,
+  CheckCircle,
 } from 'lucide-react';
 import { resourceApi, type RelaxationResource } from '../api/resource.api';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { HelpDirectory } from '../components/resources/HelpDirectory';
-
-const { Title, Paragraph, Text } = Typography;
+import './resources.css';
 
 export const ResourcesPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -90,7 +90,7 @@ export const ResourcesPage: React.FC = () => {
         }
       }
     };
-    load();
+    void load();
     return () => {
       isMounted = false;
     };
@@ -106,10 +106,6 @@ export const ResourcesPage: React.FC = () => {
     const isBox = selectedBreathing?.url === 'box-breathing';
     const isDiaphragm = selectedBreathing?.url === 'diaphragmatic';
 
-    // Durations for each technique
-    // 4-7-8: Inhale 4s -> Hold 7s -> Exhale 8s
-    // Box: Inhale 4s -> Hold 4s -> Exhale 4s -> Hold 4s
-    // Diaphragm: Inhale 4s -> Hold 2s -> Exhale 6s
     const getPhaseDuration = (phase: string) => {
       if (isBox) return 4;
       if (isDiaphragm) {
@@ -123,7 +119,7 @@ export const ResourcesPage: React.FC = () => {
       return 8;
     };
 
-    breathingTimerRef.current = setInterval(() => {
+    breathingTimerRef.current = window.setInterval(() => {
       setBreathingSecondsLeft((prev) => {
         if (prev > 1) {
           return prev - 1;
@@ -310,52 +306,38 @@ export const ResourcesPage: React.FC = () => {
   };
 
   const getPhaseColor = () => {
-    if (breathingPhase === 'inhale') return '#3b82f6';
-    if (breathingPhase === 'hold') return '#eab308';
-    if (breathingPhase === 'exhale') return '#10b981';
-    return '#8b5cf6';
+    switch (breathingPhase) {
+      case 'inhale':
+        return '#426B8A'; // Muted Blue
+      case 'hold':
+        return '#6750A4'; // Muted Violet
+      case 'exhale':
+        return '#3F7667'; // Grounded Sage
+      case 'hold-after':
+        return '#6750A4';
+      default:
+        return '#3F7667';
+    }
   };
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      {/* Header Banner */}
-      <div
-        style={{
-          background: 'linear-gradient(135deg, rgba(170, 59, 255, 0.12) 0%, rgba(59, 130, 246, 0.12) 100%)',
-          borderRadius: '16px',
-          padding: '32px 28px',
-          border: '1px solid var(--border)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '16px',
-        }}
-      >
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-            <div
-              style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '10px',
-                background: 'var(--accent)',
-                color: '#fff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Sparkles size={20} />
+    <div className="resources-container">
+      {/* ─── Header Banner ─── */}
+      <div className="resources-header-banner">
+        <div className="resources-header-banner__left">
+          <div className="resources-header-banner__title-row">
+            <div className="resources-header-banner__icon">
+              <Sparkles size={22} />
             </div>
-            <Title level={2} style={{ margin: 0, color: 'var(--text-h)' }}>
-              Không gian Thư giãn & Phục hồi
-            </Title>
+            <h1 className="resources-header-banner__title">
+              Không gian Thư giãn & Tự điều hòa
+            </h1>
           </div>
-          <Paragraph style={{ margin: 0, color: 'var(--text)', fontSize: '15px', maxWidth: '650px' }}>
-            Dành ít phút mỗi ngày để cân bằng lại cảm xúc với các bài tập thở khoa học, âm thanh tĩnh tâm và kỹ thuật cắt cơn căng thẳng.
-          </Paragraph>
+          <p className="resources-header-banner__desc">
+            Dành ít phút mỗi ngày để cân bằng lại cảm xúc với các bài tập thở khoa học, âm thanh tĩnh tâm và kỹ thuật tiếp đất cắt cơn lo âu.
+          </p>
         </div>
+
         <Button
           type="primary"
           icon={<Wind size={16} />}
@@ -374,23 +356,23 @@ export const ResourcesPage: React.FC = () => {
             };
             handleOpenBreathing(defaultBreathing);
           }}
-          style={{ height: '42px', borderRadius: '8px', padding: '0 20px', fontWeight: 600 }}
+          className="resources-header-banner__btn"
         >
-          Luyện thở ngay 🫁
+          Luyện thở ngay
         </Button>
       </div>
 
-      {/* Tabs Filter */}
+      {/* ─── Tabs Filter ─── */}
       <Tabs
         activeKey={activeTab}
         onChange={setActiveTab}
         items={[
           { key: 'all', label: 'Tất cả tài nguyên' },
-          { key: 'breathing', label: '🫁 Luyện tập nhịp thở' },
-          { key: 'music', label: '🎧 Nhạc & Âm thanh thư giãn' },
-          { key: 'meditation', label: '🧘 Thiền định' },
-          { key: 'mindfulness', label: '🌿 Kỹ thuật giải tỏa lo âu' },
-          { key: 'directory', label: '🏥 Nguồn trợ giúp & Cơ sở Y tế' },
+          { key: 'breathing', label: 'Luyện tập nhịp thở' },
+          { key: 'music', label: 'Nhạc & Âm thanh thư giãn' },
+          { key: 'meditation', label: 'Thiền định' },
+          { key: 'mindfulness', label: 'Kỹ thuật giải tỏa lo âu' },
+          { key: 'directory', label: 'Cơ sở Y tế & Đường dây nóng' },
         ]}
       />
 
@@ -399,13 +381,7 @@ export const ResourcesPage: React.FC = () => {
       ) : loading ? (
         <LoadingSpinner message="Đang tải thư viện thư giãn..." />
       ) : (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-            gap: '20px',
-          }}
-        >
+        <div className="resources-grid">
           {resources.map((item) => {
             const typeLower = (item.type || '').toLowerCase();
             const isBreathing = typeLower === 'breathing' || typeLower === 'exercise';
@@ -414,45 +390,19 @@ export const ResourcesPage: React.FC = () => {
             const isGuide = typeLower === 'article' || typeLower === 'mindfulness' || typeLower === 'guide';
 
             return (
-              <Card
-                key={item.id}
-                hoverable
-                style={{
-                  borderRadius: '14px',
-                  border: '1px solid var(--border)',
-                  background: 'var(--bg)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  height: '100%',
-                }}
-                bodyStyle={{ padding: '20px', display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between' }}
-              >
+              <div key={item.id} className="resources-card">
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                  <div className="resources-card__header">
                     <div
-                      style={{
-                        width: '42px',
-                        height: '42px',
-                        borderRadius: '12px',
-                        background: isBreathing
-                          ? 'rgba(59, 130, 246, 0.15)'
+                      className={`resources-card__type-icon ${
+                        isBreathing
+                          ? 'resources-card__type-icon--breathing'
                           : isAudio
-                          ? 'rgba(16, 185, 129, 0.15)'
+                          ? 'resources-card__type-icon--audio'
                           : isVideo
-                          ? 'rgba(99, 102, 241, 0.15)'
-                          : 'rgba(168, 85, 247, 0.15)',
-                        color: isBreathing
-                          ? '#3b82f6'
-                          : isAudio
-                          ? '#10b981'
-                          : isVideo
-                          ? '#6366f1'
-                          : '#a855f7',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
+                          ? 'resources-card__type-icon--video'
+                          : 'resources-card__type-icon--guide'
+                      }`}
                     >
                       {isBreathing && <Wind size={22} />}
                       {isAudio && <Headphones size={22} />}
@@ -460,16 +410,26 @@ export const ResourcesPage: React.FC = () => {
                       {isGuide && <Sparkles size={22} />}
                     </div>
 
-                    <Tag color={isBreathing ? 'blue' : isAudio ? 'green' : isVideo ? 'geekblue' : 'purple'}>
+                    <span
+                      className={`resources-card__tag ${
+                        isBreathing
+                          ? 'resources-card__tag--breathing'
+                          : isAudio
+                          ? 'resources-card__tag--audio'
+                          : isVideo
+                          ? 'resources-card__tag--video'
+                          : 'resources-card__tag--guide'
+                      }`}
+                    >
                       {isBreathing ? 'Luyện thở' : isAudio ? 'Âm thanh' : isVideo ? 'Video' : 'Kỹ thuật'}
-                    </Tag>
+                    </span>
                   </div>
 
-                  <h3 style={{ margin: '0 0 8px 0', fontSize: '17px', color: 'var(--text-h)', fontWeight: 600 }}>
+                  <h3 className="resources-card__title">
                     {item.title}
                   </h3>
 
-                  <div style={{ color: 'var(--text)', fontSize: '13px', marginBottom: '16px' }}>
+                  <div className="resources-card__duration">
                     {item.durationSeconds ? `Thời lượng: ${Math.round(item.durationSeconds / 60)} phút` : 'Thực hành tự do'}
                   </div>
                 </div>
@@ -478,10 +438,10 @@ export const ResourcesPage: React.FC = () => {
                   {isBreathing && (
                     <Button
                       type="primary"
-                      block
                       icon={<Wind size={15} />}
                       onClick={() => handleOpenBreathing(item)}
-                      style={{ borderRadius: '8px', background: '#3b82f6', borderColor: '#3b82f6' }}
+                      className="resources-card__action-btn"
+                      style={{ background: 'var(--color-info)', borderColor: 'var(--color-info)' }}
                     >
                       Bắt đầu bài tập thở
                     </Button>
@@ -490,10 +450,10 @@ export const ResourcesPage: React.FC = () => {
                   {isAudio && (
                     <Button
                       type="default"
-                      block
                       icon={<Play size={15} />}
                       onClick={() => handleOpenAudio(item)}
-                      style={{ borderRadius: '8px', color: '#10b981', borderColor: '#10b981' }}
+                      className="resources-card__action-btn"
+                      style={{ color: 'var(--color-secondary)', borderColor: 'var(--border-strong)' }}
                     >
                       Phát âm thanh thư giãn
                     </Button>
@@ -502,10 +462,10 @@ export const ResourcesPage: React.FC = () => {
                   {isVideo && (
                     <Button
                       type="default"
-                      block
                       icon={<Play size={15} />}
                       onClick={() => handleOpenVideo(item)}
-                      style={{ borderRadius: '8px', color: '#6366f1', borderColor: '#6366f1' }}
+                      className="resources-card__action-btn"
+                      style={{ color: 'var(--color-primary)', borderColor: 'var(--border-strong)' }}
                     >
                       Xem video hướng dẫn
                     </Button>
@@ -514,22 +474,22 @@ export const ResourcesPage: React.FC = () => {
                   {isGuide && (
                     <Button
                       type="default"
-                      block
                       icon={<Sparkles size={15} />}
                       onClick={() => handleOpenGuide(item)}
-                      style={{ borderRadius: '8px' }}
+                      className="resources-card__action-btn"
+                      style={{ color: 'var(--text-primary)', borderColor: 'var(--border-strong)' }}
                     >
                       Xem hướng dẫn từng bước
                     </Button>
                   )}
                 </div>
-              </Card>
+              </div>
             );
           })}
         </div>
       )}
 
-      {/* MODAL 1: INTERACTIVE BREATHING BUBBLE */}
+      {/* ─── MODAL 1: INTERACTIVE BREATHING BUBBLE ─── */}
       <Modal
         open={breathingModalOpen}
         onCancel={handleCloseBreathing}
@@ -538,59 +498,43 @@ export const ResourcesPage: React.FC = () => {
         centered
         destroyOnClose
       >
-        <div style={{ textAlign: 'center', padding: '16px 8px 24px' }}>
-          <Tag color="blue" style={{ marginBottom: '8px' }}>
+        <div className="resources-breathing-container">
+          <Tag color="purple" style={{ marginBottom: '8px', borderRadius: '12px', fontWeight: 600 }}>
             {selectedBreathing?.title || 'Bài tập nhịp thở'}
           </Tag>
-          <Title level={4} style={{ margin: '0 0 4px', color: 'var(--text-h)' }}>
+          <h2 className="resources-breathing-phase-title">
             {getPhaseText()}
-          </Title>
-          <Text type="secondary" style={{ fontSize: '13px' }}>
-            Thả lỏng hai vai, ngồi thẳng lưng và hít thở nhịp nhàng theo vòng tròn
-          </Text>
+          </h2>
+          <p className="resources-breathing-phase-desc">
+            Thả lỏng hai vai, ngồi thẳng lưng và hít thở nhịp nhàng theo chuyển động tròn
+          </p>
 
           {/* Animated Circle */}
-          <div
-            style={{
-              height: '240px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '28px 0',
-            }}
-          >
+          <div className="resources-breathing-bubble-wrapper">
             <div
+              className="resources-breathing-bubble"
               style={{
-                width: '160px',
-                height: '160px',
-                borderRadius: '50%',
-                background: `radial-gradient(circle, ${getPhaseColor()} 0%, rgba(255,255,255,0.05) 70%)`,
-                boxShadow: `0 0 35px ${getPhaseColor()}55`,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
+                background: `radial-gradient(circle, ${getPhaseColor()} 0%, rgba(255,255,255,0.08) 80%)`,
+                boxShadow: `0 0 40px ${getPhaseColor()}55`,
                 transform: `scale(${getPhaseScale()})`,
-                transition: 'transform 3s cubic-bezier(0.4, 0, 0.2, 1), background 1s ease',
-                color: '#fff',
               }}
             >
-              <span style={{ fontSize: '38px', fontWeight: 800, textShadow: '0 2px 6px rgba(0,0,0,0.4)' }}>
+              <span className="resources-breathing-countdown">
                 {breathingSecondsLeft}
               </span>
-              <span style={{ fontSize: '12px', opacity: 0.9, textTransform: 'uppercase', letterSpacing: '1px' }}>
+              <span className="resources-breathing-phase-label">
                 {breathingPhase === 'inhale' ? 'HÍT VÀO' : breathingPhase === 'exhale' ? 'THỞ RA' : 'GIỮ HƠI'}
               </span>
             </div>
           </div>
 
-          <Space orientation="horizontal" size="middle">
+          <Space size="middle">
             <Button
               type="primary"
               size="large"
               icon={isBreathingRunning ? <Pause size={16} /> : <Play size={16} />}
               onClick={() => setIsBreathingRunning(!isBreathingRunning)}
-              style={{ minWidth: '130px', borderRadius: '8px' }}
+              style={{ minWidth: '130px', borderRadius: '8px', fontWeight: 600 }}
             >
               {isBreathingRunning ? 'Tạm dừng' : 'Tiếp tục'}
             </Button>
@@ -609,7 +553,7 @@ export const ResourcesPage: React.FC = () => {
         </div>
       </Modal>
 
-      {/* MODAL 2: AUDIO PLAYER */}
+      {/* ─── MODAL 2: AUDIO PLAYER ─── */}
       <Modal
         open={audioModalOpen}
         onCancel={handleCloseAudio}
@@ -618,29 +562,17 @@ export const ResourcesPage: React.FC = () => {
         centered
         destroyOnClose
       >
-        <div style={{ textAlign: 'center', padding: '16px 8px 24px' }}>
-          <div
-            style={{
-              width: '68px',
-              height: '68px',
-              borderRadius: '50%',
-              background: 'rgba(16, 185, 129, 0.15)',
-              color: '#10b981',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 16px',
-            }}
-          >
+        <div className="resources-audio-container">
+          <div className="resources-audio-icon-box">
             <Volume2 size={32} />
           </div>
 
-          <Title level={4} style={{ margin: '0 0 6px', color: 'var(--text-h)' }}>
+          <h3 style={{ margin: '0 0 6px', color: 'var(--text-primary)', fontFamily: 'var(--heading)', fontSize: '18px', fontWeight: 700 }}>
             {selectedAudio?.title}
-          </Title>
-          <Paragraph type="secondary" style={{ fontSize: '13px', marginBottom: '20px' }}>
-            Đeo tai nghe và nhắm mắt lại để tận hưởng không gian thiên nhiên tĩnh lặng
-          </Paragraph>
+          </h3>
+          <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', marginBottom: '20px', lineHeight: 1.5 }}>
+            Đeo tai nghe và nhắm mắt lại để tận hưởng không gian âm thanh tĩnh lặng
+          </p>
 
           {selectedAudio && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -658,17 +590,17 @@ export const ResourcesPage: React.FC = () => {
               />
 
               {audioError && (
-                <div style={{ padding: '12px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', fontSize: '13px' }}>
-                  ⚠️ File âm thanh từ nguồn ngoài chưa sẵn sàng hoặc bị chặn CORS. Bạn có thể bật âm thanh thư giãn trực tiếp bên dưới:
+                <div style={{ padding: '12px', borderRadius: '8px', background: 'var(--tint-crimson)', color: 'var(--color-crisis)', fontSize: '13px', lineHeight: 1.5 }}>
+                  File âm thanh từ nguồn ngoài chưa sẵn sàng. Bạn có thể bật âm thanh tĩnh tâm trực tiếp tạo bởi trình duyệt bên dưới:
                 </div>
               )}
 
-              <div style={{ padding: '16px', borderRadius: '12px', background: 'var(--code-bg)', border: '1px solid var(--border)', textAlign: 'center' }}>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-h)', marginBottom: '6px' }}>
-                  🌧️ Âm thanh tĩnh tâm trực tiếp (Web Audio)
+              <div className="resources-audio-synth-box">
+                <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                  Âm thanh tĩnh tâm trực tiếp (Web Audio)
                 </div>
-                <div style={{ fontSize: '12px', color: 'var(--text)', marginBottom: '12px' }}>
-                  Tạo dải sóng âm tự nhiên dịu êm ngay trên trình duyệt, không phụ thuộc đường truyền mạng
+                <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>
+                  Tạo dải sóng âm tiếng mưa tự nhiên dịu êm ngay trên trình duyệt, không phụ thuộc đường truyền mạng
                 </div>
                 <Button
                   type={isSynthPlaying ? 'primary' : 'default'}
@@ -681,7 +613,7 @@ export const ResourcesPage: React.FC = () => {
                       startAmbientSynth();
                     }
                   }}
-                  style={{ borderRadius: '8px' }}
+                  style={{ borderRadius: '8px', fontWeight: 600, marginTop: '4px' }}
                 >
                   {isSynthPlaying ? 'Dừng tiếng mưa' : 'Bật tiếng mưa êm đềm'}
                 </Button>
@@ -691,12 +623,12 @@ export const ResourcesPage: React.FC = () => {
         </div>
       </Modal>
 
-      {/* MODAL 3: GUIDES (GROUNDING 5-4-3-2-1 / PMR) */}
+      {/* ─── MODAL 3: GUIDES (GROUNDING 5-4-3-2-1 / PMR) ─── */}
       <Modal
         open={guideModalOpen}
         onCancel={() => setGuideModalOpen(false)}
         footer={[
-          <Button key="close" type="primary" onClick={() => setGuideModalOpen(false)}>
+          <Button key="close" type="primary" onClick={() => setGuideModalOpen(false)} style={{ borderRadius: '8px', fontWeight: 600 }}>
             Tôi đã cảm thấy ổn hơn
           </Button>,
         ]}
@@ -704,81 +636,93 @@ export const ResourcesPage: React.FC = () => {
         centered
       >
         <div style={{ padding: '8px 4px' }}>
-          <Title level={4} style={{ marginBottom: '8px', color: 'var(--text-h)' }}>
+          <h2 style={{ marginBottom: '8px', color: 'var(--text-primary)', fontFamily: 'var(--heading)', fontSize: '20px', fontWeight: 700 }}>
             {selectedGuide?.title}
-          </Title>
-          <Paragraph style={{ color: 'var(--text)', fontSize: '14px', marginBottom: '20px' }}>
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.6, marginBottom: '20px' }}>
             {selectedGuide?.url === 'grounding-54321'
               ? 'Kỹ thuật tiếp đất (5-4-3-2-1 Grounding) giúp bạn định thần và cắt đứt luồng suy nghĩ hoảng loạn bằng cách kết nối lại với 5 giác quan thực tại:'
-              : 'Kỹ thuật thư giãn cơ tiến triển (PMR) giúp giải tỏa sự căng cơ tích tụ khi cơ thể phản ứng với stress:'}
-          </Paragraph>
+              : 'Kỹ thuật thư giãn cơ tiến triển (PMR) giúp giải tỏa sự căng cơ tích tụ khi cơ thể phản ứng với căng thẳng:'}
+          </p>
 
           {selectedGuide?.url === 'grounding-54321' ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                <div style={{ background: '#3b82f6', color: '#fff', borderRadius: '8px', padding: '6px' }}><Eye size={18} /></div>
+            <div className="resources-guide-list">
+              <div className="resources-guide-step">
+                <div className="resources-guide-step__icon" style={{ background: 'var(--color-info)' }}><Eye size={18} /></div>
                 <div>
-                  <strong style={{ color: 'var(--text-h)' }}>5 vật bạn có thể nhìn thấy:</strong>
-                  <div style={{ fontSize: '13px', color: 'var(--text)' }}>Quan sát xung quanh: chiếc bút, chậu cây, đồng hồ, vệt nắng, cuốn sách...</div>
+                  <div className="resources-guide-step__title">5 vật bạn có thể nhìn thấy:</div>
+                  <div className="resources-guide-step__desc">Quan sát xung quanh: chiếc bút, chậu cây, vệt nắng, đồng hồ, cuốn sách...</div>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                <div style={{ background: '#10b981', color: '#fff', borderRadius: '8px', padding: '6px' }}><Hand size={18} /></div>
+              <div className="resources-guide-step">
+                <div className="resources-guide-step__icon" style={{ background: 'var(--color-secondary)' }}><Hand size={18} /></div>
                 <div>
-                  <strong style={{ color: 'var(--text-h)' }}>4 thứ bạn có thể chạm vào:</strong>
-                  <div style={{ fontSize: '13px', color: 'var(--text)' }}>Cảm nhận bề mặt bàn, cảm giác mặt vải áo, lòng bàn chân chạm sàn nhà...</div>
+                  <div className="resources-guide-step__title">4 thứ bạn có thể chạm vào:</div>
+                  <div className="resources-guide-step__desc">Cảm nhận mặt bàn trơn nhẵn, chất vải mềm trên tay áo, lòng bàn chân chạm đất...</div>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                <div style={{ background: '#eab308', color: '#fff', borderRadius: '8px', padding: '6px' }}><Ear size={18} /></div>
+              <div className="resources-guide-step">
+                <div className="resources-guide-step__icon" style={{ background: 'var(--color-warning)' }}><Ear size={18} /></div>
                 <div>
-                  <strong style={{ color: 'var(--text-h)' }}>3 âm thanh bạn có thể nghe thấy:</strong>
-                  <div style={{ fontSize: '13px', color: 'var(--text)' }}>Tiếng quạt gió ro ro, tiếng xe cộ ngoài phố, tiếng hơi thở của bạn...</div>
+                  <div className="resources-guide-step__title">3 âm thanh bạn có thể nghe thấy:</div>
+                  <div className="resources-guide-step__desc">Tiếng quạt gió ro ro, tiếng xe cộ ngoài phố xa xa, hoặc tiếng hơi thở của bạn...</div>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                <div style={{ background: '#ec4899', color: '#fff', borderRadius: '8px', padding: '6px' }}><Coffee size={18} /></div>
+              <div className="resources-guide-step">
+                <div className="resources-guide-step__icon" style={{ background: 'var(--color-primary)' }}><Coffee size={18} /></div>
                 <div>
-                  <strong style={{ color: 'var(--text-h)' }}>2 mùi bạn có thể ngửi thấy:</strong>
-                  <div style={{ fontSize: '13px', color: 'var(--text)' }}>Hương thơm của tách trà, mùi thơm của áo mới, hoặc không khí trong phòng...</div>
+                  <div className="resources-guide-step__title">2 mùi bạn có thể ngửi thấy:</div>
+                  <div className="resources-guide-step__desc">Hương thơm của tách trà, mùi trang sách mới, hoặc làn gió mát trong phòng...</div>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                <div style={{ background: '#8b5cf6', color: '#fff', borderRadius: '8px', padding: '6px' }}><Smile size={18} /></div>
+              <div className="resources-guide-step">
+                <div className="resources-guide-step__icon" style={{ background: 'var(--color-success)' }}><Smile size={18} /></div>
                 <div>
-                  <strong style={{ color: 'var(--text-h)' }}>1 vị bạn có thể nếm được:</strong>
-                  <div style={{ fontSize: '13px', color: 'var(--text)' }}>Nhấp một ngụm nước ấm mát lành và cảm nhận dòng nước chảy qua cổ họng.</div>
+                  <div className="resources-guide-step__title">1 vị bạn có thể nếm được:</div>
+                  <div className="resources-guide-step__desc">Nhấp một ngụm nước ấm mát lành và cảm nhận dòng nước chảy chậm qua cổ họng.</div>
                 </div>
               </div>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ padding: '12px', borderRadius: '8px', background: 'var(--code-bg)', border: '1px solid var(--border)' }}>
-                <strong>Bước 1: Cơ bàn chân & Bắp chân</strong>
-                <p style={{ margin: '4px 0 0', fontSize: '13px', color: 'var(--text)' }}>Gập các ngón chân lại thật chặt trong 5 giây, sau đó thở ra và thả lỏng hoàn toàn trong 10 giây.</p>
+            <div className="resources-guide-list">
+              <div className="resources-guide-step">
+                <div className="resources-guide-step__icon" style={{ background: 'var(--color-secondary)' }}><CheckCircle size={18} /></div>
+                <div>
+                  <div className="resources-guide-step__title">Bước 1: Cơ bàn chân & Bắp chân</div>
+                  <p className="resources-guide-step__desc">Gập các ngón chân lại thật chặt trong 5 giây, sau đó thở ra từ từ và thả lỏng hoàn toàn trong 10 giây.</p>
+                </div>
               </div>
-              <div style={{ padding: '12px', borderRadius: '8px', background: 'var(--code-bg)', border: '1px solid var(--border)' }}>
-                <strong>Bước 2: Cơ bụng & Ngực</strong>
-                <p style={{ margin: '4px 0 0', fontSize: '13px', color: 'var(--text)' }}>Hít sâu gồng cơ bụng trong 5 giây, sau đó thở phào nhẹ nhõm và cảm nhận sự êm dịu lan tỏa.</p>
+              <div className="resources-guide-step">
+                <div className="resources-guide-step__icon" style={{ background: 'var(--color-secondary)' }}><CheckCircle size={18} /></div>
+                <div>
+                  <div className="resources-guide-step__title">Bước 2: Cơ bụng & Ngực</div>
+                  <p className="resources-guide-step__desc">Hít sâu gồng cơ bụng trong 5 giây, sau đó thở phào nhẹ nhõm và cảm nhận sự êm dịu lan tỏa khắp cơ thể.</p>
+                </div>
               </div>
-              <div style={{ padding: '12px', borderRadius: '8px', background: 'var(--code-bg)', border: '1px solid var(--border)' }}>
-                <strong>Bước 3: Cơ vai & Cổ</strong>
-                <p style={{ margin: '4px 0 0', fontSize: '13px', color: 'var(--text)' }}>Nhún hai vai lên sát tai, giữ căng trong 5 giây rồi buông thõng vai xuống.</p>
+              <div className="resources-guide-step">
+                <div className="resources-guide-step__icon" style={{ background: 'var(--color-secondary)' }}><CheckCircle size={18} /></div>
+                <div>
+                  <div className="resources-guide-step__title">Bước 3: Cơ vai & Cổ</div>
+                  <p className="resources-guide-step__desc">Nhún hai vai lên sát tai, giữ căng trong 5 giây rồi buông thõng hai vai xuống tự nhiên.</p>
+                </div>
               </div>
-              <div style={{ padding: '12px', borderRadius: '8px', background: 'var(--code-bg)', border: '1px solid var(--border)' }}>
-                <strong>Bước 4: Cơ mặt & Hàm</strong>
-                <p style={{ margin: '4px 0 0', fontSize: '13px', color: 'var(--text)' }}>Cắn chặt răng nhẹ và nhíu mày trong 5 giây, sau đó thả lỏng toàn bộ cơ mặt và mỉm cười nhẹ.</p>
+              <div className="resources-guide-step">
+                <div className="resources-guide-step__icon" style={{ background: 'var(--color-secondary)' }}><CheckCircle size={18} /></div>
+                <div>
+                  <div className="resources-guide-step__title">Bước 4: Cơ mặt & Hàm</div>
+                  <p className="resources-guide-step__desc">Cắn nhẹ hai hàm răng và nhíu mày trong 5 giây, sau đó thả lỏng toàn bộ cơ mặt và mỉm cười thư thái.</p>
+                </div>
               </div>
             </div>
           )}
         </div>
       </Modal>
 
-      {/* MODAL 4: VIDEO PLAYER */}
+      {/* ─── MODAL 4: VIDEO PLAYER ─── */}
       <Modal
         open={videoModalOpen}
         onCancel={handleCloseVideo}
@@ -788,15 +732,15 @@ export const ResourcesPage: React.FC = () => {
         destroyOnClose
       >
         <div style={{ textAlign: 'center', padding: '16px 8px 20px' }}>
-          <Title level={4} style={{ margin: '0 0 16px', color: 'var(--text-h)' }}>
+          <h3 style={{ margin: '0 0 16px', color: 'var(--text-primary)', fontFamily: 'var(--heading)', fontSize: '18px', fontWeight: 700 }}>
             {selectedVideo?.title}
-          </Title>
+          </h3>
           {selectedVideo && (
             <video
               src={selectedVideo.url}
               controls
               autoPlay
-              style={{ width: '100%', maxHeight: '450px', borderRadius: '12px', background: '#000' }}
+              style={{ width: '100%', maxHeight: '450px', borderRadius: '12px', background: '#000000' }}
             />
           )}
         </div>

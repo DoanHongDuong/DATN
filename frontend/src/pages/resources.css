@@ -1,0 +1,386 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   PSYTHALIA — RELAXATION & RESOURCES STYLES (WARM SANCTUARY REFINED)
+   WCAG 2.2 AA Compliant, Low Cognitive Load, Light & Dark Mode
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.resources-container {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 8px 0 48px;
+}
+
+/* ─── Header Banner ─── */
+.resources-header-banner {
+  background: linear-gradient(135deg, var(--tint-lavender) 0%, var(--tint-sage) 100%);
+  border-radius: 18px;
+  padding: 32px 28px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  transition: all 0.25s ease;
+}
+
+.resources-header-banner__left {
+  max-width: 720px;
+}
+
+.resources-header-banner__title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.resources-header-banner__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--color-primary);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(103, 80, 164, 0.2);
+}
+
+.resources-header-banner__title {
+  font-family: var(--heading);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.resources-header-banner__desc {
+  font-size: 14.5px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.resources-header-banner__btn {
+  height: 44px !important;
+  border-radius: 10px !important;
+  padding: 0 22px !important;
+  font-weight: 600 !important;
+  font-size: 14.5px !important;
+  background: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(103, 80, 164, 0.25) !important;
+  transition: all 0.2s ease !important;
+}
+
+.resources-header-banner__btn:hover {
+  background: var(--color-primary-hover) !important;
+  border-color: var(--color-primary-hover) !important;
+  transform: translateY(-1px);
+}
+
+/* ─── Activity Cards Grid ─── */
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 22px;
+}
+
+.resources-card {
+  border-radius: 16px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: 22px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.resources-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px rgba(45, 42, 50, 0.08);
+  border-color: var(--border-strong);
+}
+
+.resources-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.resources-card__type-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.resources-card__type-icon--breathing {
+  background: var(--tint-blue);
+  color: var(--color-info);
+}
+
+.resources-card__type-icon--audio {
+  background: var(--tint-sage);
+  color: var(--color-secondary);
+}
+
+.resources-card__type-icon--video {
+  background: var(--tint-lavender);
+  color: var(--color-primary);
+}
+
+.resources-card__type-icon--guide {
+  background: var(--tint-terracotta);
+  color: var(--color-warning);
+}
+
+.resources-card__tag {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  line-height: 1.4;
+}
+
+.resources-card__tag--breathing {
+  background: var(--tint-blue);
+  color: var(--color-info);
+  border: 1px solid rgba(66, 107, 138, 0.2);
+}
+
+.resources-card__tag--audio {
+  background: var(--tint-sage);
+  color: var(--color-secondary);
+  border: 1px solid rgba(63, 118, 103, 0.2);
+}
+
+.resources-card__tag--video {
+  background: var(--tint-lavender);
+  color: var(--color-primary);
+  border: 1px solid rgba(103, 80, 164, 0.2);
+}
+
+.resources-card__tag--guide {
+  background: var(--tint-terracotta);
+  color: var(--color-warning);
+  border: 1px solid rgba(161, 79, 64, 0.2);
+}
+
+.resources-card__title {
+  font-family: var(--heading);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+  line-height: 1.35;
+}
+
+.resources-card__duration {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.resources-card__action-btn {
+  height: 40px !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 13.5px !important;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease !important;
+}
+
+/* ─── Interactive Breathing Bubble Modal ─── */
+.resources-breathing-container {
+  text-align: center;
+  padding: 12px 8px 20px;
+}
+
+.resources-breathing-phase-title {
+  font-family: var(--heading);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 8px 0 4px;
+}
+
+.resources-breathing-phase-desc {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.resources-breathing-bubble-wrapper {
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 24px 0;
+}
+
+.resources-breathing-bubble {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  transition: transform 3.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 1s ease, box-shadow 1s ease;
+  user-select: none;
+}
+
+.resources-breathing-countdown {
+  font-family: var(--heading);
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.resources-breathing-phase-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-top: 4px;
+  opacity: 0.95;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .resources-breathing-bubble {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* ─── Audio Player Modal ─── */
+.resources-audio-container {
+  text-align: center;
+  padding: 12px 8px 20px;
+}
+
+.resources-audio-icon-box {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--tint-sage);
+  color: var(--color-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.resources-audio-synth-box {
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-subtle);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ─── Step-by-Step Guide Modal (Grounding 5-4-3-2-1 / PMR) ─── */
+.resources-guide-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.resources-guide-step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-subtle);
+  transition: all 0.2s ease;
+}
+
+.resources-guide-step:hover {
+  background: var(--bg-surface);
+  border-color: var(--border-strong);
+}
+
+.resources-guide-step__icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #FFFFFF;
+}
+
+.resources-guide-step__title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-primary);
+  margin-bottom: 3px;
+}
+
+.resources-guide-step__desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ─── Dark Mode Overrides ─── */
+@media (prefers-color-scheme: dark) {
+  .resources-header-banner {
+    background: linear-gradient(135deg, rgba(191, 168, 242, 0.12) 0%, rgba(126, 186, 168, 0.12) 100%);
+    border-color: #2F2E38;
+  }
+
+  .resources-card {
+    background: var(--bg-surface);
+    border-color: #2F2E38;
+  }
+
+  .resources-card:hover {
+    border-color: #454352;
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.4);
+  }
+
+  .resources-guide-step,
+  .resources-audio-synth-box {
+    background: #1A1A20;
+    border-color: #2F2E38;
+  }
+
+  .resources-guide-step:hover {
+    background: #222228;
+    border-color: #454352;
+  }
+}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Tag, Button, Tabs, Space, Typography, Row, Col } from 'antd';
+import { Card, Tag, Button, Tabs, Space, Row, Col } from 'antd';
 import {
   PhoneCall,
   Hospital,
@@ -11,8 +11,6 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { getEmergencyHotline } from '../../utils/hotline';
-
-const { Title, Paragraph, Text } = Typography;
 
 export const HelpDirectory: React.FC = () => {
   const [region, setRegion] = useState<string>('north');
@@ -167,37 +165,52 @@ export const HelpDirectory: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-      {/* Crisis Warning Banner */}
+      {/* ─── Crisis Warning Banner ─── */}
       <div
         style={{
-          borderRadius: '12px',
-          border: '1px solid rgba(239, 68, 68, 0.35)',
-          background: 'rgba(239, 68, 68, 0.08)',
-          padding: '18px 22px',
+          borderRadius: '16px',
+          border: '1px solid rgba(166, 50, 40, 0.3)',
+          background: 'var(--tint-crimson)',
+          padding: '20px 24px',
           display: 'flex',
           alignItems: 'flex-start',
-          gap: '14px',
+          gap: '16px',
         }}
       >
-        <ShieldAlert size={26} color="#ef4444" style={{ flexShrink: 0, marginTop: '2px' }} />
+        <div
+          style={{
+            width: '42px',
+            height: '42px',
+            borderRadius: '12px',
+            background: 'rgba(166, 50, 40, 0.15)',
+            color: 'var(--color-crisis)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            marginTop: '2px',
+          }}
+        >
+          <ShieldAlert size={24} />
+        </div>
         <div>
-          <div style={{ fontWeight: 700, fontSize: '16px', color: '#ef4444', marginBottom: '6px' }}>
+          <div style={{ fontWeight: 700, fontSize: '16px', color: 'var(--color-crisis)', marginBottom: '6px' }}>
             Thông báo Khẩn cấp & Chỉ dẫn Sơ cứu Tâm lý 24/7
           </div>
-          <div style={{ fontSize: '14px', lineHeight: 1.6, color: 'var(--text-h)' }}>
+          <div style={{ fontSize: '14px', lineHeight: 1.6, color: 'var(--text-primary)' }}>
             Nếu bạn hoặc người thân đang trong trạng thái khủng hoảng tâm lý nghiêm trọng, có ý nghĩ tự hại hoặc gặp nguy hiểm tính mạng, xin vui lòng gọi ngay đến đường dây nóng khẩn cấp:{' '}
             <a
               href={`tel:${emergencyHotline.replace(/\s+/g, '')}`}
-              style={{ fontWeight: 700, color: '#ef4444', textDecoration: 'underline' }}
+              style={{ fontWeight: 800, color: 'var(--color-crisis)', textDecoration: 'underline' }}
             >
               {emergencyHotline}
             </a>{' '}
-            hoặc đến phòng cấp cứu y tế gần nhất. Bạn không phải đơn độc vượt qua điều này!
+            hoặc đến phòng cấp cứu y tế gần nhất. Bạn không đơn độc, luôn có người sẵn sàng đồng hành cùng bạn!
           </div>
         </div>
       </div>
 
-      {/* Section 1: Helplines */}
+      {/* ─── Section 1: Helplines ─── */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
           <div
@@ -205,66 +218,68 @@ export const HelpDirectory: React.FC = () => {
               width: '36px',
               height: '36px',
               borderRadius: '10px',
-              background: 'rgba(239, 68, 68, 0.12)',
-              color: '#ef4444',
+              background: 'var(--tint-crimson)',
+              color: 'var(--color-crisis)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <PhoneCall size={20} />
+            <PhoneCall size={18} />
           </div>
-          <Title level={3} style={{ margin: 0, fontSize: '20px', color: 'var(--text-h)' }}>
+          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--heading)' }}>
             Đường dây nóng Cứu trợ & Tư vấn Tâm lý Toàn quốc
-          </Title>
+          </h2>
         </div>
-        <Paragraph style={{ color: 'var(--text)', fontSize: '14px', marginBottom: '20px' }}>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '20px', lineHeight: 1.5 }}>
           Các tổng đài chuyên trách lắng nghe, sơ cứu tâm lý và can thiệp khủng hoảng miễn phí hoạt động trên toàn quốc.
-        </Paragraph>
+        </p>
 
-        <Row gutter={[16, 16]}>
+        <Row gutter={[18, 18]}>
           {helplines.map((item) => (
             <Col xs={24} sm={12} lg={8} key={item.id}>
-              <Card
-                hoverable
+              <div
                 style={{
                   height: '100%',
-                  borderRadius: '12px',
-                  border: '1px solid var(--border)',
-                  background: 'var(--bg)',
+                  borderRadius: '16px',
+                  border: '1px solid var(--border-subtle)',
+                  background: 'var(--bg-surface)',
+                  padding: '22px',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
+                  boxShadow: 'var(--shadow-sm)',
+                  transition: 'all 0.2s ease',
                 }}
-                bodyStyle={{ padding: '20px', display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between' }}
               >
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
-                    <Tag color={item.color} style={{ fontWeight: 600, padding: '2px 8px', borderRadius: '6px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                    <Tag color={item.color} style={{ fontWeight: 600, padding: '3px 10px', borderRadius: '8px' }}>
                       {item.type}
                     </Tag>
                   </div>
-                  <h4 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 600, color: 'var(--text-h)' }}>
+                  <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--heading)', lineHeight: 1.35 }}>
                     {item.name}
-                  </h4>
+                  </h3>
                   <div
                     style={{
                       fontSize: '22px',
                       fontWeight: 800,
-                      color: 'var(--accent, #6366f1)',
+                      color: item.id === 'psythalia' ? 'var(--color-crisis)' : 'var(--color-primary)',
                       marginBottom: '10px',
                       letterSpacing: '0.5px',
+                      fontFamily: 'var(--heading)',
                     }}
                   >
                     {item.phone}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--text)', opacity: 0.8, marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '10px' }}>
                     <Clock size={14} />
                     <span>{item.hours}</span>
                   </div>
-                  <Paragraph style={{ fontSize: '13px', color: 'var(--text)', marginBottom: '16px', lineHeight: 1.5 }}>
+                  <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '18px', lineHeight: 1.55 }}>
                     {item.desc}
-                  </Paragraph>
+                  </p>
                 </div>
 
                 <Button
@@ -275,20 +290,20 @@ export const HelpDirectory: React.FC = () => {
                   style={{
                     borderRadius: '8px',
                     fontWeight: 600,
-                    height: '40px',
-                    background: item.id === 'psythalia' ? '#ef4444' : undefined,
-                    borderColor: item.id === 'psythalia' ? '#ef4444' : undefined,
+                    height: '42px',
+                    background: item.id === 'psythalia' ? 'var(--color-crisis)' : 'var(--color-primary)',
+                    borderColor: item.id === 'psythalia' ? 'var(--color-crisis)' : 'var(--color-primary)',
                   }}
                 >
                   Gọi điện thoại ngay
                 </Button>
-              </Card>
+              </div>
             </Col>
           ))}
         </Row>
       </div>
 
-      {/* Section 2: Specialized Hospitals */}
+      {/* ─── Section 2: Specialized Hospitals ─── */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
           <div
@@ -296,22 +311,22 @@ export const HelpDirectory: React.FC = () => {
               width: '36px',
               height: '36px',
               borderRadius: '10px',
-              background: 'rgba(59, 130, 246, 0.12)',
-              color: '#3b82f6',
+              background: 'var(--tint-blue)',
+              color: 'var(--color-info)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Hospital size={20} />
+            <Hospital size={18} />
           </div>
-          <Title level={3} style={{ margin: 0, fontSize: '20px', color: 'var(--text-h)' }}>
+          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--heading)' }}>
             Cơ sở Y tế & Bệnh viện Chuyên khoa Sức khỏe Tâm thần
-          </Title>
+          </h2>
         </div>
-        <Paragraph style={{ color: 'var(--text)', fontSize: '14px', marginBottom: '16px' }}>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '16px', lineHeight: 1.5 }}>
           Danh sách các bệnh viện và viện chuyên khoa uy tín tuyến Trung ương và khu vực, có đầy đủ khoa khám tâm thần, tâm lý lâm sàng và tiếp nhận cấp cứu 24/7.
-        </Paragraph>
+        </p>
 
         {/* Region Tabs */}
         <Tabs
@@ -319,51 +334,51 @@ export const HelpDirectory: React.FC = () => {
           onChange={setRegion}
           style={{ marginBottom: '16px' }}
           items={[
-            { key: 'north', label: '🏛️ Khu vực Miền Bắc (Hà Nội)' },
-            { key: 'south', label: '🏙️ Khu vực Miền Nam (TP. Hồ Chí Minh)' },
-            { key: 'central', label: '🌊 Khu vực Miền Trung (Đà Nẵng & Huế)' },
+            { key: 'north', label: 'Khu vực Miền Bắc (Hà Nội)' },
+            { key: 'south', label: 'Khu vực Miền Nam (TP. Hồ Chí Minh)' },
+            { key: 'central', label: 'Khu vực Miền Trung (Đà Nẵng & Huế)' },
           ]}
         />
 
-        <Row gutter={[16, 16]}>
+        <Row gutter={[18, 18]}>
           {(hospitals[region] || []).map((hosp, idx) => (
             <Col xs={24} md={12} lg={8} key={idx}>
-              <Card
-                hoverable
+              <div
                 style={{
                   height: '100%',
-                  borderRadius: '12px',
-                  border: '1px solid var(--border)',
-                  background: 'var(--bg)',
+                  borderRadius: '16px',
+                  border: '1px solid var(--border-subtle)',
+                  background: 'var(--bg-surface)',
+                  padding: '22px',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
+                  boxShadow: 'var(--shadow-sm)',
                 }}
-                bodyStyle={{ padding: '20px', display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between' }}
               >
                 <div>
-                  <div style={{ marginBottom: '6px' }}>
-                    <Tag color="blue" style={{ fontSize: '11px', borderRadius: '4px' }}>
+                  <div style={{ marginBottom: '8px' }}>
+                    <Tag color="blue" style={{ fontSize: '11px', borderRadius: '6px', fontWeight: 600 }}>
                       {hosp.subName}
                     </Tag>
                   </div>
-                  <h4 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: 600, color: 'var(--text-h)' }}>
+                  <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--heading)', lineHeight: 1.35 }}>
                     {hosp.name}
-                  </h4>
+                  </h3>
 
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '13px', color: 'var(--text)', marginBottom: '8px' }}>
-                    <MapPin size={16} style={{ flexShrink: 0, marginTop: '2px', color: '#ef4444' }} />
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+                    <MapPin size={16} style={{ flexShrink: 0, marginTop: '2px', color: 'var(--color-crisis)' }} />
                     <span>{hosp.address}</span>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text)', marginBottom: '12px' }}>
-                    <PhoneCall size={15} style={{ flexShrink: 0, color: '#10b981' }} />
-                    <span style={{ fontWeight: 600 }}>{hosp.phone}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13.5px', color: 'var(--text-primary)', marginBottom: '12px' }}>
+                    <PhoneCall size={15} style={{ flexShrink: 0, color: 'var(--color-success)' }} />
+                    <span style={{ fontWeight: 700 }}>{hosp.phone}</span>
                   </div>
 
-                  <Paragraph style={{ fontSize: '13px', color: 'var(--text)', opacity: 0.9, lineHeight: 1.5, marginBottom: '16px' }}>
+                  <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.55, marginBottom: '16px' }}>
                     {hosp.highlight}
-                  </Paragraph>
+                  </p>
                 </div>
 
                 <Space style={{ width: '100%' }}>
@@ -375,7 +390,7 @@ export const HelpDirectory: React.FC = () => {
                     rel="noopener noreferrer"
                     style={{ borderRadius: '8px', fontSize: '13px' }}
                   >
-                    Xem bản đồ chỉ đường
+                    Bản đồ chỉ đường
                   </Button>
                   <Button
                     type="primary"
@@ -386,39 +401,40 @@ export const HelpDirectory: React.FC = () => {
                     Gọi tiếp nhận
                   </Button>
                 </Space>
-              </Card>
+              </div>
             </Col>
           ))}
         </Row>
       </div>
 
-      {/* Section 3: Red Flags / When to seek professional care */}
+      {/* ─── Section 3: Red Flags / When to seek professional care ─── */}
       <Card
         style={{
-          borderRadius: '14px',
-          border: '1px solid var(--border)',
-          background: 'var(--bg-secondary, rgba(99, 102, 241, 0.04))',
+          borderRadius: '16px',
+          border: '1px solid var(--border-subtle)',
+          background: 'var(--bg-surface)',
+          boxShadow: 'var(--shadow-sm)',
         }}
-        bodyStyle={{ padding: '24px' }}
+        bodyStyle={{ padding: '26px' }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
-          <AlertTriangle size={22} style={{ color: '#f59e0b' }} />
-          <Title level={4} style={{ margin: 0, fontSize: '18px', color: 'var(--text-h)' }}>
+          <AlertTriangle size={22} style={{ color: 'var(--color-warning)' }} />
+          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--heading)' }}>
             Cẩm nang Nhận diện: Khi nào bạn cần tìm kiếm sự hỗ trợ chuyên môn y khoa?
-          </Title>
+          </h2>
         </div>
-        <Paragraph style={{ color: 'var(--text)', fontSize: '14px', marginBottom: '18px' }}>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '20px', lineHeight: 1.6 }}>
           Sơ cứu tâm lý (PFA) và các bài tập tự điều hòa cảm xúc có ý nghĩa hỗ trợ xoa dịu ban đầu. Tuy nhiên, nếu bạn nhận thấy một trong các dấu hiệu báo động đỏ dưới đây, việc thăm khám bác sĩ chuyên khoa hoặc chuyên gia tâm lý lâm sàng là bước đi cần thiết và dũng cảm:
-        </Paragraph>
+        </p>
 
         <Row gutter={[16, 16]}>
           {redFlags.map((flag, idx) => (
             <Col xs={24} md={12} key={idx}>
               <div
                 style={{
-                  background: 'var(--bg)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '10px',
+                  background: 'var(--bg-canvas)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '12px',
                   padding: '16px',
                   height: '100%',
                 }}
@@ -429,8 +445,8 @@ export const HelpDirectory: React.FC = () => {
                       width: '24px',
                       height: '24px',
                       borderRadius: '50%',
-                      background: 'rgba(245, 158, 11, 0.18)',
-                      color: '#f59e0b',
+                      background: 'var(--tint-terracotta)',
+                      color: 'var(--color-warning)',
                       fontWeight: 700,
                       fontSize: '12px',
                       display: 'flex',
@@ -440,23 +456,34 @@ export const HelpDirectory: React.FC = () => {
                   >
                     {idx + 1}
                   </span>
-                  <Text strong style={{ fontSize: '14px', color: 'var(--text-h)' }}>
+                  <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>
                     {flag.title}
-                  </Text>
+                  </span>
                 </div>
-                <Paragraph style={{ margin: 0, fontSize: '13px', color: 'var(--text)', paddingLeft: '32px', lineHeight: 1.5 }}>
+                <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', paddingLeft: '32px', lineHeight: 1.55 }}>
                   {flag.desc}
-                </Paragraph>
+                </p>
               </div>
             </Col>
           ))}
         </Row>
 
-        <div style={{ marginTop: '20px', padding: '14px 18px', background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <HeartHandshake size={24} style={{ color: '#10b981', flexShrink: 0 }} />
-          <Text style={{ fontSize: '13px', color: 'var(--text)' }}>
+        <div
+          style={{
+            marginTop: '22px',
+            padding: '16px 20px',
+            background: 'var(--tint-sage)',
+            border: '1px solid rgba(58, 117, 88, 0.25)',
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+          }}
+        >
+          <HeartHandshake size={24} style={{ color: 'var(--color-success)', flexShrink: 0 }} />
+          <div style={{ fontSize: '13.5px', color: 'var(--text-primary)', lineHeight: 1.55 }}>
             <strong>Thông điệp từ PSYTHALIA:</strong> Sức khỏe tinh thần cũng giống như sức khỏe thể chất — khi bị ốm, tìm kiếm bác sĩ là việc hoàn toàn tự nhiên và đúng đắn. Hãy cho bản thân cơ hội được giúp đỡ chuyên nghiệp để phục hồi trọn vẹn nhất.
-          </Text>
+          </div>
         </div>
       </Card>
     </div>
