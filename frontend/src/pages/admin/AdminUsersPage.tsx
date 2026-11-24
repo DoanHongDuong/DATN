@@ -1,10 +1,24 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Table, Button, Tag, Space, Popconfirm, Input, message, Card, Typography, Tabs } from 'antd';
-import { Lock, Unlock, Search, RefreshCw, Users, User, UserCheck, Shield } from 'lucide-react';
+import {
+  Lock,
+  Unlock,
+  Search,
+  RefreshCw,
+  Users,
+  User,
+  UserCheck,
+  Shield,
+  CheckCircle2,
+  Ban,
+  Clock,
+  AlertCircle,
+} from 'lucide-react';
 import { adminApi, type AdminUser } from '../../api/admin.api';
 import { useAuth } from '../../hooks/useAuth';
 import { AdminHeaderNav } from './AdminHeaderNav';
 import axios, { AxiosError } from 'axios';
+import './admin.css';
 
 const { Text } = Typography;
 
@@ -12,6 +26,7 @@ export const AdminUsersPage: React.FC = () => {
   const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const [total, setTotal] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -22,6 +37,7 @@ export const AdminUsersPage: React.FC = () => {
   const fetchUsers = useCallback(async (p: number, limit: number, search?: string, role?: string) => {
     try {
       setLoading(true);
+      setError(null);
       const data = await adminApi.getUsers({
         page: p,
         limit,
@@ -37,6 +53,7 @@ export const AdminUsersPage: React.FC = () => {
         const axiosErr = err as AxiosError<{ message?: string }>;
         msg = axiosErr.response?.data?.message || msg;
       }
+      setError(msg);
       message.error(msg);
     } finally {
       setLoading(false);
@@ -48,6 +65,7 @@ export const AdminUsersPage: React.FC = () => {
     const load = async () => {
       try {
         setLoading(true);
+        setError(null);
         const data = await adminApi.getUsers({
           page,
           limit: pageSize,
@@ -59,7 +77,10 @@ export const AdminUsersPage: React.FC = () => {
           setTotal(data.total);
         }
       } catch (err: unknown) {
-        console.error('Failed to load users:', err);
+        if (isMounted) {
+          console.error('Failed to load users:', err);
+          setError('Không thể tải danh sách tài khoản. Vui lòng thử lại.');
+        }
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -102,18 +123,18 @@ export const AdminUsersPage: React.FC = () => {
 
   const columns = [
     {
-      title: 'Họ và tên',
+      title: 'Tên hiển thị',
       key: 'fullName',
-      width: 180,
+      width: 190,
       render: (_: unknown, record: AdminUser) => (
         <div>
-          <div style={{ fontWeight: 600, color: 'var(--text-h)' }}>
+          <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
             {record.fullName}
             {record.id === currentUser?.id && (
               <Tag color="cyan" style={{ marginLeft: 6 }}>Tôi</Tag>
             )}
           </div>
-          <div style={{ fontSize: '12px', color: 'var(--text)' }}>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
             {record.phone || 'Chưa có SĐT'}
           </div>
         </div>
@@ -135,31 +156,63 @@ export const AdminUsersPage: React.FC = () => {
       title: 'Vai trò',
       dataIndex: 'role',
       key: 'role',
-      width: 140,
+      width: 160,
       render: (role: string) => {
-        if (role === 'ADMIN') return <Tag color="purple">Quản trị viên</Tag>;
-        if (role === 'VOLUNTEER') return <Tag color="green">Tình nguyện viên</Tag>;
-        return <Tag color="blue">Người dùng</Tag>;
+        if (role === 'ADMIN') {
+          return (
+            <Tag color="purple" className="admin-status-tag">
+              <Shield size={12} aria-hidden="true" /> Quản trị viên
+            </Tag>
+          );
+        }
+        if (role === 'VOLUNTEER') {
+          return (
+            <Tag color="green" className="admin-status-tag">
+              <UserCheck size={12} aria-hidden="true" /> Tình nguyện viên
+            </Tag>
+          );
+        }
+        return (
+          <Tag color="blue" className="admin-status-tag">
+            <User size={12} aria-hidden="true" /> Người dùng
+          </Tag>
+        );
       },
     },
     {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
-      width: 140,
+      width: 150,
       render: (status: string) => {
-        if (status === 'ACTIVE') return <Tag color="success">Hoạt động</Tag>;
-        if (status === 'SUSPENDED') return <Tag color="error">Đã khoá</Tag>;
-        return <Tag color="default">Chưa kích hoạt</Tag>;
+        if (status === 'ACTIVE') {
+          return (
+            <Tag color="success" className="admin-status-tag">
+              <CheckCircle2 size={12} aria-hidden="true" /> Hoạt động
+            </Tag>
+          );
+        }
+        if (status === 'SUSPENDED') {
+          return (
+            <Tag color="error" className="admin-status-tag">
+              <Ban size={12} aria-hidden="true" /> Đã khoá
+            </Tag>
+          );
+        }
+        return (
+          <Tag color="default" className="admin-status-tag">
+            <Clock size={12} aria-hidden="true" /> Chưa kích hoạt
+          </Tag>
+        );
       },
     },
     {
       title: 'Ngày tạo',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      width: 140,
+      width: 130,
       render: (dateStr: string) => (
-        <span style={{ fontSize: '13px', color: 'var(--text)' }}>
+        <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
           {new Date(dateStr).toLocaleDateString('vi-VN')}
         </span>
       ),
@@ -167,7 +220,7 @@ export const AdminUsersPage: React.FC = () => {
     {
       title: 'Hành động',
       key: 'action',
-      width: 130,
+      width: 140,
       fixed: 'right' as const,
       render: (_: unknown, record: AdminUser) => {
         const isSelf = record.id === currentUser?.id;
@@ -258,39 +311,47 @@ export const AdminUsersPage: React.FC = () => {
   ];
 
   return (
-    <div>
+    <div className="admin-page-container">
       <AdminHeaderNav />
 
+      {error && (
+        <div className="admin-error-box" role="alert">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <AlertCircle size={18} color="var(--color-crisis)" />
+            <span style={{ fontSize: '14px', fontWeight: 500 }}>{error}</span>
+          </div>
+          <Button size="small" onClick={() => fetchUsers(page, pageSize, searchTerm, roleFilter)} loading={loading}>
+            Thử lại
+          </Button>
+        </div>
+      )}
+
       <Card
-        style={{
-          borderRadius: '12px',
-          border: '1px solid var(--border)',
-          background: 'var(--bg)',
-          overflow: 'hidden',
-        }}
+        className="admin-card"
         title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Users size={18} color="var(--accent)" />
+          <div className="admin-section-title" style={{ fontSize: '16px' }}>
+            <Users size={18} color="var(--color-primary)" aria-hidden="true" />
             <span>
               {roleFilter === 'USER'
                 ? 'Danh sách Người dùng'
                 : roleFilter === 'VOLUNTEER'
-                ? 'Danh sách Tình nguyện viên'
-                : roleFilter === 'ADMIN'
-                ? 'Danh sách Quản trị viên'
-                : 'Danh sách tất cả tài khoản'}{' '}
+                  ? 'Danh sách Tình nguyện viên'
+                  : roleFilter === 'ADMIN'
+                    ? 'Danh sách Quản trị viên'
+                    : 'Danh sách tất cả tài khoản'}{' '}
               ({total})
             </span>
           </div>
         }
         extra={
-          <Space>
+          <div className="admin-toolbar-group">
             <Input.Search
-              placeholder="Tìm theo họ tên hoặc email..."
+              className="admin-toolbar-input"
+              placeholder="Tìm theo tên hoặc email..."
               allowClear
               onSearch={handleSearch}
               enterButton={<Search size={16} />}
-              style={{ width: 280 }}
+              style={{ width: 260 }}
             />
             <Button
               icon={<RefreshCw size={14} />}
@@ -299,7 +360,7 @@ export const AdminUsersPage: React.FC = () => {
             >
               Làm mới
             </Button>
-          </Space>
+          </div>
         }
       >
         <Tabs
@@ -309,7 +370,7 @@ export const AdminUsersPage: React.FC = () => {
             setPage(1);
           }}
           items={roleTabItems}
-          style={{ marginBottom: '16px' }}
+          style={{ marginBottom: '12px' }}
         />
 
         <Table
@@ -317,9 +378,9 @@ export const AdminUsersPage: React.FC = () => {
           columns={columns}
           rowKey="id"
           loading={loading}
-          scroll={{ x: 950 }}
+          scroll={{ x: 960 }}
           locale={{
-            emptyText: 'Không tìm thấy người dùng nào phù hợp.',
+            emptyText: 'Không tìm thấy tài khoản nào phù hợp.',
           }}
           pagination={{
             current: page,
@@ -327,6 +388,7 @@ export const AdminUsersPage: React.FC = () => {
             total,
             showSizeChanger: true,
             pageSizeOptions: ['10', '20', '50'],
+            showTotal: (tot) => `Tổng cộng ${tot} tài khoản`,
             onChange: (p, ps) => {
               setPage(p);
               setPageSize(ps);

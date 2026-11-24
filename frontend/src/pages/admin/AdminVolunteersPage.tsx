@@ -1,15 +1,17 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Table, Button, Space, Popconfirm, message, Card, Typography, Modal, Input, Alert, Tag } from 'antd';
-import { ExternalLink, Check, X, RefreshCw, UserCheck } from 'lucide-react';
+import { ExternalLink, Check, X, RefreshCw, UserCheck, Clock, AlertCircle } from 'lucide-react';
 import { adminApi, type PendingVolunteer } from '../../api/admin.api';
 import { AdminHeaderNav } from './AdminHeaderNav';
 import axios, { AxiosError } from 'axios';
+import './admin.css';
 
 const { Text } = Typography;
 
 export const AdminVolunteersPage: React.FC = () => {
   const [volunteers, setVolunteers] = useState<PendingVolunteer[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const [actionId, setActionId] = useState<string | null>(null);
 
   // State cho Modal từ chối hồ sơ
@@ -20,6 +22,8 @@ export const AdminVolunteersPage: React.FC = () => {
 
   const fetchPendingVolunteers = useCallback(async () => {
     try {
+      setLoading(true);
+      setError(null);
       const data = await adminApi.getPendingVolunteers();
       setVolunteers(data);
     } catch (err: unknown) {
@@ -29,6 +33,7 @@ export const AdminVolunteersPage: React.FC = () => {
         const axiosErr = err as AxiosError<{ message?: string }>;
         msg = axiosErr.response?.data?.message || msg;
       }
+      setError(msg);
       message.error(msg);
     } finally {
       setLoading(false);
@@ -39,12 +44,16 @@ export const AdminVolunteersPage: React.FC = () => {
     let isMounted = true;
     const load = async () => {
       try {
+        setError(null);
         const data = await adminApi.getPendingVolunteers();
         if (isMounted) {
           setVolunteers(data);
         }
       } catch (err: unknown) {
-        console.error('Failed to load pending volunteers:', err);
+        if (isMounted) {
+          console.error('Failed to load pending volunteers:', err);
+          setError('Không thể tải danh sách hồ sơ tình nguyện viên. Vui lòng thử lại.');
+        }
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -105,13 +114,15 @@ export const AdminVolunteersPage: React.FC = () => {
 
   const columns = [
     {
-      title: 'Họ và tên',
+      title: 'Ứng viên',
       key: 'fullName',
-      width: 170,
+      width: 180,
       render: (_: unknown, record: PendingVolunteer) => (
         <div>
-          <div style={{ fontWeight: 600, color: 'var(--text-h)' }}>{record.user?.fullName}</div>
-          <div style={{ fontSize: '12px', color: 'var(--text)' }}>ID: {record.id.slice(0, 8)}...</div>
+          <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{record.user?.fullName}</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'var(--mono)' }}>
+            ID: {record.id.slice(0, 8)}...
+          </div>
         </div>
       ),
     },
@@ -127,13 +138,23 @@ export const AdminVolunteersPage: React.FC = () => {
       ),
     },
     {
+      title: 'Trạng thái',
+      key: 'status',
+      width: 130,
+      render: () => (
+        <Tag color="warning" className="admin-status-tag">
+          <Clock size={12} aria-hidden="true" /> Chờ duyệt
+        </Tag>
+      ),
+    },
+    {
       title: 'Chuyên môn',
       dataIndex: 'specialization',
       key: 'specialization',
       width: 180,
       ellipsis: true,
       render: (spec: string | null) => (
-        <span style={{ fontWeight: 500 }} title={spec || ''}>
+        <span style={{ fontWeight: 500, color: 'var(--text-primary)' }} title={spec || ''}>
           {spec || 'Chưa cập nhật'}
         </span>
       ),
@@ -145,7 +166,7 @@ export const AdminVolunteersPage: React.FC = () => {
       width: 220,
       ellipsis: true,
       render: (bio: string | null) => (
-        <span title={bio || ''} style={{ fontSize: '13px' }}>
+        <span title={bio || ''} style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
           {bio || 'Không có mô tả'}
         </span>
       ),
@@ -157,7 +178,7 @@ export const AdminVolunteersPage: React.FC = () => {
       width: 160,
       render: (url: string | null) => {
         if (!url) {
-          return <span style={{ color: 'var(--text)', fontSize: '12px' }}>Không có</span>;
+          return <span style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>Không có</span>;
         }
         return (
           <a
@@ -168,13 +189,13 @@ export const AdminVolunteersPage: React.FC = () => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '4px',
-              color: 'var(--accent)',
-              fontWeight: 500,
+              color: 'var(--color-primary)',
+              fontWeight: 600,
               fontSize: '13px',
             }}
           >
             <span>Xem chứng chỉ</span>
-            <ExternalLink size={14} />
+            <ExternalLink size={14} aria-hidden="true" />
           </a>
         );
       },
@@ -185,7 +206,7 @@ export const AdminVolunteersPage: React.FC = () => {
       key: 'createdAt',
       width: 160,
       render: (dateStr: string) => (
-        <span style={{ fontSize: '13px', color: 'var(--text)' }}>
+        <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
           {new Date(dateStr).toLocaleString('vi-VN')}
         </span>
       ),
@@ -212,7 +233,7 @@ export const AdminVolunteersPage: React.FC = () => {
                 size="small"
                 icon={<Check size={14} />}
                 loading={isBusy}
-                style={{ background: '#10b981', borderColor: '#10b981' }}
+                style={{ background: 'var(--color-success)', borderColor: 'var(--color-success)' }}
               >
                 Duyệt
               </Button>
@@ -234,20 +255,27 @@ export const AdminVolunteersPage: React.FC = () => {
   ];
 
   return (
-    <div>
+    <div className="admin-page-container">
       <AdminHeaderNav />
 
+      {error && (
+        <div className="admin-error-box" role="alert">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <AlertCircle size={18} color="var(--color-crisis)" />
+            <span style={{ fontSize: '14px', fontWeight: 500 }}>{error}</span>
+          </div>
+          <Button size="small" onClick={fetchPendingVolunteers} loading={loading}>
+            Thử lại
+          </Button>
+        </div>
+      )}
+
       <Card
-        style={{
-          borderRadius: '12px',
-          border: '1px solid var(--border)',
-          background: 'var(--bg)',
-          overflow: 'hidden',
-        }}
+        className="admin-card"
         title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <UserCheck size={18} color="var(--accent)" />
-            <span>Danh sách Hồ sơ đang chờ phê duyệt ({volunteers.length})</span>
+          <div className="admin-section-title" style={{ fontSize: '16px' }}>
+            <UserCheck size={18} color="var(--color-primary)" aria-hidden="true" />
+            <span>Hồ sơ đang chờ phê duyệt ({volunteers.length})</span>
           </div>
         }
         extra={
@@ -265,18 +293,18 @@ export const AdminVolunteersPage: React.FC = () => {
           columns={columns}
           rowKey="id"
           loading={loading}
-          scroll={{ x: 1050 }}
+          scroll={{ x: 1120 }}
           locale={{
             emptyText: 'Hiện không có hồ sơ tình nguyện viên nào đang chờ duyệt.',
           }}
-          pagination={{ pageSize: 10 }}
+          pagination={{ pageSize: 10, showTotal: (tot) => `Tổng cộng ${tot} hồ sơ` }}
         />
       </Card>
 
       {/* Modal từ chối hồ sơ TNV kèm nhập lý do */}
       <Modal
         title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ef4444' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-crisis)' }}>
             <X size={20} />
             <span>Từ chối hồ sơ Tình nguyện viên</span>
           </div>
@@ -316,10 +344,14 @@ export const AdminVolunteersPage: React.FC = () => {
           />
 
           <div>
-            <label style={{ display: 'block', fontWeight: 600, fontSize: '13px', marginBottom: '6px', color: 'var(--text-h)' }}>
+            <label
+              htmlFor="reject-reason-input"
+              style={{ display: 'block', fontWeight: 600, fontSize: '13px', marginBottom: '6px', color: 'var(--text-primary)' }}
+            >
               Lý do từ chối (Gửi tới ứng viên):
             </label>
             <Input.TextArea
+              id="reject-reason-input"
               rows={4}
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
@@ -331,7 +363,7 @@ export const AdminVolunteersPage: React.FC = () => {
           </div>
 
           <div>
-            <div style={{ fontSize: '12px', color: 'var(--text)', marginBottom: '6px' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '6px' }}>
               Gợi ý lý do nhanh:
             </div>
             <Space wrap size={[6, 6]}>
@@ -341,13 +373,14 @@ export const AdminVolunteersPage: React.FC = () => {
                 'Ảnh chụp chứng chỉ bị mờ, không xác minh được danh tính.',
                 'Chưa đáp ứng tiêu chuẩn xét duyệt tình nguyện viên đợt này.',
               ].map((reason) => (
-                <Tag
+                <button
                   key={reason}
-                  style={{ cursor: 'pointer', padding: '4px 8px', fontSize: '12px' }}
+                  type="button"
+                  className="admin-reason-chip"
                   onClick={() => setRejectReason(reason)}
                 >
                   + {reason}
-                </Tag>
+                </button>
               ))}
             </Space>
           </div>

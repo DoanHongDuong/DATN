@@ -26,6 +26,7 @@ import {
   Wind,
   FileText,
   RefreshCw,
+  AlertCircle,
 } from 'lucide-react';
 import {
   adminApi,
@@ -35,6 +36,7 @@ import {
 } from '../../api/admin.api';
 import { AdminHeaderNav } from './AdminHeaderNav';
 import axios, { AxiosError } from 'axios';
+import './admin.css';
 
 const { Text } = Typography;
 
@@ -57,6 +59,7 @@ const TYPE_MAP: Record<string, { label: string; icon: React.FC<{ size?: number }
 export const AdminResourcesPage: React.FC = () => {
   const [resources, setResources] = useState<AdminRelaxationResource[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
 
@@ -68,8 +71,10 @@ export const AdminResourcesPage: React.FC = () => {
 
   const fetchResources = useCallback(async (cat?: string) => {
     setLoading(true);
+    setError(null);
     try {
-      const data = await adminApi.getResources(cat);
+      const normalizedCat = cat === 'all' ? undefined : cat;
+      const data = await adminApi.getResources(normalizedCat);
       setResources(data);
     } catch (err: unknown) {
       let msg = 'Không thể tải danh sách tài nguyên thư giãn';
@@ -77,6 +82,7 @@ export const AdminResourcesPage: React.FC = () => {
         const axiosErr = err as AxiosError<{ message?: string }>;
         msg = axiosErr.response?.data?.message || msg;
       }
+      setError(msg);
       message.error(msg);
     } finally {
       setLoading(false);
@@ -87,6 +93,7 @@ export const AdminResourcesPage: React.FC = () => {
     let isMounted = true;
     const loadData = async () => {
       try {
+        setError(null);
         const cat = selectedCategory === 'all' ? undefined : selectedCategory;
         const data = await adminApi.getResources(cat);
         if (isMounted) {
@@ -99,6 +106,7 @@ export const AdminResourcesPage: React.FC = () => {
             const axiosErr = err as AxiosError<{ message?: string }>;
             msg = axiosErr.response?.data?.message || msg;
           }
+          setError(msg);
           message.error(msg);
         }
       } finally {
@@ -189,27 +197,30 @@ export const AdminResourcesPage: React.FC = () => {
       title: 'Tên tài nguyên',
       dataIndex: 'title',
       key: 'title',
+      width: 300,
       render: (title: string, record: AdminRelaxationResource) => {
         const typeInfo = TYPE_MAP[record.type] || { label: record.type, icon: Sparkles };
         const Icon = typeInfo.icon;
         return (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div
               style={{
-                width: '32px',
-                height: '32px',
+                width: '34px',
+                height: '34px',
                 borderRadius: '8px',
-                background: 'var(--code-bg)',
+                background: 'var(--tint-lavender)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'var(--accent)',
+                color: 'var(--color-primary)',
+                flexShrink: 0,
               }}
+              aria-hidden="true"
             >
               <Icon size={16} />
             </div>
-            <div>
-              <Text strong style={{ color: 'var(--text-h)' }}>
+            <div style={{ minWidth: 0 }}>
+              <Text strong style={{ color: 'var(--text-primary)' }}>
                 {title}
               </Text>
               <div>
@@ -219,17 +230,17 @@ export const AdminResourcesPage: React.FC = () => {
                   rel="noreferrer"
                   style={{
                     fontSize: '12px',
-                    color: 'var(--text)',
+                    color: 'var(--text-secondary)',
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '4px',
-                    maxWidth: '300px',
+                    maxWidth: '240px',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  <ExternalLink size={12} /> {record.url}
+                  <ExternalLink size={12} aria-hidden="true" /> {record.url}
                 </a>
               </div>
             </div>
@@ -241,31 +252,39 @@ export const AdminResourcesPage: React.FC = () => {
       title: 'Danh mục',
       dataIndex: 'category',
       key: 'category',
+      width: 150,
       render: (cat: string) => {
         const catInfo = CATEGORY_MAP[cat] || { label: cat, color: 'default' };
-        return <Tag color={catInfo.color}>{catInfo.label}</Tag>;
+        return <Tag color={catInfo.color} className="admin-status-tag">{catInfo.label}</Tag>;
       },
     },
     {
       title: 'Định dạng',
       dataIndex: 'type',
       key: 'type',
+      width: 130,
       render: (type: string) => {
         const normalized = (type || '').toLowerCase();
-        const typeInfo = TYPE_MAP[normalized] || { label: type };
-        return <Tag>{typeInfo.label}</Tag>;
+        const typeInfo = TYPE_MAP[normalized] || { label: type, icon: Sparkles };
+        const Icon = typeInfo.icon;
+        return (
+          <Tag className="admin-status-tag">
+            <Icon size={12} /> {typeInfo.label}
+          </Tag>
+        );
       },
     },
     {
       title: 'Thời lượng',
       dataIndex: 'durationSeconds',
       key: 'durationSeconds',
+      width: 130,
       render: (sec: number | null) => {
-        if (!sec) return <Text type="secondary">Không xác định</Text>;
+        if (!sec) return <Text type="secondary">Không giới hạn</Text>;
         const minutes = Math.floor(sec / 60);
         const remainingSec = sec % 60;
         return (
-          <Text style={{ fontSize: '13px' }}>
+          <Text style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
             {minutes > 0 ? `${minutes} phút ` : ''}
             {remainingSec > 0 ? `${remainingSec}s` : ''}
           </Text>
@@ -276,18 +295,26 @@ export const AdminResourcesPage: React.FC = () => {
       title: 'Ngày tạo',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: (date: string) => new Date(date).toLocaleDateString('vi-VN'),
+      width: 120,
+      render: (date: string) => (
+        <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+          {new Date(date).toLocaleDateString('vi-VN')}
+        </span>
+      ),
     },
     {
       title: 'Thao tác',
       key: 'actions',
+      width: 150,
+      fixed: 'right' as const,
       render: (_: unknown, record: AdminRelaxationResource) => (
         <Space>
           <Button
             type="text"
+            size="small"
             icon={<Edit2 size={15} />}
             onClick={() => handleOpenEditModal(record)}
-            style={{ color: 'var(--accent)' }}
+            style={{ color: 'var(--color-primary)' }}
           >
             Sửa
           </Button>
@@ -299,7 +326,7 @@ export const AdminResourcesPage: React.FC = () => {
             cancelText="Huỷ"
             okButtonProps={{ danger: true }}
           >
-            <Button type="text" danger icon={<Trash2 size={15} />}>
+            <Button type="text" size="small" danger icon={<Trash2 size={15} />}>
               Xoá
             </Button>
           </Popconfirm>
@@ -309,34 +336,52 @@ export const AdminResourcesPage: React.FC = () => {
   ];
 
   return (
-    <div>
+    <div className="admin-page-container">
       <AdminHeaderNav />
 
-      <Card style={{ borderRadius: '12px', border: '1px solid var(--border)' }}>
-        {/* Controls: Search, Filter, Add */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '12px',
-            marginBottom: '20px',
-          }}
-        >
-          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+      {error && (
+        <div className="admin-error-box" role="alert">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <AlertCircle size={18} color="var(--color-crisis)" />
+            <span style={{ fontSize: '14px', fontWeight: 500 }}>{error}</span>
+          </div>
+          <Button size="small" onClick={() => fetchResources(selectedCategory)} loading={loading}>
+            Thử lại
+          </Button>
+        </div>
+      )}
+
+      <Card
+        className="admin-card"
+        title={
+          <div className="admin-section-title" style={{ fontSize: '16px' }}>
+            <Sparkles size={18} color="var(--color-primary)" aria-hidden="true" />
+            <span>Quản lý Tài nguyên Thư giãn ({filteredResources.length})</span>
+          </div>
+        }
+        extra={
+          <Button type="primary" icon={<Plus size={16} />} onClick={handleOpenAddModal}>
+            Thêm tài nguyên mới
+          </Button>
+        }
+      >
+        {/* Controls: Search & Filter */}
+        <div className="admin-toolbar">
+          <div className="admin-toolbar-group" style={{ flex: 1 }}>
             <Input
-              prefix={<Search size={16} style={{ color: 'var(--text)' }} />}
+              className="admin-toolbar-input"
+              prefix={<Search size={16} style={{ color: 'var(--text-secondary)' }} />}
               placeholder="Tìm theo tên hoặc URL..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ width: '260px' }}
+              style={{ width: 260 }}
               allowClear
             />
             <Select
+              className="admin-toolbar-select"
               value={selectedCategory}
               onChange={(val) => setSelectedCategory(val)}
-              style={{ width: '180px' }}
+              style={{ width: 190 }}
               options={[
                 { label: 'Tất cả danh mục', value: 'all' },
                 { label: 'Bài tập thở', value: 'breathing' },
@@ -345,14 +390,10 @@ export const AdminResourcesPage: React.FC = () => {
                 { label: 'Chánh niệm', value: 'mindfulness' },
               ]}
             />
-            <Button icon={<RefreshCw size={14} />} onClick={() => fetchResources(selectedCategory)}>
+            <Button icon={<RefreshCw size={14} />} loading={loading} onClick={() => fetchResources(selectedCategory)}>
               Làm mới
             </Button>
           </div>
-
-          <Button type="primary" icon={<Plus size={16} />} onClick={handleOpenAddModal}>
-            Thêm tài nguyên mới
-          </Button>
         </div>
 
         {/* Resources Table */}
@@ -361,8 +402,9 @@ export const AdminResourcesPage: React.FC = () => {
           columns={columns}
           rowKey="id"
           loading={loading}
-          scroll={{ x: 750 }}
-          pagination={{ pageSize: 8, showTotal: (total) => `Tổng cộng ${total} tài nguyên` }}
+          scroll={{ x: 880 }}
+          locale={{ emptyText: 'Chưa có tài nguyên thư giãn nào phù hợp.' }}
+          pagination={{ pageSize: 8, showTotal: (tot) => `Tổng cộng ${tot} tài nguyên` }}
         />
       </Card>
 
@@ -375,7 +417,7 @@ export const AdminResourcesPage: React.FC = () => {
         confirmLoading={submitting}
         okText={editingItem ? 'Lưu thay đổi' : 'Tạo mới'}
         cancelText="Huỷ"
-        destroyOnClose
+        destroyOnHidden
       >
         <Form form={form} layout="vertical" onFinish={handleModalSubmit} style={{ marginTop: '16px' }}>
           <Form.Item
@@ -386,7 +428,7 @@ export const AdminResourcesPage: React.FC = () => {
             <Input placeholder="Ví dụ: Kỹ thuật thở 4-7-8 giảm lo âu" />
           </Form.Item>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-modal-grid">
             <Form.Item
               label="Danh mục"
               name="category"
