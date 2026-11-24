@@ -370,19 +370,30 @@ export const AssessmentPage: React.FC = () => {
             <p className="assessment-quiz-desc">{selectedTest.description}</p>
           </div>
 
-          {/* Progress Bar */}
-          <div className="assessment-progress-box">
-            <div className="assessment-progress-info">
-              <span className="assessment-progress-label">
-                Đã hoàn thành {answeredCount} / {totalQuestions} câu hỏi
-              </span>
-              <span className="assessment-progress-pct">{progressPct}%</span>
-            </div>
-            <div className="assessment-progress-bar-bg">
+          {/* Sticky Progress Bar */}
+          <div className="assessment-sticky-progress-wrapper" role="region" aria-label="Tiến độ bài đánh giá">
+            <div className="assessment-progress-box">
+              <div className="assessment-progress-info">
+                <span className="assessment-progress-label">
+                  Đã hoàn thành <strong>{answeredCount}</strong> / {totalQuestions} câu hỏi
+                </span>
+                <span className="assessment-progress-pct">
+                  {progressPct}% {answeredCount === totalQuestions && totalQuestions > 0 ? '✓' : ''}
+                </span>
+              </div>
               <div
-                className="assessment-progress-bar-fill"
-                style={{ width: `${progressPct}%` }}
-              />
+                className="assessment-progress-bar-bg"
+                role="progressbar"
+                aria-valuenow={progressPct}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`Tiến độ hoàn thành: ${progressPct}%`}
+              >
+                <div
+                  className="assessment-progress-bar-fill"
+                  style={{ width: `${progressPct}%` }}
+                />
+              </div>
             </div>
           </div>
 

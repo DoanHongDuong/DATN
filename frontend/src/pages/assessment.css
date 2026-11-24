@@ -245,16 +245,34 @@
   margin: 0;
 }
 
-/* Progress indicator */
+/* ─── Sticky Progress Indicator ─── */
+.assessment-sticky-progress-wrapper {
+  position: sticky;
+  top: 64px;
+  z-index: 50;
+  background: var(--bg-canvas);
+  padding: 8px 0 12px 0;
+  margin-top: -6px;
+  transition: background-color 0.25s ease;
+}
+
 .assessment-progress-box {
-  padding: 16px 20px;
+  padding: 14px 20px;
   border-radius: 14px;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 14px -2px rgba(45, 42, 50, 0.08);
   display: flex;
   flex-direction: column;
   gap: 8px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  .assessment-progress-box {
+    box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.4);
+    border-color: #363440;
+  }
 }
 
 .assessment-progress-info {
@@ -265,13 +283,19 @@
 }
 
 .assessment-progress-label {
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-primary);
+}
+
+.assessment-progress-label strong {
+  color: var(--color-primary);
+  font-weight: 700;
 }
 
 .assessment-progress-pct {
   font-weight: 700;
   color: var(--color-primary);
+  font-size: 13.5px;
 }
 
 .assessment-progress-bar-bg {
@@ -279,6 +303,7 @@
   height: 8px;
   border-radius: 4px;
   background: var(--bg-canvas);
+  border: 1px solid var(--border-subtle);
   overflow: hidden;
 }
 
@@ -682,9 +707,25 @@
     padding: 24px 18px;
   }
   .assessment-quiz-container {
-    padding: 0 8px;
+    padding: 0 4px;
   }
   .assessment-question-card {
     padding: 18px 16px;
+  }
+  .assessment-sticky-progress-wrapper {
+    top: 54px;
+    padding: 6px 0 10px 0;
+    margin-top: -4px;
+  }
+  .assessment-progress-box {
+    padding: 10px 14px;
+    border-radius: 10px;
+    gap: 6px;
+  }
+  .assessment-progress-info {
+    font-size: 12.5px;
+  }
+  .assessment-progress-bar-bg {
+    height: 6px;
   }
 }
