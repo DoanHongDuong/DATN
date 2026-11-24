@@ -422,3 +422,173 @@
     border-color: #2F2E38;
   }
 }
+
+/* ─── Volunteer Support Queue Page & Empty State (Warm Sanctuary) ─── */
+.chat-volunteer-queue-page {
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 4px 0 40px;
+  box-sizing: border-box;
+}
+
+.chat-queue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.chat-queue-title {
+  margin: 0 0 6px 0;
+  color: var(--text-primary);
+  font-family: var(--heading);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.chat-queue-desc {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.chat-queue-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.chat-queue-status-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-surface);
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.chat-queue-card {
+  border-radius: 16px !important;
+  border: 1px solid var(--border-subtle) !important;
+  background: var(--bg-surface) !important;
+  box-shadow: var(--shadow-card) !important;
+  overflow: hidden;
+}
+
+.chat-queue-card .ant-card-body {
+  padding: 0 !important;
+}
+
+.chat-queue-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 56px 24px;
+  max-width: 520px;
+  margin: 0 auto;
+  gap: 12px;
+}
+
+.chat-queue-empty__icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--tint-sage);
+  color: var(--color-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  transition: all 0.2s ease;
+}
+
+.chat-queue-empty__title {
+  font-family: var(--heading);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.chat-queue-empty__desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.chat-queue-empty__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-subtle);
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+}
+
+.chat-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.chat-status-dot--online {
+  background-color: var(--color-success);
+  box-shadow: 0 0 0 3px rgba(58, 117, 88, 0.2);
+}
+
+.chat-status-dot--offline {
+  background-color: var(--text-disabled);
+}
+
+@media (prefers-color-scheme: dark) {
+  .chat-queue-empty__icon {
+    background: rgba(126, 186, 168, 0.15);
+    color: var(--color-secondary);
+  }
+  .chat-status-dot--online {
+    box-shadow: 0 0 0 3px rgba(125, 194, 159, 0.25);
+  }
+}
+
+@media (max-width: 768px) {
+  .chat-volunteer-queue-page {
+    gap: 18px;
+    padding: 0 0 32px;
+  }
+  .chat-queue-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+  .chat-queue-actions {
+    justify-content: space-between;
+  }
+  .chat-queue-status-pill {
+    flex: 1;
+    justify-content: space-between;
+  }
+  .chat-queue-empty {
+    padding: 40px 16px;
+  }
+}

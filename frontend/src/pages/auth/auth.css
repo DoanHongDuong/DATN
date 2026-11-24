@@ -145,13 +145,15 @@
   opacity: 0.85;
 }
 
-/* ─── Harmonious Alert Styles in Auth Card ─── */
+/* ─── Harmonious Alert Styles in Auth Card (Warm Sanctuary) ─── */
 .auth-card .ant-alert {
-  border-radius: 10px !important;
-  padding: 12px 16px !important;
+  border-radius: 12px !important;
+  padding: 14px 16px !important;
   font-size: 13.5px !important;
   line-height: 1.55 !important;
   border-width: 1px !important;
+  border-style: solid !important;
+  box-shadow: 0 1px 3px rgba(45, 42, 50, 0.03) !important;
 }
 
 .auth-card .ant-alert .ant-alert-message {
@@ -163,74 +165,124 @@
 .auth-card .ant-alert .ant-alert-description {
   font-size: 13px !important;
   line-height: 1.55 !important;
-  color: var(--text-primary) !important;
-  opacity: 0.88;
 }
 
+/* Light Mode Alerts: Light, refreshing, gentle pastel tints with soft borders */
 .auth-card .ant-alert-info {
-  background: var(--tint-blue) !important;
-  border-color: #CFDFEC !important;
+  background: #F0F6FA !important;
+  border-color: #D3E4F0 !important;
 }
-
 .auth-card .ant-alert-info .ant-alert-icon {
-  color: var(--color-info) !important;
+  color: #3775A6 !important;
 }
-
 .auth-card .ant-alert-info .ant-alert-message {
-  color: var(--color-info) !important;
+  color: #1D527A !important;
+}
+.auth-card .ant-alert-info .ant-alert-description {
+  color: #3B5F79 !important;
 }
 
 .auth-card .ant-alert-error {
-  background: var(--tint-crimson) !important;
-  border-color: #F7D0CC !important;
+  background: #FDF3F2 !important;
+  border-color: #F8D3CE !important;
 }
-
 .auth-card .ant-alert-error .ant-alert-icon {
-  color: var(--color-crisis) !important;
+  color: #C73B30 !important;
 }
-
 .auth-card .ant-alert-error .ant-alert-message {
-  color: var(--color-crisis) !important;
+  color: #932218 !important;
+}
+.auth-card .ant-alert-error .ant-alert-description {
+  color: #7A332C !important;
 }
 
 .auth-card .ant-alert-warning {
-  background: var(--tint-terracotta) !important;
-  border-color: #F7E2CB !important;
+  background: #FDF8EE !important;
+  border-color: #F8E2BE !important;
 }
-
 .auth-card .ant-alert-warning .ant-alert-icon {
-  color: var(--color-warning) !important;
+  color: #BF6A1B !important;
 }
-
 .auth-card .ant-alert-warning .ant-alert-message {
-  color: var(--color-warning) !important;
+  color: #82440C !important;
+}
+.auth-card .ant-alert-warning .ant-alert-description {
+  color: #6C471E !important;
 }
 
 .auth-card .ant-alert-success {
-  background: var(--tint-sage) !important;
-  border-color: #CFE7DA !important;
+  background: #F1F8F4 !important;
+  border-color: #CFE8D9 !important;
 }
-
 .auth-card .ant-alert-success .ant-alert-icon {
-  color: var(--color-success) !important;
+  color: #2D7C53 !important;
 }
-
 .auth-card .ant-alert-success .ant-alert-message {
-  color: var(--color-success) !important;
+  color: #1B5637 !important;
+}
+.auth-card .ant-alert-success .ant-alert-description {
+  color: #2D563E !important;
 }
 
+/* Dark Mode Alerts: Deep velvet surfaces with gentle luminous accents */
 @media (prefers-color-scheme: dark) {
+  .auth-card .ant-alert {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+  }
   .auth-card .ant-alert-info {
-    border-color: #2D3E4F !important;
+    background: rgba(130, 174, 207, 0.08) !important;
+    border-color: rgba(130, 174, 207, 0.25) !important;
   }
+  .auth-card .ant-alert-info .ant-alert-icon {
+    color: #92BDE0 !important;
+  }
+  .auth-card .ant-alert-info .ant-alert-message {
+    color: #C0DDF4 !important;
+  }
+  .auth-card .ant-alert-info .ant-alert-description {
+    color: #A3C5DE !important;
+  }
+
   .auth-card .ant-alert-error {
-    border-color: #4D2B2C !important;
+    background: rgba(226, 118, 104, 0.09) !important;
+    border-color: rgba(226, 118, 104, 0.25) !important;
   }
+  .auth-card .ant-alert-error .ant-alert-icon {
+    color: #E88B7F !important;
+  }
+  .auth-card .ant-alert-error .ant-alert-message {
+    color: #F8BEB7 !important;
+  }
+  .auth-card .ant-alert-error .ant-alert-description {
+    color: #DEACA5 !important;
+  }
+
   .auth-card .ant-alert-warning {
-    border-color: #4D3A2B !important;
+    background: rgba(223, 155, 99, 0.09) !important;
+    border-color: rgba(223, 155, 99, 0.25) !important;
   }
+  .auth-card .ant-alert-warning .ant-alert-icon {
+    color: #E5AB7A !important;
+  }
+  .auth-card .ant-alert-warning .ant-alert-message {
+    color: #F6D0AC !important;
+  }
+  .auth-card .ant-alert-warning .ant-alert-description {
+    color: #DCBC9A !important;
+  }
+
   .auth-card .ant-alert-success {
-    border-color: #2C4437 !important;
+    background: rgba(125, 194, 159, 0.08) !important;
+    border-color: rgba(125, 194, 159, 0.25) !important;
+  }
+  .auth-card .ant-alert-success .ant-alert-icon {
+    color: #8FD2AF !important;
+  }
+  .auth-card .ant-alert-success .ant-alert-message {
+    color: #BBEAD1 !important;
+  }
+  .auth-card .ant-alert-success .ant-alert-description {
+    color: #9ECBB3 !important;
   }
 }
 

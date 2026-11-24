@@ -1,10 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ConfigProvider, theme } from 'antd';
+import { ConfigProvider, theme, message, notification } from 'antd';
 import viVN from 'antd/locale/vi_VN';
 import { AuthProvider } from './store/AuthContext';
 import { SocketProvider } from './store/SocketProvider';
 import { AppRouter } from './router/AppRouter';
+
+// Configure Ant Design Message & Notification to always appear below the navbar
+message.config({
+  top: 80,
+  duration: 3,
+  maxCount: 3,
+});
+
+notification.config({
+  top: 80,
+  duration: 4.5,
+  maxCount: 3,
+});
 
 const queryClient = new QueryClient({
   defaultOptions: {

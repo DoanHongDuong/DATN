@@ -432,8 +432,23 @@ code {
   }
 }
 
-html, body {
-  overflow-x: clip;
+html {
+  overflow-y: scroll;
+}
+
+body {
+  margin: 0;
   max-width: 100%;
+}
+
+/* ─── Global Ant Design Toast & Notification Clearance below Sticky Navbar ─── */
+.ant-message {
+  top: calc(var(--header-height, 65px) + 16px) !important;
+  z-index: 1050 !important;
+}
+
+.ant-notification {
+  top: calc(var(--header-height, 65px) + 16px) !important;
+  z-index: 1050 !important;
 }
 

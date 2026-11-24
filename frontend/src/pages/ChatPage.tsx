@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Button, Tag, Card, Alert, Space, message, Typography, Switch, Popconfirm, Modal, Rate, Input } from 'antd';
+import { Table, Button, Tag, Card, Alert, message, Typography, Switch, Popconfirm, Modal, Rate, Input } from 'antd';
 import {
   MessageSquare,
   Clock,
@@ -13,6 +13,7 @@ import {
   Heart,
   Wind,
   ShieldCheck,
+  CheckCircle2,
 } from 'lucide-react';
 import axios, { AxiosError } from 'axios';
 import {
@@ -70,6 +71,7 @@ export const ChatPage: React.FC = () => {
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
   const [isOnline, setIsOnline] = useState<boolean>(false);
   const [togglingOnline, setTogglingOnline] = useState<boolean>(false);
+  const isEndingSessionRef = useRef<boolean>(false);
 
   // Lấy trạng thái online ban đầu của tình nguyện viên
   useEffect(() => {
@@ -261,7 +263,11 @@ export const ChatPage: React.FC = () => {
       const endedSessionId = closedSession?.id || activeSessionRef.current?.id;
       setActiveSession(null);
       setMessages([]);
-      message.info('Phiên tư vấn hỗ trợ đã kết thúc.');
+      // Only display the toast if not already shown locally by handleEndSession
+      if (!isEndingSessionRef.current) {
+        message.info('Phiên tư vấn hỗ trợ đã kết thúc.');
+      }
+      isEndingSessionRef.current = false;
       if (isVolunteer) {
         fetchWaitingSessions();
       } else if (endedSessionId) {
@@ -335,6 +341,7 @@ export const ChatPage: React.FC = () => {
       cancelText: 'Tiếp tục trò chuyện',
       centered: true,
       onOk: async () => {
+        isEndingSessionRef.current = true;
         try {
           await chatApi.endSession(activeSession.id);
           if (socket) {
@@ -347,6 +354,7 @@ export const ChatPage: React.FC = () => {
             fetchWaitingSessions();
           }
         } catch (err: unknown) {
+          isEndingSessionRef.current = false;
           let msg = 'Không thể kết thúc phiên hỗ trợ';
           if (axios.isAxiosError(err)) {
             const axiosErr = err as AxiosError<{ message?: string }>;
@@ -674,24 +682,18 @@ export const ChatPage: React.FC = () => {
     ];
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1000px', margin: '0 auto' }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          flexWrap: 'wrap',
-          gap: '14px'
-        }}>
+      <div className="chat-volunteer-queue-page">
+        <div className="chat-queue-header">
           <div>
-            <h1 style={{ margin: '0 0 6px', color: 'var(--text-primary)', fontFamily: 'var(--heading)', fontSize: '24px', fontWeight: 700 }}>
+            <h1 className="chat-queue-title">
               Hàng đợi Yêu cầu Hỗ trợ Tâm lý
             </h1>
-            <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '14px' }}>
+            <p className="chat-queue-desc">
               Danh sách các phiên trò chuyện đang chờ Tình nguyện viên tiếp nhận.
             </p>
           </div>
-          <Space wrap size="middle">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--bg-surface)', padding: '8px 16px', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
+          <div className="chat-queue-actions">
+            <div className="chat-queue-status-pill">
               <span style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--text-primary)' }}>
                 Sẵn sàng nhận phiên:
               </span>
@@ -711,21 +713,41 @@ export const ChatPage: React.FC = () => {
             >
               Làm mới hàng đợi
             </Button>
-          </Space>
+          </div>
         </div>
 
-        <Card style={{ borderRadius: '16px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', boxShadow: 'var(--shadow-card)' }}>
-          <Table
-            dataSource={waitingSessions}
-            columns={columns}
-            rowKey="id"
-            loading={loadingQueue}
-            locale={{
-              emptyText: 'Hiện không có sinh viên nào đang chờ hỗ trợ.',
-            }}
-            pagination={{ pageSize: 10 }}
-            scroll={{ x: 650 }}
-          />
+        <Card className="chat-queue-card">
+          {waitingSessions.length === 0 && !loadingQueue ? (
+            <div className="chat-queue-empty">
+              <div className="chat-queue-empty__icon">
+                <CheckCircle2 size={32} />
+              </div>
+              <h3 className="chat-queue-empty__title">
+                Hiện chưa có yêu cầu hỗ trợ nào đang chờ
+              </h3>
+              <p className="chat-queue-empty__desc">
+                Bạn có thể tiếp tục sẵn sàng tiếp nhận phiên mới. Khi có sinh viên gửi yêu cầu hỗ trợ, hệ thống sẽ tự động cập nhật danh sách tại đây.
+              </p>
+              <div className="chat-queue-empty__badge">
+                <span className={`chat-status-dot ${isOnline ? 'chat-status-dot--online' : 'chat-status-dot--offline'}`} />
+                <span>
+                  Trạng thái: <strong>{isOnline ? 'Đang sẵn sàng nhận phiên' : 'Đang tạm dừng nhận phiên'}</strong>
+                </span>
+              </div>
+            </div>
+          ) : (
+            <Table
+              dataSource={waitingSessions}
+              columns={columns}
+              rowKey="id"
+              loading={loadingQueue}
+              locale={{
+                emptyText: 'Hiện không có sinh viên nào đang chờ hỗ trợ.',
+              }}
+              pagination={{ pageSize: 10 }}
+              scroll={{ x: 650 }}
+            />
+          )}
         </Card>
       </div>
     );
