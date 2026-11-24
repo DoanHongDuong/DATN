@@ -247,12 +247,14 @@
 
 /* ─── Sticky Progress Indicator ─── */
 .assessment-sticky-progress-wrapper {
+  position: -webkit-sticky;
   position: sticky;
-  top: 64px;
+  top: var(--header-height, 65px);
   z-index: 50;
+  width: 100%;
+  align-self: stretch;
   background: var(--bg-canvas);
-  padding: 8px 0 12px 0;
-  margin-top: -6px;
+  padding: 8px 0 14px 0;
   transition: background-color 0.25s ease;
 }
 
@@ -713,9 +715,8 @@
     padding: 18px 16px;
   }
   .assessment-sticky-progress-wrapper {
-    top: 54px;
+    top: var(--header-height, 55px);
     padding: 6px 0 10px 0;
-    margin-top: -4px;
   }
   .assessment-progress-box {
     padding: 10px 14px;

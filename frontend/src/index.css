@@ -4,6 +4,9 @@
    ══════════════════════════════════════════════════════════════════════════ */
 
 :root {
+  /* ─── Layout Dimensions ─── */
+  --header-height: 65px;
+
   /* ─── Typography System ─── */
   --sans: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --heading: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -242,11 +245,14 @@ code {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: var(--header-height);
+  box-sizing: border-box;
   padding: 12px 24px;
   border-bottom: 1px solid var(--border-subtle);
   background: rgba(247, 245, 240, 0.95);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  position: -webkit-sticky;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -420,8 +426,14 @@ code {
   }
 }
 
+@media (max-width: 768px) {
+  :root {
+    --header-height: 55px;
+  }
+}
+
 html, body {
-  overflow-x: hidden;
-  max-width: 100vw;
+  overflow-x: clip;
+  max-width: 100%;
 }
 
