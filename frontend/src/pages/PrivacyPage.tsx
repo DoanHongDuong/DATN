@@ -289,7 +289,7 @@ export const PrivacyPage: React.FC = () => {
             </p>
             <ul style={{ margin: 0, paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <li>
-                <strong style={{ color: 'var(--text-primary)' }}>Tin nhắn chat trực tiếp:</strong> Dữ liệu tin nhắn trong phiên chat thời gian thực hiện được lưu trữ dạng văn bản có cấu trúc trong cơ sở dữ liệu để phục vụ việc duy trì lịch sử phiên trao đổi cho Sinh viên và TNV, <em>chưa áp dụng mã hóa đầu cuối (End-to-End Encryption - E2EE)</em>.
+                <strong style={{ color: 'var(--text-primary)' }}>Tin nhắn chat trực tiếp:</strong> Dữ liệu tin nhắn trong phiên chat thời gian thực hiện được lưu trữ dạng văn bản có cấu trúc trong cơ sở dữ liệu để phục vụ việc duy trì lịch sử phiên trao đổi cho Người dùng và TNV, <em>chưa áp dụng mã hóa đầu cuối (End-to-End Encryption - E2EE)</em>.
               </li>
               <li>
                 <strong style={{ color: 'var(--text-primary)' }}>Trí tuệ nhân tạo (AI):</strong> Phân tích cảm xúc bằng AI (Google Gemini) chỉ đóng vai trò nhận diện gợi ý và hỗ trợ phát hiện nguy cơ khủng hoảng, không thay thế cho chẩn đoán y khoa chuyên nghiệp và không tự động thay đổi trạng thái tài khoản người dùng.

@@ -235,7 +235,7 @@ export const AdminUsersPage: React.FC = () => {
       key: 'USER',
       label: (
         <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <User size={15} /> Người dùng (Sinh viên)
+          <User size={15} /> Người dùng
         </span>
       ),
     },
@@ -273,7 +273,7 @@ export const AdminUsersPage: React.FC = () => {
             <Users size={18} color="var(--accent)" />
             <span>
               {roleFilter === 'USER'
-                ? 'Danh sách Người dùng / Sinh viên'
+                ? 'Danh sách Người dùng'
                 : roleFilter === 'VOLUNTEER'
                 ? 'Danh sách Tình nguyện viên'
                 : roleFilter === 'ADMIN'

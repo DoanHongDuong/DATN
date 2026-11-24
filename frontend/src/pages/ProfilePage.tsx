@@ -120,7 +120,7 @@ export const ProfilePage: React.FC = () => {
   const roleConfig = {
     ADMIN: { label: 'Quản trị viên', className: 'profile-role-tag--admin' },
     VOLUNTEER: { label: 'Tình nguyện viên', className: 'profile-role-tag--volunteer' },
-    USER: { label: 'Sinh viên', className: 'profile-role-tag--user' },
+    USER: { label: 'Người dùng', className: 'profile-role-tag--user' },
   }[profile?.role || 'USER'] || { label: profile?.role || 'Người dùng', className: 'profile-role-tag--user' };
 
   return (
@@ -224,15 +224,28 @@ export const ProfilePage: React.FC = () => {
 
             <Form.Item
               name="fullName"
-              label="Họ và tên"
+              label="Tên hiển thị"
               rules={[
-                { required: true, message: 'Vui lòng nhập họ và tên' },
-                { min: 2, max: 100, message: 'Họ và tên phải từ 2 đến 100 ký tự' },
+                { required: true, message: 'Vui lòng nhập tên hiển thị' },
+                { min: 2, max: 100, message: 'Tên hiển thị phải từ 2 đến 100 ký tự' },
+                {
+                  validator(_, value) {
+                    if (value && value.trim().length < 2) {
+                      return Promise.reject(new Error('Tên hiển thị phải chứa ít nhất 2 ký tự hợp lệ'));
+                    }
+                    return Promise.resolve();
+                  },
+                },
               ]}
+              extra={
+                <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                  Tên này sẽ được hiển thị khi bạn sử dụng các tính năng trên PSYTHALIA (bạn không bắt buộc phải dùng họ tên thật).
+                </span>
+              }
             >
               <Input
                 prefix={<User size={16} style={{ color: 'var(--text-disabled)', marginRight: 4 }} />}
-                placeholder="Nguyễn Văn A"
+                placeholder="VD: An Nhiên, Minh Trí..."
                 maxLength={100}
               />
             </Form.Item>
@@ -246,6 +259,11 @@ export const ProfilePage: React.FC = () => {
                   message: 'Số điện thoại không đúng định dạng VN (VD: 0912345678 hoặc +84912345678)',
                 },
               ]}
+              extra={
+                <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                  Dùng để hỗ trợ xác minh khi cần thiết (tùy chọn), hoàn toàn bảo mật và không công khai.
+                </span>
+              }
             >
               <Input
                 prefix={<Phone size={16} style={{ color: 'var(--text-disabled)', marginRight: 4 }} />}
@@ -258,9 +276,10 @@ export const ProfilePage: React.FC = () => {
                 type="primary"
                 htmlType="submit"
                 loading={updatingProfile}
+                disabled={updatingProfile}
                 className="profile-submit-btn"
               >
-                Lưu thay đổi hồ sơ
+                {updatingProfile ? 'Đang lưu thay đổi...' : 'Lưu thay đổi hồ sơ'}
               </Button>
             </Form.Item>
           </Form>
@@ -347,6 +366,7 @@ export const ProfilePage: React.FC = () => {
                 type="primary"
                 htmlType="submit"
                 loading={changingPassword}
+                disabled={changingPassword}
                 className="profile-submit-btn"
                 style={{
                   background: 'var(--color-warning)',
@@ -354,7 +374,7 @@ export const ProfilePage: React.FC = () => {
                   color: '#FFFFFF',
                 }}
               >
-                Cập nhật mật khẩu
+                {changingPassword ? 'Đang cập nhật...' : 'Cập nhật mật khẩu'}
               </Button>
             </Form.Item>
           </Form>

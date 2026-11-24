@@ -210,7 +210,7 @@ export const Navbar: React.FC = () => {
                   letterSpacing: '0.02em',
                 }}
               >
-                {user?.role === 'ADMIN' ? 'Admin' : user?.role === 'VOLUNTEER' ? 'TNV' : 'Sinh viên'}
+                {user?.role === 'ADMIN' ? 'Admin' : user?.role === 'VOLUNTEER' ? 'TNV' : 'Người dùng'}
               </span>
             </Link>
 
@@ -375,7 +375,7 @@ export const Navbar: React.FC = () => {
                     ? 'Quản trị viên'
                     : user?.role === 'VOLUNTEER'
                       ? 'Tình nguyện viên PFA'
-                      : 'Sinh viên'}
+                      : 'Người dùng'}
                 </div>
               </div>
             </div>
