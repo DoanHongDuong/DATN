@@ -43,9 +43,10 @@ export const NotificationDropdown: React.FC = () => {
     }
   }, []);
 
-  // Poll unread count every 45s
+  // Poll unread count every 45s & listen to socket events with debounce
   useEffect(() => {
     let cancelled = false;
+    let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 
     const checkCount = () => {
       notificationApi
@@ -63,18 +64,24 @@ export const NotificationDropdown: React.FC = () => {
     checkCount();
     const timer = setInterval(checkCount, 45000);
 
-    // Lắng nghe thông báo socket realtime
+    // Lắng nghe thông báo socket realtime có debounce 600ms chống spam request
     const handleSocketNotification = () => {
-      checkCount();
-      if (isOpen) {
-        fetchNotifications();
-      }
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        if (!cancelled) {
+          checkCount();
+          if (isOpen) {
+            fetchNotifications();
+          }
+        }
+      }, 600);
     };
     window.addEventListener('socket:new_notification', handleSocketNotification);
 
     return () => {
       cancelled = true;
       clearInterval(timer);
+      if (debounceTimer) clearTimeout(debounceTimer);
       window.removeEventListener('socket:new_notification', handleSocketNotification);
     };
   }, [isOpen, fetchNotifications]);

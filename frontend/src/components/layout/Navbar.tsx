@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Drawer } from 'antd';
 import { useAuth } from '../../hooks/useAuth';
@@ -20,12 +20,13 @@ export const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [prevPathname, setPrevPathname] = useState(location.pathname);
 
-  if (prevPathname !== location.pathname) {
-    setPrevPathname(location.pathname);
-    setMobileMenuOpen(false);
-  }
+  // Đóng Drawer khi điều hướng lịch sử trình duyệt (back/forward)
+  useEffect(() => {
+    const handlePopState = () => setMobileMenuOpen(false);
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const isAuthPage = ['/login', '/register', '/forgot-password', '/reset-password'].includes(
     location.pathname,

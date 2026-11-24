@@ -72,6 +72,8 @@ export const ChatPage: React.FC = () => {
   const [isOnline, setIsOnline] = useState<boolean>(false);
   const [togglingOnline, setTogglingOnline] = useState<boolean>(false);
   const isEndingSessionRef = useRef<boolean>(false);
+  const acceptedSessionToastRef = useRef<string | null>(null);
+  const endedSessionToastRef = useRef<string | null>(null);
 
   // Lấy trạng thái online ban đầu của tình nguyện viên
   useEffect(() => {
@@ -252,7 +254,11 @@ export const ChatPage: React.FC = () => {
       setQueuePosition(null);
       loadMessages(session.id);
       socket.emit('join_session', { sessionId: session.id });
-      message.success('Tình nguyện viên đã tham gia cuộc trò chuyện!');
+      // Deduplicate toast: only show once per session ID
+      if (acceptedSessionToastRef.current !== session.id) {
+        acceptedSessionToastRef.current = session.id;
+        message.success('Tình nguyện viên đã tham gia cuộc trò chuyện!');
+      }
     };
 
     const onNewMessage = (msg: ChatMessage) => {
@@ -263,8 +269,9 @@ export const ChatPage: React.FC = () => {
       const endedSessionId = closedSession?.id || activeSessionRef.current?.id;
       setActiveSession(null);
       setMessages([]);
-      // Only display the toast if not already shown locally by handleEndSession
-      if (!isEndingSessionRef.current) {
+      // Only display the toast if not already shown locally and not already displayed for this session
+      if (!isEndingSessionRef.current && endedSessionId && endedSessionToastRef.current !== endedSessionId) {
+        endedSessionToastRef.current = endedSessionId;
         message.info('Phiên tư vấn hỗ trợ đã kết thúc.');
       }
       isEndingSessionRef.current = false;

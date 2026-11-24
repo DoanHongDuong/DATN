@@ -445,10 +445,78 @@ body {
 .ant-message {
   top: calc(var(--header-height, 65px) + 16px) !important;
   z-index: 1050 !important;
+  pointer-events: none;
+}
+
+.ant-message .ant-message-notice {
+  pointer-events: auto;
 }
 
 .ant-notification {
   top: calc(var(--header-height, 65px) + 16px) !important;
   z-index: 1050 !important;
+  pointer-events: none;
+}
+
+.ant-notification .ant-notification-notice {
+  pointer-events: auto;
+}
+
+/* ─── Mobile Viewports (<= 768px: 375px, 390px, 430px) ─── */
+@media (max-width: 768px) {
+  .ant-notification {
+    top: calc(var(--header-height, 55px) + 10px) !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    max-width: calc(100vw - 24px) !important;
+    margin: 0 !important;
+  }
+
+  .ant-notification-notice {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    margin-bottom: 8px !important;
+    padding: 12px 14px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .ant-notification-notice-message {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    margin-bottom: 4px !important;
+    word-break: break-word !important;
+  }
+
+  .ant-notification-notice-description {
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+    word-break: break-word !important;
+  }
+
+  .ant-message {
+    top: calc(var(--header-height, 55px) + 10px) !important;
+    width: auto !important;
+    left: 12px !important;
+    right: 12px !important;
+    margin: 0 auto !important;
+  }
+
+  .ant-message-notice {
+    max-width: 100% !important;
+    margin-bottom: 8px !important;
+  }
+
+  .ant-message-notice-content {
+    max-width: 100% !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+    padding: 9px 14px !important;
+    font-size: 13.5px !important;
+    border-radius: 10px !important;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12) !important;
+  }
 }
 
