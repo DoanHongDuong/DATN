@@ -26,8 +26,9 @@ import { useSocket } from '../hooks/useSocket';
 import { useAuth } from '../hooks/useAuth';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { getEmergencyHotline } from '../utils/hotline';
+import './chat.css';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 const PRIORITY_COLOR_MAP: Record<PriorityLevel, string> = {
   CRITICAL: 'error',
@@ -244,7 +245,6 @@ export const ChatPage: React.FC = () => {
   useEffect(() => {
     if (!socket) return;
 
-    // Khi user nhận được thông báo TNV đã accept
     const onSessionAccepted = (session: ChatSession) => {
       setActiveSession(session);
       setQueuePosition(null);
@@ -253,12 +253,10 @@ export const ChatPage: React.FC = () => {
       message.success('Tình nguyện viên đã tham gia cuộc trò chuyện!');
     };
 
-    // Khi có tin nhắn mới trong phòng chat
     const onNewMessage = (msg: ChatMessage) => {
       setMessages((prev) => [...prev, msg]);
     };
 
-    // Khi phiên chat kết thúc
     const onSessionEnded = (closedSession?: ChatSession) => {
       const endedSessionId = closedSession?.id || activeSessionRef.current?.id;
       setActiveSession(null);
@@ -272,7 +270,6 @@ export const ChatPage: React.FC = () => {
       }
     };
 
-    // Khi có sinh viên mới vào hàng đợi hoặc một phiên vừa được nhận
     const onQueueChanged = () => {
       if (isVolunteer && !activeSessionRef.current) {
         fetchWaitingSessions();
@@ -294,14 +291,12 @@ export const ChatPage: React.FC = () => {
     };
   }, [socket, loadMessages, isVolunteer, fetchWaitingSessions]);
 
-  // Join room socket khi activeSession thay đổi
   useEffect(() => {
     if (socket && activeSession && activeSession.status === 'ACTIVE') {
       socket.emit('join_session', { sessionId: activeSession.id });
     }
   }, [socket, activeSession]);
 
-  // Xử lý Volunteer: Nhận phiên
   const handleAcceptSession = async (sessionId: string) => {
     setAcceptingId(sessionId);
     try {
@@ -330,7 +325,6 @@ export const ChatPage: React.FC = () => {
     }
   };
 
-  // Xử lý Kết thúc phiên (TNV hoặc User)
   const handleEndSession = () => {
     if (!activeSession) return;
     Modal.confirm({
@@ -339,16 +333,13 @@ export const ChatPage: React.FC = () => {
       okText: 'Kết thúc',
       okType: 'danger',
       cancelText: 'Tiếp tục trò chuyện',
+      centered: true,
       onOk: async () => {
         try {
-          // 1. Gọi HTTP API chắc chắn cập nhật DB thành CLOSED
           await chatApi.endSession(activeSession.id);
-
-          // 2. Gửi socket emit để realtime cho bên kia
           if (socket) {
             socket.emit('end_session', { sessionId: activeSession.id });
           }
-
           setActiveSession(null);
           setMessages([]);
           message.success('Đã kết thúc phiên hỗ trợ.');
@@ -367,7 +358,6 @@ export const ChatPage: React.FC = () => {
     });
   };
 
-  // Xử lý User: Gửi yêu cầu hỗ trợ
   const handleRequestSupport = async () => {
     setIsRequesting(true);
     setNoVolunteerInfo({ noVolunteer: false });
@@ -399,7 +389,6 @@ export const ChatPage: React.FC = () => {
         const axiosErr = err as AxiosError<{ message?: string }>;
         msg = axiosErr.response?.data?.message || msg;
 
-        // Nếu đã có phiên chưa kết thúc (409 Conflict), tự động khôi phục phiên đó
         if (axiosErr.response?.status === 409) {
           try {
             const currentSession = await chatApi.getMyActiveSession();
@@ -427,7 +416,6 @@ export const ChatPage: React.FC = () => {
     }
   };
 
-  // Xử lý gửi tin nhắn
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputMessage.trim() || !activeSession) return;
@@ -445,7 +433,6 @@ export const ChatPage: React.FC = () => {
     setInputMessage('');
   };
 
-  // Xử lý gửi đánh giá chất lượng phiên (PB-27)
   const handleSubmitFeedback = async () => {
     if (!feedbackSessionId) return;
     if (rating < 1) {
@@ -481,51 +468,32 @@ export const ChatPage: React.FC = () => {
   // ==========================================
   if (activeSession && activeSession.status === 'ACTIVE') {
     return (
-      <div
-        style={{
-          maxWidth: '900px',
-          margin: '0 auto',
-          display: 'flex',
-          flexDirection: 'column',
-          height: 'calc(100vh - 150px)',
-          border: '1px solid var(--border)',
-          borderRadius: '16px',
-          overflow: 'hidden',
-          background: 'var(--bg)',
-        }}
-      >
+      <div className="chat-container">
         {/* Chat Header */}
-        <div
-          style={{
-            padding: '12px 16px',
-            borderBottom: '1px solid var(--border)',
-            background: 'var(--code-bg)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '10px',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <UserCheck size={22} color="#10b981" />
+        <div className="chat-header">
+          <div className="chat-header__left">
+            <div className="chat-header__avatar">
+              <UserCheck size={22} />
+            </div>
             <div>
-              <div style={{ fontWeight: 600, color: 'var(--text-h)', fontSize: '14px' }}>
-                {isVolunteer
-                  ? 'Phiên tư vấn với Người dùng'
-                  : 'Đang trò chuyện với Tình nguyện viên'}
-              </div>
-              <div style={{ fontSize: '12px', color: 'var(--text)' }}>
-                Mã phiên: {activeSession.id.slice(0, 8)}...
+              <h2 className="chat-header__title">
+                {isVolunteer ? 'Phiên tư vấn với Người dùng' : 'Tình nguyện viên hỗ trợ tâm lý'}
+              </h2>
+              <div className="chat-header__subtitle">
+                <span>Mã phiên: {activeSession.id.slice(0, 8)}...</span>
               </div>
             </div>
           </div>
 
-          <Space wrap size="small">
-            <Tag color={isConnected ? 'success' : 'error'}>
+          <div className="chat-header__right">
+            <span
+              className={`chat-status-pill ${
+                isConnected ? 'chat-status-pill--online' : 'chat-status-pill--offline'
+              }`}
+            >
               {isConnected ? '● Trực tuyến' : '○ Đang kết nối'}
-            </Tag>
-            <Tag color={PRIORITY_COLOR_MAP[activeSession.priorityLevel]}>
+            </span>
+            <Tag color={PRIORITY_COLOR_MAP[activeSession.priorityLevel]} className="chat-priority-pill">
               Ưu tiên: {activeSession.priorityLevel}
             </Tag>
             <Button
@@ -533,33 +501,23 @@ export const ChatPage: React.FC = () => {
               size="small"
               icon={<LogOut size={14} />}
               onClick={handleEndSession}
+              className="chat-end-btn"
             >
               Kết thúc phiên
             </Button>
-          </Space>
+          </div>
         </div>
 
         {/* Messages Stream */}
-        <div
-          style={{
-            flex: 1,
-            padding: '20px',
-            overflowY: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '12px',
-          }}
-        >
+        <div className="chat-messages-stream">
           {messages.length === 0 ? (
-            <div
-              style={{
-                textAlign: 'center',
-                color: 'var(--text)',
-                fontSize: '14px',
-                margin: 'auto',
-              }}
-            >
-              Hãy gửi tin nhắn đầu tiên để bắt đầu cuộc trò chuyện.
+            <div className="chat-empty-state">
+              <div className="chat-empty-state__icon">
+                <MessageSquare size={24} />
+              </div>
+              <p className="chat-empty-state__text">
+                Đây là không gian an toàn để bạn chia sẻ. Hãy bắt đầu bằng bất kỳ điều gì bạn cảm thấy thoải mái nhất.
+              </p>
             </div>
           ) : (
             messages.map((m) => {
@@ -568,79 +526,45 @@ export const ChatPage: React.FC = () => {
               return (
                 <div
                   key={m.id}
-                  style={{
-                    alignSelf: isMe ? 'flex-end' : 'flex-start',
-                    maxWidth: '70%',
-                    padding: '10px 16px',
-                    borderRadius: isMe
-                      ? '16px 16px 4px 16px'
-                      : '16px 16px 16px 4px',
-                    background: isMe ? 'var(--accent)' : 'var(--code-bg)',
-                    color: isMe ? '#fff' : 'var(--text-h)',
-                    fontSize: '14px',
-                    lineHeight: 1.5,
-                    boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
-                  }}
+                  className={`chat-message-row ${
+                    isMe ? 'chat-message-row--me' : 'chat-message-row--partner'
+                  }`}
                 >
-                  <div style={{ wordBreak: 'break-word' }}>{m.content}</div>
-                  <div
-                    style={{
-                      fontSize: '10px',
-                      opacity: 0.75,
-                      textAlign: 'right',
-                      marginTop: '4px',
-                    }}
-                  >
-                    {timeStr
-                      ? new Date(timeStr).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })
-                      : ''}
+                  <div className={`chat-bubble ${isMe ? 'chat-bubble--me' : 'chat-bubble--partner'}`}>
+                    <div>{m.content}</div>
+                    <div className="chat-bubble__time">
+                      {timeStr
+                        ? new Date(timeStr).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })
+                        : ''}
+                    </div>
                   </div>
                 </div>
               );
             })
           )}
-          {/* Auto-scroll sentinel */}
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Send Input Footer */}
-        <form
-          onSubmit={handleSendMessage}
-          style={{
-            padding: '16px 20px',
-            borderTop: '1px solid var(--border)',
-            background: 'var(--code-bg)',
-            display: 'flex',
-            gap: '10px',
-            alignItems: 'center',
-          }}
-        >
+        {/* Send Input Composer */}
+        <form onSubmit={handleSendMessage} className="chat-composer">
           <Input
             size="large"
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onPressEnter={handleSendMessage}
-            placeholder="Nhập tin nhắn... (Nhấn Enter để gửi)"
-            style={{
-              flex: 1,
-              borderRadius: '8px',
-            }}
+            placeholder="Bạn có thể chia sẻ những điều đang khiến mình bận lòng..."
+            className="chat-composer__input"
+            aria-label="Nhập tin nhắn trò chuyện"
           />
           <Button
             type="primary"
             size="large"
             htmlType="submit"
             icon={<Send size={16} />}
-            style={{
-              borderRadius: '8px',
-              fontWeight: 600,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
+            className="chat-composer__send-btn"
           >
             Gửi
           </Button>
@@ -654,34 +578,11 @@ export const ChatPage: React.FC = () => {
   // ==========================================
   if (user?.role === 'ADMIN') {
     return (
-      <div
-        style={{
-          maxWidth: '680px',
-          margin: '40px auto',
-          padding: '36px',
-          borderRadius: '16px',
-          border: '1px solid var(--border)',
-          background: 'var(--code-bg)',
-          textAlign: 'center',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
-        }}
-      >
-        <div
-          style={{
-            width: '64px',
-            height: '64px',
-            borderRadius: '16px',
-            background: 'var(--accent-bg)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 20px',
-            color: 'var(--accent)',
-          }}
-        >
-          <ShieldCheck size={36} />
+      <div className="chat-idle-card">
+        <div className="chat-idle-icon">
+          <ShieldCheck size={32} />
         </div>
-        <h2 style={{ margin: '0 0 12px 0', color: 'var(--text-h)' }}>
+        <h2 className="chat-idle-title">
           Cổng Giám sát Kênh Tư vấn Trực tuyến
         </h2>
         <Alert
@@ -694,8 +595,8 @@ export const ChatPage: React.FC = () => {
                 Bạn đang đăng nhập với tư cách <strong>Quản trị viên hệ thống (ADMIN)</strong>. Theo nguyên tắc phân tách trách nhiệm và chuẩn mực đạo đức sơ cứu tâm lý (PFA):
               </p>
               <ul style={{ margin: '0 0 8px 0', paddingLeft: '20px' }}>
-                <li>Tài khoản Quản trị không tham gia vào hàng đợi tiếp nhận để yêu cầu tư vấn với Tình nguyện viên do chính mình quản lý.</li>
-                <li>Để kiểm thử luồng Người dùng (học sinh/sinh viên gửi yêu cầu hỗ trợ và trao đổi 1-1 với TNV), vui lòng sử dụng tài khoản thử nghiệm có vai trò <strong>USER</strong>.</li>
+                <li>Tài khoản Quản trị không tham gia vào hàng đợi để yêu cầu tư vấn với Tình nguyện viên do chính mình quản lý.</li>
+                <li>Để kiểm thử luồng Người dùng gửi yêu cầu hỗ trợ và trao đổi 1-1 với TNV, vui lòng sử dụng tài khoản thử nghiệm có vai trò <strong>USER</strong>.</li>
               </ul>
             </div>
           }
@@ -764,6 +665,7 @@ export const ChatPage: React.FC = () => {
             type="primary"
             loading={acceptingId === record.id}
             onClick={() => handleAcceptSession(record.id)}
+            style={{ borderRadius: '8px', fontWeight: 600 }}
           >
             Nhận phiên
           </Button>
@@ -772,25 +674,25 @@ export const ChatPage: React.FC = () => {
     ];
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1000px', margin: '0 auto' }}>
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
           flexWrap: 'wrap',
-          gap: '12px'
+          gap: '14px'
         }}>
-          <div style={{ minWidth: '220px', flex: '1 1 auto' }}>
-            <Title level={3} style={{ margin: 0, color: 'var(--text-h)', fontSize: 'clamp(18px, 4vw, 24px)' }}>
-              📋 Hàng đợi Yêu cầu Hỗ trợ Tâm lý
-            </Title>
-            <Text type="secondary" style={{ display: 'block', marginTop: '4px' }}>
-              Danh sách các phiên chat đang chờ Tình nguyện viên tiếp nhận.
-            </Text>
+          <div>
+            <h1 style={{ margin: '0 0 6px', color: 'var(--text-primary)', fontFamily: 'var(--heading)', fontSize: '24px', fontWeight: 700 }}>
+              Hàng đợi Yêu cầu Hỗ trợ Tâm lý
+            </h1>
+            <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '14px' }}>
+              Danh sách các phiên trò chuyện đang chờ Tình nguyện viên tiếp nhận.
+            </p>
           </div>
-          <Space wrap size="middle" style={{ marginTop: '4px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-h)' }}>
+          <Space wrap size="middle">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--bg-surface)', padding: '8px 16px', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
+              <span style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--text-primary)' }}>
                 Sẵn sàng nhận phiên:
               </span>
               <Switch
@@ -805,20 +707,21 @@ export const ChatPage: React.FC = () => {
               icon={<RefreshCw size={14} />}
               loading={loadingQueue}
               onClick={fetchWaitingSessions}
+              style={{ borderRadius: '8px' }}
             >
               Làm mới hàng đợi
             </Button>
           </Space>
         </div>
 
-        <Card style={{ borderRadius: '12px', border: '1px solid var(--border)' }}>
+        <Card style={{ borderRadius: '16px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', boxShadow: 'var(--shadow-card)' }}>
           <Table
             dataSource={waitingSessions}
             columns={columns}
             rowKey="id"
             loading={loadingQueue}
             locale={{
-              emptyText: 'Hiện không có người dùng nào đang chờ hỗ trợ.',
+              emptyText: 'Hiện không có sinh viên nào đang chờ hỗ trợ.',
             }}
             pagination={{ pageSize: 10 }}
             scroll={{ x: 650 }}
@@ -833,66 +736,35 @@ export const ChatPage: React.FC = () => {
   // ==========================================
   if (activeSession && activeSession.status === 'WAITING') {
     return (
-      <div
-        style={{
-          maxWidth: '520px',
-          margin: '40px auto',
-          padding: '36px',
-          borderRadius: '16px',
-          border: '1px solid var(--border)',
-          background: 'var(--code-bg)',
-          textAlign: 'center',
-        }}
-      >
-        <Clock size={48} color="#f59e0b" style={{ marginBottom: '16px' }} />
-        <h2 style={{ margin: '0 0 8px 0', color: 'var(--text-h)' }}>
-          Đang chờ Tình nguyện viên
-        </h2>
-        <p style={{ color: 'var(--text)', fontSize: '14px', marginBottom: '24px' }}>
-          Yêu cầu của bạn đã được ghi nhận. Vui lòng giữ màn hình để tự động kết nối khi TNV tiếp nhận.
-        </p>
+      <div className="chat-waiting-card">
+        <div>
+          <Clock size={44} color="var(--color-warning)" style={{ marginBottom: '12px' }} />
+          <h2 style={{ margin: '0 0 8px 0', fontFamily: 'var(--heading)', fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)' }}>
+            Đang chờ Tình nguyện viên kết nối
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.6, margin: 0 }}>
+            Yêu cầu của bạn đã được ghi nhận. Vui lòng giữ màn hình để tự động kết nối khi Tình nguyện viên tiếp nhận.
+          </p>
+        </div>
 
         {queuePosition !== null && (
-          <div
-            style={{
-              padding: '16px 20px',
-              borderRadius: '12px',
-              background: 'var(--bg)',
-              border: '1px solid var(--border)',
-              marginBottom: '18px',
-            }}
-          >
-            <div style={{ fontSize: '13px', color: 'var(--text)' }}>
+          <div className="chat-waiting-queue-box">
+            <div style={{ fontSize: '13px', color: 'var(--color-primary)', fontWeight: 600 }}>
               Vị trí của bạn trong hàng đợi tiếp nhận:
             </div>
-            <div
-              style={{
-                fontSize: '32px',
-                fontWeight: 800,
-                color: 'var(--accent)',
-              }}
-            >
+            <div className="chat-waiting-queue-number">
               #{queuePosition}
             </div>
           </div>
         )}
 
-        {/* Calming Breathing Pacer during queue wait (Gợi ý 2) */}
-        <div
-          style={{
-            padding: '18px 20px',
-            borderRadius: '14px',
-            background: 'rgba(99, 102, 241, 0.06)',
-            border: '1px solid rgba(99, 102, 241, 0.25)',
-            marginBottom: '18px',
-            textAlign: 'center',
-          }}
-        >
+        {/* Calming Breathing Pacer during queue wait */}
+        <div className="chat-waiting-pacer-box">
           <div
             style={{
-              fontSize: '13px',
+              fontSize: '13.5px',
               fontWeight: 600,
-              color: 'var(--accent, #6366f1)',
+              color: 'var(--color-primary)',
               marginBottom: '14px',
               display: 'flex',
               alignItems: 'center',
@@ -904,40 +776,23 @@ export const ChatPage: React.FC = () => {
             <span>Xoa dịu cảm xúc trong lúc chờ đợi</span>
           </div>
 
-          <div
-            style={{
-              width: '85px',
-              height: '85px',
-              margin: '0 auto 12px auto',
-              borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, rgba(99, 102, 241, 0.05) 70%)',
-              border: '2px solid rgba(99, 102, 241, 0.45)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--text-h)',
-              fontWeight: 600,
-              fontSize: '11px',
-              animation: 'pulseBreathing 6s ease-in-out infinite',
-              letterSpacing: '0.3px',
-            }}
-          >
+          <div className="chat-waiting-pacer-circle">
             Hít vào • Thở ra
           </div>
 
-          <p style={{ margin: 0, fontSize: '13px', color: 'var(--text)', lineHeight: 1.5 }}>
-            Người lắng nghe đang trên đường đến với bạn. Hãy nhắm mắt lại, thử hít một hơi thật sâu bằng mũi và thở ra chậm rãi bằng miệng nhé...
+          <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+            Người lắng nghe đang trên đường đến với bạn. Hãy nhắm mắt lại, hít một hơi thật sâu bằng mũi và thở ra chậm rãi bằng miệng nhé...
           </p>
         </div>
 
-        <div style={{ fontSize: '13px', color: 'var(--text)' }}>
+        <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
           Trạng thái kết nối: {' '}
-          <strong style={{ color: isConnected ? '#10b981' : '#ef4444' }}>
-            {isConnected ? 'Đã kết nối Socket' : 'Đang kết nối lại...'}
+          <strong style={{ color: isConnected ? 'var(--color-success)' : 'var(--color-crisis)' }}>
+            {isConnected ? 'Đã kết nối máy chủ' : 'Đang kết nối lại...'}
           </strong>
         </div>
 
-        <div style={{ marginTop: '24px' }}>
+        <div>
           <Popconfirm
             title="Huỷ yêu cầu tư vấn"
             description="Bạn có chắc chắn muốn huỷ yêu cầu và rời khỏi hàng đợi?"
@@ -946,7 +801,7 @@ export const ChatPage: React.FC = () => {
             cancelText="Tiếp tục đợi"
             okButtonProps={{ danger: true }}
           >
-            <Button danger loading={cancellingSession}>
+            <Button danger loading={cancellingSession} style={{ borderRadius: '8px', fontWeight: 600 }}>
               Huỷ yêu cầu tư vấn
             </Button>
           </Popconfirm>
@@ -960,176 +815,159 @@ export const ChatPage: React.FC = () => {
   // ==========================================
   return (
     <>
-      <div
-        style={{
-        maxWidth: '580px',
-        margin: '40px auto',
-        padding: '36px',
-        borderRadius: '16px',
-        border: '1px solid var(--border)',
-        background: 'var(--code-bg)',
-        textAlign: 'center',
-      }}
-    >
-      {isRequesting ? (
-        <LoadingSpinner message="Đang kết nối và kiểm tra hàng đợi..." />
-      ) : noVolunteerInfo.noVolunteer ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <Alert
-            type="warning"
-            showIcon
-            icon={<PhoneCall size={24} color="#f59e0b" />}
-            message="Hiện không có Tình nguyện viên trực tuyến"
-            description={
-              <div style={{ marginTop: '8px', lineHeight: 1.6, textAlign: 'left' }}>
-                <p style={{ margin: '0 0 8px 0' }}>
-                  Rất tiếc, hiện tại không có tình nguyện viên nào đang trực tiếp nhận phiên chat.
-                </p>
-                <p style={{ margin: 0 }}>
-                  Trong trường hợp khẩn cấp hoặc cần hỗ trợ ngay lập tức, vui lòng liên hệ đường dây nóng:
-                  <strong style={{ display: 'block', fontSize: '18px', color: 'var(--accent)', marginTop: '4px' }}>
-                    📞 {getEmergencyHotline(noVolunteerInfo.hotline)}
-                  </strong>
-                </p>
-              </div>
-            }
-          />
-          <Button
-            type="primary"
-            size="large"
-            onClick={handleRequestSupport}
-            style={{ alignSelf: 'center' }}
-          >
-            Thử kết nối lại
-          </Button>
-        </div>
-      ) : (
-        <div>
-          <MessageSquare
-            size={48}
-            color="var(--accent)"
-            style={{ marginBottom: '16px' }}
-          />
-          <h2 style={{ margin: '0 0 12px 0', color: 'var(--text-h)' }}>
-            Tư vấn Tâm lý Trực tiếp
-          </h2>
-          <p
-            style={{
-              color: 'var(--text)',
-              fontSize: '15px',
-              lineHeight: 1.6,
-              marginBottom: '28px',
-            }}
-          >
-            Bạn đang trải qua cảm xúc khó khăn và cần người lắng nghe? Hãy gửi yêu cầu hỗ trợ để kết nối riêng tư 1-1 với Tình nguyện viên tâm lý.
-          </p>
-          <Button
-            type="primary"
-            size="large"
-            onClick={handleRequestSupport}
-            style={{
-              padding: '0 32px',
-              height: '48px',
-              fontSize: '16px',
-              fontWeight: 600,
-              borderRadius: '10px',
-            }}
-          >
-            Yêu cầu tư vấn ngay
-          </Button>
-        </div>
-      )}
-    </div>
-
-    {/* Modal Đánh giá phiên hỗ trợ (PB-27) */}
-    <Modal
-      title={
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Heart size={20} color="#e11d48" />
-          <span>Đánh giá phiên hỗ trợ tâm lý</span>
-        </div>
-      }
-      open={isFeedbackModalOpen}
-      onCancel={() => {
-        setIsFeedbackModalOpen(false);
-        setFeedbackSessionId(null);
-      }}
-      footer={null}
-      destroyOnClose
-      centered
-      width={480}
-    >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '16px' }}>
-        <p style={{ margin: 0, fontSize: '14px', color: 'var(--text)', lineHeight: 1.5 }}>
-          Phiên tư vấn vừa kết thúc. Hãy dành ít phút để gửi đánh giá và nhận xét về buổi trò chuyện cùng Tình nguyện viên nhé!
-        </p>
-
-        <div
-          style={{
-            padding: '16px',
-            borderRadius: '12px',
-            background: 'var(--bg)',
-            border: '1px solid var(--border)',
-            textAlign: 'center',
-          }}
-        >
-          <div style={{ fontSize: '13px', color: 'var(--text)', marginBottom: '8px' }}>
-            Mức độ hài lòng của bạn:
+      <div className="chat-idle-card">
+        {isRequesting ? (
+          <LoadingSpinner message="Đang kết nối và kiểm tra hàng đợi..." />
+        ) : noVolunteerInfo.noVolunteer ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <Alert
+              type="warning"
+              showIcon
+              icon={<PhoneCall size={24} color="var(--color-warning)" />}
+              message="Hiện không có Tình nguyện viên trực tuyến"
+              description={
+                <div style={{ marginTop: '8px', lineHeight: 1.6, textAlign: 'left' }}>
+                  <p style={{ margin: '0 0 8px 0' }}>
+                    Rất tiếc, hiện tại không có tình nguyện viên nào đang trực tiếp nhận phiên chat.
+                  </p>
+                  <p style={{ margin: 0 }}>
+                    Trong trường hợp khẩn cấp hoặc cần hỗ trợ ngay lập tức, vui lòng liên hệ đường dây nóng 24/7:
+                    <strong style={{ display: 'block', fontSize: '18px', color: 'var(--color-crisis)', marginTop: '4px' }}>
+                      📞 {getEmergencyHotline(noVolunteerInfo.hotline)}
+                    </strong>
+                  </p>
+                </div>
+              }
+            />
+            <Button
+              type="primary"
+              size="large"
+              onClick={handleRequestSupport}
+              style={{ alignSelf: 'center', borderRadius: '8px', fontWeight: 600 }}
+            >
+              Thử kết nối lại
+            </Button>
           </div>
-          <Rate
-            allowClear={false}
-            value={rating}
-            onChange={setRating}
-            style={{ fontSize: 32, color: '#f59e0b' }}
-          />
-          <div style={{ marginTop: '8px', fontSize: '14px', fontWeight: 600, color: 'var(--text-h)' }}>
-            {RATING_DESC[rating - 1]}
+        ) : (
+          <div>
+            <div className="chat-idle-icon">
+              <MessageSquare size={28} />
+            </div>
+            <h1 className="chat-idle-title">
+              Tư vấn Tâm lý Trực tiếp
+            </h1>
+            <p className="chat-idle-desc">
+              Bạn đang trải qua cảm xúc khó khăn và cần người lắng nghe? Hãy gửi yêu cầu hỗ trợ để kết nối riêng tư 1-1 với Tình nguyện viên tâm lý.
+            </p>
+            <Button
+              type="primary"
+              size="large"
+              onClick={handleRequestSupport}
+              style={{
+                padding: '0 32px',
+                height: '48px',
+                fontSize: '15px',
+                fontWeight: 600,
+                borderRadius: '10px',
+              }}
+            >
+              Yêu cầu tư vấn ngay
+            </Button>
           </div>
-        </div>
-
-        <div>
-          <label
-            style={{
-              display: 'block',
-              fontSize: '13px',
-              fontWeight: 500,
-              color: 'var(--text-h)',
-              marginBottom: '6px',
-            }}
-          >
-            Nhận xét hoặc lời nhắn gửi đến Tình nguyện viên (tùy chọn):
-          </label>
-          <Input.TextArea
-            rows={3}
-            maxLength={1000}
-            showCount
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder="Chia sẻ cảm xúc của bạn hoặc góp ý để chúng tôi cải thiện tốt hơn..."
-          />
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-          <Button
-            onClick={() => {
-              setIsFeedbackModalOpen(false);
-              setFeedbackSessionId(null);
-            }}
-          >
-            Để sau
-          </Button>
-          <Button
-            type="primary"
-            onClick={handleSubmitFeedback}
-            loading={submittingFeedback}
-            icon={<Star size={14} />}
-            style={{ background: 'var(--accent)', borderColor: 'var(--accent)' }}
-          >
-            Gửi đánh giá
-          </Button>
-        </div>
+        )}
       </div>
-    </Modal>
-  </>
+
+      {/* Modal Đánh giá phiên hỗ trợ (PB-27) */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-crisis)', fontSize: '17px' }}>
+            <Heart size={20} />
+            <span>Đánh giá phiên hỗ trợ tâm lý</span>
+          </div>
+        }
+        open={isFeedbackModalOpen}
+        onCancel={() => {
+          setIsFeedbackModalOpen(false);
+          setFeedbackSessionId(null);
+        }}
+        footer={null}
+        destroyOnClose
+        centered
+        width={480}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '16px' }}>
+          <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+            Phiên tư vấn vừa kết thúc. Hãy dành ít phút để gửi đánh giá và nhận xét về buổi trò chuyện cùng Tình nguyện viên nhé!
+          </p>
+
+          <div
+            style={{
+              padding: '16px',
+              borderRadius: '14px',
+              background: 'var(--bg-canvas)',
+              border: '1px solid var(--border-subtle)',
+              textAlign: 'center',
+            }}
+          >
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+              Mức độ hài lòng của bạn:
+            </div>
+            <Rate
+              allowClear={false}
+              value={rating}
+              onChange={setRating}
+              style={{ fontSize: 32, color: '#f59e0b' }}
+            />
+            <div style={{ marginTop: '8px', fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
+              {RATING_DESC[rating - 1]}
+            </div>
+          </div>
+
+          <div>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '13.5px',
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+                marginBottom: '6px',
+              }}
+            >
+              Nhận xét hoặc lời nhắn gửi đến Tình nguyện viên (tùy chọn):
+            </label>
+            <Input.TextArea
+              rows={3}
+              maxLength={1000}
+              showCount
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Chia sẻ cảm xúc của bạn hoặc góp ý để chúng tôi cải thiện tốt hơn..."
+              style={{ borderRadius: '8px' }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+            <Button
+              onClick={() => {
+                setIsFeedbackModalOpen(false);
+                setFeedbackSessionId(null);
+              }}
+              style={{ borderRadius: '8px' }}
+            >
+              Để sau
+            </Button>
+            <Button
+              type="primary"
+              onClick={handleSubmitFeedback}
+              loading={submittingFeedback}
+              icon={<Star size={14} />}
+              style={{ borderRadius: '8px', fontWeight: 600 }}
+            >
+              Gửi đánh giá
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    </>
   );
 };

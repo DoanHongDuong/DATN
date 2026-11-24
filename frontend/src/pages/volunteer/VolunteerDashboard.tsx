@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Button, Tag, Switch, Alert, Table, message, Typography, Modal, Form, Input } from 'antd';
+import { Button, Tag, Switch, Alert, Table, message, Modal, Form, Input } from 'antd';
 import {
   MessageSquare,
   Users,
@@ -20,8 +20,7 @@ import { volunteerApi, type VolunteerProfile, type UpdateVolunteerProfilePayload
 import { useAuth } from '../../hooks/useAuth';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { getEmergencyHotline } from '../../utils/hotline';
-
-const { Title, Text } = Typography;
+import './volunteer.css';
 
 const PRIORITY_COLOR_MAP: Record<PriorityLevel, string> = {
   CRITICAL: 'error',
@@ -129,13 +128,12 @@ export const VolunteerDashboard: React.FC = () => {
       }
     };
 
-    loadData();
+    void loadData();
     return () => {
       isMounted = false;
     };
   }, []);
 
-  // Tự động làm mới danh sách hàng đợi khi có sinh viên mới hoặc có ca được nhận
   useEffect(() => {
     const handleQueueUpdate = () => {
       chatApi
@@ -175,7 +173,7 @@ export const VolunteerDashboard: React.FC = () => {
       navigate('/chat');
     } catch {
       message.error('Không thể tiếp nhận phiên. Có thể phiên đã được TNV khác nhận.');
-      fetchVolunteerData();
+      void fetchVolunteerData();
     } finally {
       setAcceptingId(null);
     }
@@ -194,7 +192,7 @@ export const VolunteerDashboard: React.FC = () => {
       dataIndex: 'priorityLevel',
       key: 'priorityLevel',
       render: (level: PriorityLevel) => (
-        <Tag color={PRIORITY_COLOR_MAP[level] || 'default'}>
+        <Tag color={PRIORITY_COLOR_MAP[level] || 'default'} style={{ borderRadius: '6px', fontWeight: 600 }}>
           {PRIORITY_LABEL_MAP[level] || level}
         </Tag>
       ),
@@ -206,11 +204,11 @@ export const VolunteerDashboard: React.FC = () => {
       render: (date?: string, record?: ChatSession) => {
         const timeStr = date || record?.createdAt;
         return timeStr ? (
-          <span style={{ fontSize: '13px' }}>
+          <span style={{ fontSize: '13px', color: 'var(--text-primary)' }}>
             {new Date(timeStr).toLocaleTimeString('vi-VN')} ({new Date(timeStr).toLocaleDateString('vi-VN')})
           </span>
         ) : (
-          <Text type="secondary">Vừa xong</Text>
+          <span style={{ color: 'var(--text-secondary)' }}>Vừa xong</span>
         );
       },
     },
@@ -218,7 +216,7 @@ export const VolunteerDashboard: React.FC = () => {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
-      render: () => <Tag color="blue">Đang đợi TNV</Tag>,
+      render: () => <Tag color="blue" style={{ borderRadius: '6px' }}>Đang đợi TNV</Tag>,
     },
     {
       title: 'Thao tác',
@@ -229,7 +227,7 @@ export const VolunteerDashboard: React.FC = () => {
           size="small"
           loading={acceptingId === record.id}
           onClick={() => handleAcceptSession(record.id)}
-          style={{ background: '#10b981', borderColor: '#10b981' }}
+          style={{ borderRadius: '6px', fontWeight: 600 }}
         >
           Tiếp nhận ca này
         </Button>
@@ -238,65 +236,33 @@ export const VolunteerDashboard: React.FC = () => {
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      {/* Volunteer Profile & Shift Banner */}
-      <div
-        style={{
-          padding: '24px 28px',
-          borderRadius: '16px',
-          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(5, 150, 105, 0.06) 100%)',
-          border: '1px solid rgba(16, 185, 129, 0.25)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '20px',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div
-            style={{
-              width: '52px',
-              height: '52px',
-              borderRadius: '14px',
-              background: '#10b981',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#fff',
-            }}
-          >
+    <div className="volunteer-dashboard-container">
+      {/* ─── 1. Volunteer Profile & Shift Banner ─── */}
+      <div className="volunteer-shift-banner">
+        <div className="volunteer-shift-banner__left">
+          <div className="volunteer-shift-banner__avatar">
             <HeartHandshake size={28} />
           </div>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
-              <Title level={4} style={{ margin: 0, color: 'var(--text-h)' }}>
+            <div className="volunteer-shift-banner__title-row">
+              <h1 className="volunteer-shift-banner__title">
                 Bàn trực Tình nguyện viên: {user?.fullName}
-              </Title>
+              </h1>
               {profile?.isVerified ? (
-                <Tag color="success" icon={<ShieldCheck size={12} />}>
+                <Tag color="success" icon={<ShieldCheck size={12} />} style={{ borderRadius: '6px', fontWeight: 600 }}>
                   Đã xác minh chính thức
                 </Tag>
               ) : (
-                <Tag color="warning" icon={<Clock size={12} />}>
+                <Tag color="warning" icon={<Clock size={12} />} style={{ borderRadius: '6px', fontWeight: 600 }}>
                   Chờ duyệt lại hồ sơ
                 </Tag>
               )}
             </div>
-            <p style={{ margin: 0, fontSize: '14px', color: 'var(--text)' }}>
-              Chuyên môn: <strong style={{ color: 'var(--text-h)' }}>{profile?.specialization || 'Tư vấn tâm lý chung'}</strong> • Sẵn sàng đồng hành cùng sinh viên.
+            <p className="volunteer-shift-banner__meta">
+              Chuyên môn: <strong style={{ color: 'var(--text-primary)' }}>{profile?.specialization || 'Tư vấn tâm lý chung'}</strong> • Sẵn sàng đồng hành cùng sinh viên.
             </p>
             {profile?.bio && (
-              <p
-                style={{
-                  margin: '6px 0 0 0',
-                  fontSize: '13px',
-                  color: 'var(--text)',
-                  maxWidth: '650px',
-                  fontStyle: 'italic',
-                  lineHeight: 1.5,
-                }}
-              >
+              <p className="volunteer-shift-banner__bio">
                 "{profile.bio}"
               </p>
             )}
@@ -311,8 +277,8 @@ export const VolunteerDashboard: React.FC = () => {
                     alignItems: 'center',
                     gap: '4px',
                     fontSize: '12px',
-                    color: 'var(--accent)',
-                    fontWeight: 500,
+                    color: 'var(--color-primary)',
+                    fontWeight: 600,
                   }}
                 >
                   <ExternalLink size={12} />
@@ -334,24 +300,14 @@ export const VolunteerDashboard: React.FC = () => {
         </div>
 
         {/* Shift online toggle */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            background: 'var(--bg)',
-            padding: '10px 18px',
-            borderRadius: '12px',
-            border: '1px solid var(--border)',
-          }}
-        >
-          <Activity size={18} color={isOnline ? '#10b981' : 'var(--text)'} />
+        <div className="volunteer-shift-toggle-box">
+          <Activity size={20} color={isOnline ? 'var(--color-success)' : 'var(--text-secondary)'} />
           <div>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-h)' }}>
+            <div className="volunteer-shift-toggle-status">
               {isOnline ? 'Đang trực tuyến' : 'Đang ngoại tuyến'}
             </div>
-            <div style={{ fontSize: '11px', color: 'var(--text)' }}>
-              {isOnline ? 'Nhận ca hỗ trợ' : 'Nghỉ ngơi'}
+            <div className="volunteer-shift-toggle-sub">
+              {isOnline ? 'Sẵn sàng nhận ca' : 'Nghỉ ca'}
             </div>
           </div>
           <Switch
@@ -359,23 +315,24 @@ export const VolunteerDashboard: React.FC = () => {
             disabled={!profile?.isVerified}
             loading={togglingOnline}
             onChange={handleToggleOnline}
-            style={{ marginLeft: '8px' }}
+            style={{ marginLeft: '6px' }}
           />
         </div>
       </div>
 
-      {/* Cảnh báo hồ sơ chờ duyệt lại */}
+      {/* ─── 2. Cảnh báo hồ sơ chờ duyệt lại ─── */}
       {!profile?.isVerified && (
         <Alert
           type="warning"
           showIcon
           icon={<Clock size={20} />}
           message={<strong>Hồ sơ đang chờ Quản trị viên duyệt lại</strong>}
-          description="Bạn vừa cập nhật thông tin chuyên môn hoặc chứng chỉ. Để đảm bảo an toàn cho người dùng, hệ thống tạm thời khóa tính năng nhận phiên trực tuyến cho đến khi Quản trị viên đối soát xong."
+          description="Bạn vừa cập nhật thông tin chuyên môn hoặc chứng chỉ. Để đảm bảo an toàn cho sinh viên, hệ thống tạm thời khóa tính năng nhận phiên trực tuyến cho đến khi Quản trị viên đối soát xong."
+          style={{ borderRadius: '12px' }}
         />
       )}
 
-      {/* Critical Alert Banner if high risk waiting */}
+      {/* ─── 3. Critical Alert Banner if high risk waiting ─── */}
       {criticalCount > 0 && (
         <Alert
           type="error"
@@ -392,145 +349,102 @@ export const VolunteerDashboard: React.FC = () => {
               danger
               type="primary"
               onClick={() => navigate('/chat')}
-              style={{ fontWeight: 600 }}
+              style={{ fontWeight: 600, borderRadius: '8px' }}
             >
               Vào phòng tư vấn ngay
             </Button>
           }
+          style={{ borderRadius: '12px' }}
         />
       )}
 
-      {/* Metrics Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
-        <Card style={{ borderRadius: '12px', border: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      {/* ─── 4. Metrics Grid ─── */}
+      <div className="volunteer-metrics-grid">
+        <div className="volunteer-metric-card">
+          <div className="volunteer-metric-card__header">
             <div>
-              <Text type="secondary" style={{ fontSize: '13px' }}>
-                Hàng đợi sinh viên
-              </Text>
-              <Title level={2} style={{ margin: '4px 0 0 0', color: 'var(--text-h)' }}>
+              <div className="volunteer-metric-card__label">Hàng đợi sinh viên</div>
+              <div className="volunteer-metric-card__val" style={{ color: 'var(--text-primary)' }}>
                 {waitingSessions.length}
-              </Title>
+              </div>
             </div>
-            <div
-              style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '10px',
-                background: 'rgba(59, 130, 246, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#3b82f6',
-              }}
-            >
+            <div className="volunteer-metric-card__icon" style={{ background: 'var(--tint-blue)', color: 'var(--color-info)' }}>
               <Users size={22} />
             </div>
           </div>
-          <Text style={{ fontSize: '12px', color: 'var(--text)' }}>Số ca đang chờ hỗ trợ</Text>
-        </Card>
+          <div className="volunteer-metric-card__subtext">Số ca đang chờ hỗ trợ</div>
+        </div>
 
-        <Card style={{ borderRadius: '12px', border: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="volunteer-metric-card">
+          <div className="volunteer-metric-card__header">
             <div>
-              <Text type="secondary" style={{ fontSize: '13px' }}>
-                Ca khẩn cấp (Critical)
-              </Text>
-              <Title level={2} style={{ margin: '4px 0 0 0', color: '#ef4444' }}>
+              <div className="volunteer-metric-card__label">Ca khẩn cấp (Critical)</div>
+              <div className="volunteer-metric-card__val" style={{ color: 'var(--color-crisis)' }}>
                 {criticalCount}
-              </Title>
+              </div>
             </div>
-            <div
-              style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '10px',
-                background: 'rgba(239, 68, 68, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#ef4444',
-              }}
-            >
+            <div className="volunteer-metric-card__icon" style={{ background: 'var(--tint-crimson)', color: 'var(--color-crisis)' }}>
               <AlertTriangle size={22} />
             </div>
           </div>
-          <Text style={{ fontSize: '12px', color: 'var(--text)' }}>Cần ưu tiên xử lý lập tức</Text>
-        </Card>
+          <div className="volunteer-metric-card__subtext">Cần ưu tiên can thiệp lập tức</div>
+        </div>
 
-        <Card style={{ borderRadius: '12px', border: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="volunteer-metric-card">
+          <div className="volunteer-metric-card__header">
             <div>
-              <Text type="secondary" style={{ fontSize: '13px' }}>
-                Ca ưu tiên cao (High)
-              </Text>
-              <Title level={2} style={{ margin: '4px 0 0 0', color: '#f59e0b' }}>
+              <div className="volunteer-metric-card__label">Ca ưu tiên cao (High)</div>
+              <div className="volunteer-metric-card__val" style={{ color: 'var(--color-warning)' }}>
                 {highCount}
-              </Title>
+              </div>
             </div>
-            <div
-              style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '10px',
-                background: 'rgba(245, 158, 11, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#f59e0b',
-              }}
-            >
+            <div className="volunteer-metric-card__icon" style={{ background: 'var(--tint-terracotta)', color: 'var(--color-warning)' }}>
               <Clock size={22} />
             </div>
           </div>
-          <Text style={{ fontSize: '12px', color: 'var(--text)' }}>Mức độ lo âu / trầm cảm nặng</Text>
-        </Card>
+          <div className="volunteer-metric-card__subtext">Mức độ căng thẳng / lo âu nặng</div>
+        </div>
 
-        <Card style={{ borderRadius: '12px', border: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="volunteer-metric-card">
+          <div className="volunteer-metric-card__header">
             <div>
-              <Text type="secondary" style={{ fontSize: '13px' }}>
-                Phòng tư vấn trực tiếp
-              </Text>
-              <div style={{ marginTop: '6px' }}>
+              <div className="volunteer-metric-card__label">Phòng tư vấn trực tiếp</div>
+              <div style={{ marginTop: '8px' }}>
                 <Button
                   type="primary"
                   icon={<MessageSquare size={16} />}
                   onClick={() => navigate('/chat')}
-                  style={{ background: 'var(--accent)', borderColor: 'var(--accent)' }}
+                  style={{ borderRadius: '8px', fontWeight: 600 }}
                 >
                   Mở phòng chat
                 </Button>
               </div>
             </div>
           </div>
-          <Text style={{ fontSize: '12px', color: 'var(--text)', marginTop: '8px', display: 'block' }}>
-            Xem giao diện tư vấn 1-1
-          </Text>
-        </Card>
+          <div className="volunteer-metric-card__subtext">Xem giao diện tư vấn 1-1</div>
+        </div>
       </div>
 
-      {/* Main Content Grid: Waiting Queue + Guidelines */}
-      <div className="dashboard-split-grid">
-        {/* Waiting Queue Table */}
-        <Card
-          title={
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '16px', fontWeight: 600 }}>Hàng đợi sinh viên chờ hỗ trợ</span>
-              <Button size="small" icon={<RefreshCw size={13} />} onClick={fetchVolunteerData}>
-                Làm mới
-              </Button>
-            </div>
-          }
-          style={{ borderRadius: '12px', border: '1px solid var(--border)' }}
-        >
+      {/* ─── 5. Main Content Split Grid ─── */}
+      <div className="volunteer-split-grid">
+        {/* Waiting Queue Table Card */}
+        <div className="volunteer-card">
+          <div className="volunteer-card__title-row">
+            <h2 className="volunteer-card__title">
+              Hàng đợi sinh viên chờ hỗ trợ
+            </h2>
+            <Button size="small" icon={<RefreshCw size={13} />} onClick={fetchVolunteerData} style={{ borderRadius: '6px' }}>
+              Làm mới
+            </Button>
+          </div>
+
           {waitingSessions.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '36px 0', color: 'var(--text)' }}>
-              <div style={{ fontSize: '32px', marginBottom: '8px' }}>🎉</div>
-              <Text strong style={{ color: 'var(--text-h)' }}>
+            <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-secondary)' }}>
+              <div style={{ fontSize: '32px', marginBottom: '8px' }}>🌱</div>
+              <div style={{ fontWeight: 700, fontSize: '15px', color: 'var(--text-primary)' }}>
                 Hiện không có sinh viên nào trong hàng đợi
-              </Text>
-              <p style={{ margin: '4px 0 0 0', fontSize: '13px' }}>
+              </div>
+              <p style={{ margin: '4px 0 0', fontSize: '13.5px', color: 'var(--text-secondary)' }}>
                 Hệ thống đang hoạt động ổn định. Khi có sinh viên gửi yêu cầu, danh sách sẽ hiển thị tại đây.
               </p>
             </div>
@@ -540,137 +454,124 @@ export const VolunteerDashboard: React.FC = () => {
               columns={queueColumns}
               rowKey="id"
               pagination={{ pageSize: 5 }}
-              scroll={{ x: 750 }}
+              scroll={{ x: 700 }}
               size="middle"
             />
           )}
-        </Card>
+        </div>
 
         {/* Volunteer Guidelines & Emergency Protocols */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <Card
-            title="Quy tắc an toàn & Can thiệp"
-            style={{ borderRadius: '12px', border: '1px solid var(--border)' }}
-          >
-            <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--text)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <li>
-                <strong style={{ color: 'var(--text-h)' }}>Lắng nghe thấu cảm:</strong> Không phán xét, tạo không gian an toàn để sinh viên chia sẻ.
-              </li>
-              <li>
-                <strong style={{ color: 'var(--text-h)' }}>Bảo mật danh tính:</strong> Tuyệt đối không tiết lộ thông tin cá nhân của người được tư vấn ra ngoài hệ thống.
-              </li>
-              <li>
-                <strong style={{ color: 'var(--text-h)' }}>Xử lý nguy cơ tự hại:</strong> Khi nhận thấy ý định tự sát, hãy ngay lập tức cung cấp số Hotline và giữ liên lạc.
-              </li>
-            </ul>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div className="volunteer-card">
+            <h2 className="volunteer-card__title" style={{ marginBottom: '14px' }}>
+              Quy tắc an toàn & Can thiệp
+            </h2>
+            <div className="volunteer-guidelines-box">
+              <div className="volunteer-guidelines-item">
+                <strong>Lắng nghe thấu cảm:</strong> Không phán xét, tạo không gian an toàn để sinh viên trải lòng.
+              </div>
+              <div className="volunteer-guidelines-item">
+                <strong>Bảo mật danh tính:</strong> Tuyệt đối không tiết lộ thông tin cá nhân của người được tư vấn ra ngoài hệ thống.
+              </div>
+              <div className="volunteer-guidelines-item">
+                <strong>Xử lý nguy cơ tự hại:</strong> Khi nhận thấy ý định tự sát, hãy ngay lập tức cung cấp số Hotline và giữ liên lạc.
+              </div>
+            </div>
 
-            <div
-              style={{
-                marginTop: '16px',
-                padding: '12px 14px',
-                borderRadius: '8px',
-                background: 'rgba(239, 68, 68, 0.08)',
-                border: '1px solid rgba(239, 68, 68, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-              }}
-            >
-              <PhoneCall size={18} color="#ef4444" />
+            <div className="volunteer-emergency-strip">
+              <PhoneCall size={20} color="var(--color-crisis)" style={{ flexShrink: 0 }} />
               <div>
-                <div style={{ fontSize: '12px', fontWeight: 600, color: '#ef4444' }}>
-                  Hotline Hỗ trợ Khẩn cấp
+                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-crisis)' }}>
+                  Hotline Hỗ trợ Khẩn cấp 24/7
                 </div>
-                <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-h)' }}>
+                <div className="volunteer-emergency-strip__number">
                   {getEmergencyHotline()}
                 </div>
               </div>
             </div>
-          </Card>
+          </div>
 
-          <Card
-            title="Tài nguyên hỗ trợ sinh viên"
-            style={{ borderRadius: '12px', border: '1px solid var(--border)' }}
-          >
-            <p style={{ fontSize: '13px', color: 'var(--text)', margin: '0 0 12px 0' }}>
+          <div className="volunteer-card">
+            <h2 className="volunteer-card__title" style={{ marginBottom: '12px' }}>
+              Tài nguyên hỗ trợ sinh viên
+            </h2>
+            <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', margin: '0 0 14px', lineHeight: 1.55 }}>
               Bạn có thể hướng dẫn sinh viên sử dụng các bài tập thở hoặc tài nguyên thư giãn đã được tích hợp sẵn:
             </p>
             <Button
               block
               onClick={() => navigate('/resources')}
-              icon={<ExternalLink size={14} />}
-              style={{ fontSize: '13px' }}
+              style={{ borderRadius: '8px', fontWeight: 600 }}
             >
-              Xem kho tài nguyên thư giãn
+              Mở kho bài tập thư giãn
             </Button>
-          </Card>
+          </div>
         </div>
       </div>
 
-      {/* Modal Cập nhật hồ sơ TNV (PB-28) */}
+      {/* ─── 6. Modal Cập nhật Hồ sơ Chuyên môn (PB-28) ─── */}
       <Modal
-        title="Cập nhật hồ sơ Tình nguyện viên"
+        title="Cập nhật Hồ sơ Tình nguyện viên"
         open={isEditModalOpen}
         onCancel={() => setIsEditModalOpen(false)}
         footer={null}
         destroyOnClose
         centered
+        width={560}
       >
         <Form
           form={editForm}
           layout="vertical"
           onFinish={handleUpdateProfile}
+          requiredMark={false}
           style={{ marginTop: '16px' }}
         >
-          <Alert
-            type="info"
-            showIcon
-            message="Lưu ý về kiểm duyệt chuyên môn"
-            description="Nếu bạn thay đổi Chuyên môn hoặc Đường dẫn chứng chỉ, hồ sơ sẽ tự động chuyển sang trạng thái Chờ duyệt lại bởi Quản trị viên để đảm bảo an toàn cho sinh viên. Việc chỉ sửa Lời giới thiệu (Bio) sẽ có hiệu lực ngay lập tức."
-            style={{ marginBottom: '16px', fontSize: '13px' }}
-          />
           <Form.Item
-            label="Chuyên môn / Học vấn"
+            label="Lĩnh vực chuyên môn"
             name="specialization"
-            rules={[
-              { required: true, message: 'Vui lòng nhập chuyên môn' },
-              { max: 255, message: 'Tối đa 255 ký tự' },
-            ]}
+            rules={[{ required: true, message: 'Vui lòng nhập chuyên môn của bạn' }]}
           >
-            <Input placeholder="VD: Cử nhân Tâm lý học, Tham vấn viên..." />
+            <Input placeholder="Ví dụ: Tư vấn tâm lý học đường, Trị liệu nhận thức hành vi (CBT)..." />
           </Form.Item>
 
           <Form.Item
             label="Giới thiệu bản thân & Kinh nghiệm"
             name="bio"
-            rules={[
-              { required: true, message: 'Vui lòng viết đôi nét giới thiệu' },
-              { max: 1000, message: 'Tối đa 1000 ký tự' },
-            ]}
+            rules={[{ required: true, message: 'Vui lòng giới thiệu đôi nét về bản thân' }]}
           >
             <Input.TextArea
               rows={4}
-              placeholder="Chia sẻ kinh nghiệm tư vấn hoặc phương châm hỗ trợ của bạn..."
+              maxLength={500}
+              showCount
+              placeholder="Chia sẻ về kinh nghiệm lắng nghe, hỗ trợ cộng đồng của bạn..."
             />
           </Form.Item>
 
           <Form.Item
-            label="Đường dẫn chứng chỉ / Bằng cấp chuyên môn"
+            label="Đường dẫn chứng chỉ / Bằng cấp chuyên môn (nếu có)"
             name="certificateUrl"
-            rules={[{ max: 500, message: 'Tối đa 500 ký tự' }]}
+            rules={[{ type: 'url', message: 'Vui lòng nhập đường dẫn URL hợp lệ' }]}
           >
-            <Input placeholder="https://drive.google.com/... hoặc link ảnh chứng chỉ" />
+            <Input placeholder="https://example.com/certificate.pdf" />
           </Form.Item>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '24px' }}>
-            <Button onClick={() => setIsEditModalOpen(false)}>
-              Huỷ
+          <Alert
+            type="info"
+            showIcon
+            message="Lưu ý về quy trình kiểm duyệt"
+            description="Nếu bạn thay đổi đường dẫn chứng chỉ hoặc nội dung chuyên môn, hệ thống sẽ tự động chuyển hồ sơ về trạng thái chờ Quản trị viên duyệt lại để đảm bảo an toàn cho người dùng."
+            style={{ marginBottom: '20px' }}
+          />
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+            <Button onClick={() => setIsEditModalOpen(false)} style={{ borderRadius: '8px' }}>
+              Hủy
             </Button>
             <Button
               type="primary"
               htmlType="submit"
               loading={updatingProfile}
-              style={{ background: 'var(--accent)', borderColor: 'var(--accent)' }}
+              style={{ borderRadius: '8px', fontWeight: 600 }}
             >
               Lưu thay đổi
             </Button>
