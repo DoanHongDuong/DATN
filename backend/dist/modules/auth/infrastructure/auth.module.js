@@ -21,6 +21,7 @@ const resend_verification_email_use_case_1 = require("../application/use-cases/r
 const change_password_use_case_1 = require("../application/use-cases/change-password.use-case");
 const user_prisma_repository_1 = require("./persistence/user.prisma.repository");
 const user_repository_interface_1 = require("../domain/repositories/user.repository.interface");
+const verified_email_guard_1 = require("../presentation/guards/verified-email.guard");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -54,8 +55,9 @@ exports.AuthModule = AuthModule = __decorate([
             verify_email_use_case_1.VerifyEmailUseCase,
             resend_verification_email_use_case_1.ResendVerificationEmailUseCase,
             change_password_use_case_1.ChangePasswordUseCase,
+            verified_email_guard_1.VerifiedEmailGuard,
         ],
-        exports: [jwt_1.JwtModule],
+        exports: [jwt_1.JwtModule, verified_email_guard_1.VerifiedEmailGuard],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

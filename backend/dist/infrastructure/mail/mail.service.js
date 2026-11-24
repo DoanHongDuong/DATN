@@ -110,6 +110,11 @@ let NodemailerMailService = NodemailerMailService_1 = class NodemailerMailServic
         }
     }
     async dispatchEmail(to, subject, html) {
+        const isDevLog = cleanEnv(this.configService.get('MAIL_DEV_MODE')) === 'true';
+        if (isDevLog) {
+            this.logger.log(`[MAIL DEV MODE] Không gửi mail thật. Đích: ${to} | Tiêu đề: "${subject}"`);
+            return;
+        }
         const brevoApiKey = cleanEnv(this.configService.get('BREVO_API_KEY'));
         const resendApiKey = cleanEnv(this.configService.get('RESEND_API_KEY'));
         if (brevoApiKey) {
@@ -174,46 +179,50 @@ let NodemailerMailService = NodemailerMailService_1 = class NodemailerMailServic
     }
     async sendVerificationEmail(to, fullName, token) {
         const verifyUrl = `${this.frontendUrl}/verify-email?token=${token}&email=${encodeURIComponent(to)}`;
+        const isDevLog = cleanEnv(this.configService.get('MAIL_DEV_MODE')) === 'true';
         const resendApiKey = cleanEnv(this.configService.get('RESEND_API_KEY'));
         const brevoApiKey = cleanEnv(this.configService.get('BREVO_API_KEY'));
-        if (!resendApiKey && !brevoApiKey && !this.transporter) {
-            this.logger.warn(`[CHƯA CẤU HÌNH MAIL] Bỏ qua gửi email xác nhận đến: ${to}.\nLink xác nhận (dùng để test): ${verifyUrl}`);
-            return;
+        if (isDevLog || (!resendApiKey && !brevoApiKey && !this.transporter)) {
+            this.logger.log(`[EMAIL XÁC THỰC] Gửi tới: ${to} (${fullName})\n🔗 Link xác nhận (hạn 24h): ${verifyUrl}`);
+            if (isDevLog)
+                return;
         }
         const html = `
-          <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #edf2f7; border-radius: 12px; background: #ffffff;">
+          <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 580px; margin: 0 auto; padding: 28px; border: 1px solid #eef2f6; border-radius: 12px; background: #ffffff;">
             <div style="text-align: center; margin-bottom: 24px;">
-              <h1 style="color: #6c5ce7; margin-bottom: 8px;">✨ PSYTHALIA</h1>
-              <p style="color: #718096; font-size: 14px; margin: 0;">Nền tảng Hỗ trợ Sức khỏe Tinh thần & Sơ cứu Tâm lý</p>
+              <h1 style="color: #8b5cf6; margin: 0 0 6px 0; font-size: 24px; font-weight: 700;">✨ PSYTHALIA</h1>
+              <p style="color: #64748b; font-size: 13px; margin: 0;">Đồng hành cùng bạn trên hành trình học tập và cuộc sống</p>
             </div>
-            <h2 style="color: #2d3436; font-size: 20px;">Xin chào ${fullName},</h2>
-            <p style="color: #4a5568; font-size: 15px; line-height: 1.6;">
-              Cảm ơn bạn đã đăng ký tài khoản tại PSYTHALIA. Vui lòng nhấn vào nút bên dưới để kích hoạt tài khoản của bạn:
+            <h2 style="color: #1e293b; font-size: 18px; font-weight: 600; margin-bottom: 12px;">Xin chào ${fullName},</h2>
+            <p style="color: #475569; font-size: 14px; line-height: 1.6; margin-bottom: 20px;">
+              Cảm ơn bạn đã tham gia PSYTHALIA. Để bảo vệ tài khoản và thuận tiện khôi phục khi cần, bạn vui lòng nhấn nút bên dưới để xác nhận địa chỉ email nhé:
             </p>
-            <div style="text-align: center; margin: 32px 0;">
+            <div style="text-align: center; margin: 28px 0;">
               <a href="${verifyUrl}"
-                 style="background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-                        color: #ffffff; padding: 14px 36px; border-radius: 8px;
-                        text-decoration: none; font-weight: 600; font-size: 16px;
-                        display: inline-block; box-shadow: 0 4px 12px rgba(108, 92, 231, 0.25);">
-                Xác nhận Email ngay
+                 style="background: #8b5cf6; color: #ffffff; padding: 12px 32px; border-radius: 8px;
+                        text-decoration: none; font-weight: 600; font-size: 15px; display: inline-block;
+                        box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);">
+                Xác nhận địa chỉ Email
               </a>
             </div>
-            <p style="color: #718096; font-size: 13px; line-height: 1.5;">
-              Nếu nút trên không hoạt động, bạn có thể sao chép và dán liên kết sau vào trình duyệt:<br/>
-              <a href="${verifyUrl}" style="color: #6c5ce7; word-break: break-all;">${verifyUrl}</a>
+            <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin-bottom: 16px;">
+              Bạn vẫn có thể tiếp tục trải nghiệm và sử dụng các tính năng trên PSYTHALIA bình thường mà không cần chờ đợi.
             </p>
-            <p style="color: #a0aec0; font-size: 13px;">
-              Liên kết này sẽ hết hạn sau <strong>24 giờ</strong>. Nếu bạn không yêu cầu đăng ký này, vui lòng bỏ qua email.
+            <p style="color: #94a3b8; font-size: 12px; line-height: 1.5;">
+              Nếu nút trên không mở được, bạn có thể sao chép liên kết sau vào trình duyệt:<br/>
+              <a href="${verifyUrl}" style="color: #8b5cf6; word-break: break-all;">${verifyUrl}</a>
             </p>
-            <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
-            <p style="color: #a0aec0; font-size: 12px; text-align: center; margin: 0;">
-              © 2026 PSYTHALIA — Khóa luận Tốt nghiệp
+            <p style="color: #94a3b8; font-size: 12px; margin-top: 16px;">
+              Liên kết này có hiệu lực trong vòng <strong>24 giờ</strong>. Nếu bạn không tạo tài khoản này, bạn chỉ cần bỏ qua thư này.
+            </p>
+            <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 24px 0;" />
+            <p style="color: #cbd5e1; font-size: 11px; text-align: center; margin: 0;">
+              © ${new Date().getFullYear()} PSYTHALIA. Thư gửi tự động, vui lòng không phản hồi.
             </p>
           </div>
         `;
         try {
-            await this.dispatchEmail(to, 'Xác nhận tài khoản — PSYTHALIA', html);
+            await this.dispatchEmail(to, '[PSYTHALIA] Xác nhận địa chỉ email của bạn', html);
         }
         catch (error) {
             this.logger.error(`Lỗi khi gửi email xác nhận đến ${to}:`, error);

@@ -62,7 +62,7 @@ let ChatController = class ChatController {
         return session;
     }
     async requestSupport(req) {
-        const result = await this.requestSupportUseCase.execute(req.user.userId);
+        const result = await this.requestSupportUseCase.execute(req.user.userId, req.user.role);
         if (result.session) {
             this.chatGateway.emitNewWaitingSession(result.session);
         }

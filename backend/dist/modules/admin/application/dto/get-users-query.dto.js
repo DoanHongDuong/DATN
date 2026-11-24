@@ -13,10 +13,12 @@ exports.GetUsersQueryDto = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
 const swagger_1 = require("@nestjs/swagger");
+const client_1 = require("@prisma/client");
 class GetUsersQueryDto {
     page = 1;
     limit = 10;
     search;
+    role;
 }
 exports.GetUsersQueryDto = GetUsersQueryDto;
 __decorate([
@@ -41,4 +43,10 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], GetUsersQueryDto.prototype, "search", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ enum: client_1.Role, description: 'Lọc theo vai trò (USER, VOLUNTEER, ADMIN)' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEnum)(client_1.Role),
+    __metadata("design:type", String)
+], GetUsersQueryDto.prototype, "role", void 0);
 //# sourceMappingURL=get-users-query.dto.js.map

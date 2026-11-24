@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Alert } from 'antd';
 import { LockOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { ShieldCheck } from 'lucide-react';
 import { authApi } from '../../api/auth.api';
 import './auth.css';
 
@@ -78,7 +79,9 @@ export const ResetPasswordPage: React.FC = () => {
       <div className="auth-card">
         {/* Header */}
         <div className="auth-card__header">
-          <div className="auth-card__icon">🔐</div>
+          <div className="auth-card__icon" aria-hidden="true">
+            <ShieldCheck size={22} />
+          </div>
           <h2 className="auth-card__title">Đặt lại mật khẩu</h2>
           <p className="auth-card__subtitle">
             {email ? `Tạo mật khẩu mới cho ${email}` : 'Nhập mật khẩu mới cho tài khoản của bạn'}
@@ -196,6 +199,9 @@ export const ResetPasswordPage: React.FC = () => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
+                color: 'var(--color-primary)',
+                fontWeight: 600,
+                textDecoration: 'none',
               }}
             >
               <ArrowLeftOutlined /> Quay lại Đăng nhập

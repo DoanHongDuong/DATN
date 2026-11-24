@@ -44,43 +44,56 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var ResendVerificationEmailUseCase_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ResendVerificationEmailUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const user_repository_interface_1 = require("../../domain/repositories/user.repository.interface");
 const mail_service_1 = require("../../../../infrastructure/mail/mail.service");
-const bcrypt = __importStar(require("bcrypt"));
 const crypto = __importStar(require("crypto"));
-let ResendVerificationEmailUseCase = class ResendVerificationEmailUseCase {
+let ResendVerificationEmailUseCase = ResendVerificationEmailUseCase_1 = class ResendVerificationEmailUseCase {
     userRepository;
     mailService;
+    logger = new common_1.Logger(ResendVerificationEmailUseCase_1.name);
     constructor(userRepository, mailService) {
         this.userRepository = userRepository;
         this.mailService = mailService;
     }
-    async execute(email) {
-        const user = await this.userRepository.findByEmail(email);
+    async execute(identifier) {
+        let user = null;
+        if (typeof identifier === 'string') {
+            const trimmed = identifier.trim();
+            user = await this.userRepository.findByEmail(trimmed);
+        }
+        else if (identifier.userId) {
+            user = await this.userRepository.findById(identifier.userId);
+        }
+        else if (identifier.email) {
+            user = await this.userRepository.findByEmail(identifier.email.trim());
+        }
         if (!user) {
-            return { message: 'Nếu email tồn tại, link xác minh đã được gửi lại' };
+            return { message: 'Nếu email tồn tại, link xác nhận đã được gửi lại' };
         }
         if (user.emailVerified) {
-            throw new common_1.BadRequestException('Email đã được xác minh. Vui lòng đăng nhập');
+            throw new common_1.BadRequestException('Email của bạn đã được xác minh trước đó');
         }
-        const verifyToken = crypto.randomBytes(32).toString('hex');
-        const emailVerifyTokenHash = await bcrypt.hash(verifyToken, 10);
-        const expiresAt = new Date();
-        expiresAt.setHours(expiresAt.getHours() + 24);
+        const rawVerifyToken = crypto.randomBytes(32).toString('hex');
+        const emailVerifyTokenHash = crypto.createHash('sha256').update(rawVerifyToken).digest('hex');
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
         await this.userRepository.update(user.id, {
             emailVerifyTokenHash,
             emailVerifyTokenExpiresAt: expiresAt,
         });
-        this.mailService.sendVerificationEmail(user.email, user.fullName, verifyToken).catch(() => {
+        this.mailService
+            .sendVerificationEmail(user.email, user.fullName, rawVerifyToken)
+            .catch((err) => {
+            this.logger.warn(`Không thể gửi lại email xác thực tới ${user.email}: ${err instanceof Error ? err.message : String(err)}`);
         });
-        return { message: 'Nếu email tồn tại, link xác minh đã được gửi lại' };
+        return { message: 'Nếu email tồn tại, link xác nhận đã được gửi lại' };
     }
 };
 exports.ResendVerificationEmailUseCase = ResendVerificationEmailUseCase;
-exports.ResendVerificationEmailUseCase = ResendVerificationEmailUseCase = __decorate([
+exports.ResendVerificationEmailUseCase = ResendVerificationEmailUseCase = ResendVerificationEmailUseCase_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(user_repository_interface_1.USER_REPOSITORY)),
     __param(1, (0, common_1.Inject)(mail_service_1.MAIL_SERVICE)),

@@ -1,4 +1,7 @@
-/* ─── Auth page styles ─── */
+/* ══════════════════════════════════════════════════════════════════════════
+   PSYTHALIA — AUTHENTICATION PAGES STYLING (WARM SANCTUARY REFINED)
+   WCAG 2.2 AA Compliant, Low Cognitive Load, Light & Dark Mode
+   ══════════════════════════════════════════════════════════════════════════ */
 
 .auth-page {
   display: flex;
@@ -6,23 +9,26 @@
   justify-content: center;
   min-height: calc(100vh - 160px);
   padding: 40px 16px;
+  background: var(--bg-canvas);
+  transition: background-color 0.25s ease;
 }
 
 .auth-card {
   width: 100%;
   max-width: 440px;
-  background: var(--code-bg);
-  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 16px;
-  padding: 40px 36px;
-  box-shadow: var(--shadow);
-  animation: authFadeIn 0.45s ease-out;
+  padding: 36px 32px;
+  box-shadow: var(--shadow-card);
+  animation: authCardFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-@keyframes authFadeIn {
+@keyframes authCardFadeIn {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -32,74 +38,87 @@
 
 .auth-card__header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .auth-card__icon {
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
   margin: 0 auto 16px;
-  border-radius: 16px;
-  background: var(--accent-bg);
+  border-radius: 14px;
+  background: var(--tint-lavender);
+  color: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  font-size: 24px;
+  transition: all 0.2s ease;
 }
 
 .auth-card__title {
+  font-family: var(--heading);
   font-size: 24px;
   font-weight: 600;
-  color: var(--text-h);
+  color: var(--text-primary);
   margin: 0 0 6px;
   letter-spacing: -0.3px;
+  line-height: 1.3;
 }
 
 .auth-card__subtitle {
   font-size: 14px;
-  color: var(--text);
+  color: var(--text-secondary);
   margin: 0;
+  line-height: 1.5;
 }
 
 .auth-card__footer {
   text-align: center;
   margin-top: 24px;
   font-size: 14px;
-  color: var(--text);
+  color: var(--text-secondary);
 }
 
 .auth-card__footer a {
-  color: var(--accent);
+  color: var(--color-primary);
   font-weight: 600;
   text-decoration: none;
-  transition: opacity 0.2s;
+  transition: color 0.2s ease, opacity 0.2s ease;
 }
 
 .auth-card__footer a:hover {
-  opacity: 0.8;
+  color: var(--color-primary-hover);
+  text-decoration: underline;
 }
 
-/* Override antd styles inside auth card */
+/* ─── Form Labels & Layout ─── */
 .auth-card .ant-form-item-label > label {
-  color: var(--text-h) !important;
+  color: var(--text-primary) !important;
   font-weight: 500;
   font-size: 14px;
 }
 
-/* Inputs & Affix Wrappers */
+/* ─── Ant Design Input & Affix Wrapper Overrides ─── */
 .auth-card .ant-input,
 .auth-card .ant-input-affix-wrapper {
-  background: var(--bg) !important;
-  border-color: var(--border) !important;
-  color: var(--text-h) !important;
+  background: var(--bg-surface) !important;
+  border-color: var(--border-strong) !important;
+  color: var(--text-primary) !important;
   border-radius: 8px !important;
+  font-size: 14px;
+  transition: all 0.2s ease;
 }
 
-/* Fix inner input tag inside affix wrapper (prevent dark rectangle) */
+.auth-card .ant-input:hover,
+.auth-card .ant-input-affix-wrapper:hover {
+  border-color: var(--color-primary) !important;
+}
+
+/* Prevent dark rectangle inside password & affix input tags */
 .auth-card .ant-input-affix-wrapper input.ant-input,
 .auth-card .ant-input-password input.ant-input {
   background: transparent !important;
-  color: var(--text-h) !important;
+  color: var(--text-primary) !important;
   box-shadow: none !important;
   border: none !important;
 }
@@ -107,7 +126,8 @@
 .auth-card .ant-input-prefix,
 .auth-card .ant-input-suffix,
 .auth-card .ant-input-password-icon {
-  color: var(--text) !important;
+  color: var(--text-secondary) !important;
+  opacity: 0.75;
 }
 
 .auth-card .ant-input:focus,
@@ -115,43 +135,158 @@
 .auth-card .ant-input-affix-wrapper:focus,
 .auth-card .ant-input-affix-wrapper-focused,
 .auth-card .ant-input-password:focus-within {
-  border-color: var(--accent) !important;
-  box-shadow: 0 0 0 2px var(--accent-bg) !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px var(--ring-focus) !important;
 }
 
 .auth-card .ant-input::placeholder,
 .auth-card .ant-input-affix-wrapper input::placeholder {
-  color: var(--text) !important;
-  opacity: 0.5;
+  color: var(--text-disabled) !important;
+  opacity: 0.85;
 }
 
+/* ─── Harmonious Alert Styles in Auth Card ─── */
+.auth-card .ant-alert {
+  border-radius: 10px !important;
+  padding: 12px 16px !important;
+  font-size: 13.5px !important;
+  line-height: 1.55 !important;
+  border-width: 1px !important;
+}
+
+.auth-card .ant-alert .ant-alert-message {
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  margin-bottom: 4px !important;
+}
+
+.auth-card .ant-alert .ant-alert-description {
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+  color: var(--text-primary) !important;
+  opacity: 0.88;
+}
+
+.auth-card .ant-alert-info {
+  background: var(--tint-blue) !important;
+  border-color: #CFDFEC !important;
+}
+
+.auth-card .ant-alert-info .ant-alert-icon {
+  color: var(--color-info) !important;
+}
+
+.auth-card .ant-alert-info .ant-alert-message {
+  color: var(--color-info) !important;
+}
+
+.auth-card .ant-alert-error {
+  background: var(--tint-crimson) !important;
+  border-color: #F7D0CC !important;
+}
+
+.auth-card .ant-alert-error .ant-alert-icon {
+  color: var(--color-crisis) !important;
+}
+
+.auth-card .ant-alert-error .ant-alert-message {
+  color: var(--color-crisis) !important;
+}
+
+.auth-card .ant-alert-warning {
+  background: var(--tint-terracotta) !important;
+  border-color: #F7E2CB !important;
+}
+
+.auth-card .ant-alert-warning .ant-alert-icon {
+  color: var(--color-warning) !important;
+}
+
+.auth-card .ant-alert-warning .ant-alert-message {
+  color: var(--color-warning) !important;
+}
+
+.auth-card .ant-alert-success {
+  background: var(--tint-sage) !important;
+  border-color: #CFE7DA !important;
+}
+
+.auth-card .ant-alert-success .ant-alert-icon {
+  color: var(--color-success) !important;
+}
+
+.auth-card .ant-alert-success .ant-alert-message {
+  color: var(--color-success) !important;
+}
+
+/* ─── Primary Submit Button ─── */
 .auth-card .ant-btn-primary {
   height: 44px;
   font-size: 15px;
   font-weight: 600;
-  border-radius: 10px;
-  background: var(--accent);
-  border-color: var(--accent);
-  box-shadow: 0 4px 14px rgba(170, 59, 255, 0.3);
-  transition: all 0.25s ease;
+  border-radius: 8px;
+  background: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(103, 80, 164, 0.2);
+  transition: all 0.2s ease;
 }
 
 .auth-card .ant-btn-primary:hover:not(:disabled) {
-  background: var(--accent);
-  border-color: var(--accent);
-  opacity: 0.9;
-  box-shadow: 0 6px 20px rgba(170, 59, 255, 0.4);
+  background: var(--color-primary-hover) !important;
+  border-color: var(--color-primary-hover) !important;
+  box-shadow: 0 4px 12px rgba(103, 80, 164, 0.3);
   transform: translateY(-1px);
 }
 
+.auth-card .ant-btn-primary:active:not(:disabled) {
+  background: var(--color-primary-active) !important;
+  border-color: var(--color-primary-active) !important;
+  transform: translateY(0);
+}
+
+.auth-card .ant-btn-primary:disabled {
+  background: var(--tint-lavender) !important;
+  border-color: transparent !important;
+  color: var(--text-disabled) !important;
+  opacity: 0.9 !important;
+  box-shadow: none !important;
+  cursor: not-allowed;
+}
+
+/* ─── Secondary/Default Button ─── */
+.auth-card .ant-btn-default {
+  height: 44px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  background: var(--bg-surface) !important;
+  border-color: var(--border-strong) !important;
+  color: var(--text-primary) !important;
+}
+
+.auth-card .ant-btn-default:hover {
+  background: var(--tint-lavender) !important;
+  border-color: var(--color-primary) !important;
+  color: var(--color-primary) !important;
+}
+
+/* ─── Divider Text ─── */
 .auth-card .ant-divider-inner-text {
-  color: var(--text);
+  color: var(--text-secondary);
   font-size: 13px;
 }
 
+/* ─── Responsive adjustments ─── */
 @media (max-width: 480px) {
+  .auth-page {
+    padding: 24px 12px;
+  }
   .auth-card {
     padding: 28px 20px;
-    border-radius: 12px;
+    border-radius: 14px;
+  }
+  .auth-card__title {
+    font-size: 22px;
   }
 }

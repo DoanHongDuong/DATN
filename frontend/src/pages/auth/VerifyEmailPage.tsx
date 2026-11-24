@@ -10,6 +10,7 @@ import {
   ReloadOutlined,
   HomeOutlined,
 } from '@ant-design/icons';
+import { Hourglass, CheckCircle2, ShieldCheck, Clock, MailWarning } from 'lucide-react';
 import { authApi } from '../../api/auth.api';
 import { useAuth } from '../../hooks/useAuth';
 import './auth.css';
@@ -116,11 +117,11 @@ export const VerifyEmailPage: React.FC = () => {
         {/* Header */}
         <div className="auth-card__header">
           <div className="auth-card__icon" aria-hidden="true">
-            {verifyState === 'loading' && '⏳'}
-            {verifyState === 'success' && '✨'}
-            {verifyState === 'already_verified' && '🛡️'}
-            {verifyState === 'expired' && '⏰'}
-            {verifyState === 'invalid' && '✉️'}
+            {verifyState === 'loading' && <Hourglass size={22} />}
+            {verifyState === 'success' && <CheckCircle2 size={22} />}
+            {verifyState === 'already_verified' && <ShieldCheck size={22} />}
+            {verifyState === 'expired' && <Clock size={22} />}
+            {verifyState === 'invalid' && <MailWarning size={22} />}
           </div>
           <h2 className="auth-card__title">Xác thực tài khoản</h2>
           <p className="auth-card__subtitle">Hệ thống Hỗ trợ Tâm lý Sinh viên — PSYTHALIA</p>
@@ -244,7 +245,14 @@ export const VerifyEmailPage: React.FC = () => {
             <div className="auth-card__footer" style={{ marginTop: 8 }}>
               <Link
                 to={getTargetUrl()}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  color: 'var(--color-primary)',
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                }}
               >
                 <ArrowLeftOutlined /> Quay lại {isAuthenticated ? 'trang chủ' : 'đăng nhập'}
               </Link>

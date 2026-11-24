@@ -72,7 +72,7 @@ let AdminPrismaRepository = class AdminPrismaRepository {
             });
         });
     }
-    async rejectVolunteer(actorId, profileId, userId) {
+    async rejectVolunteer(actorId, profileId, userId, reason) {
         await this.prisma.$transaction(async (tx) => {
             await tx.volunteerProfile.delete({
                 where: { id: profileId },
@@ -82,20 +82,25 @@ let AdminPrismaRepository = class AdminPrismaRepository {
                     actorId,
                     action: 'REJECT_VOLUNTEER',
                     targetId: userId,
-                    description: 'Từ chối hồ sơ tình nguyện viên',
+                    description: reason
+                        ? `Từ chối hồ sơ tình nguyện viên. Lý do: ${reason}`
+                        : 'Từ chối hồ sơ tình nguyện viên',
                 },
             });
         });
     }
-    async getUsers(page, limit, search) {
-        const where = search
-            ? {
-                OR: [
-                    { fullName: { contains: search, mode: 'insensitive' } },
-                    { email: { contains: search, mode: 'insensitive' } },
-                ],
-            }
-            : {};
+    async getUsers(page, limit, search, role) {
+        const where = {
+            ...(role ? { role: role } : {}),
+            ...(search
+                ? {
+                    OR: [
+                        { fullName: { contains: search, mode: 'insensitive' } },
+                        { email: { contains: search, mode: 'insensitive' } },
+                    ],
+                }
+                : {}),
+        };
         const [total, items] = await Promise.all([
             this.prisma.user.count({ where }),
             this.prisma.user.findMany({
@@ -171,6 +176,12 @@ let AdminPrismaRepository = class AdminPrismaRepository {
                     updatedAt: true,
                 },
             });
+            if (status === client_1.AccountStatus.SUSPENDED && updated.role === client_1.Role.VOLUNTEER) {
+                await tx.volunteerProfile.updateMany({
+                    where: { userId: targetUserId },
+                    data: { isOnline: false },
+                });
+            }
             await tx.auditLog.create({
                 data: {
                     actorId,

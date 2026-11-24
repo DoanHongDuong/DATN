@@ -47,6 +47,7 @@ let ChatPrismaRepository = class ChatPrismaRepository {
             where: {
                 isOnline: true,
                 isVerified: true,
+                user: { status: client_1.AccountStatus.ACTIVE },
             },
         });
         return count > 0;
@@ -56,6 +57,7 @@ let ChatPrismaRepository = class ChatPrismaRepository {
             where: {
                 isOnline: true,
                 isVerified: true,
+                user: { status: client_1.AccountStatus.ACTIVE },
             },
             select: { userId: true },
         });

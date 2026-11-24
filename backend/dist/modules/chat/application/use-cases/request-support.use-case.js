@@ -28,7 +28,10 @@ let RequestSupportUseCase = class RequestSupportUseCase {
         this.configService = configService;
         this.createNotificationUseCase = createNotificationUseCase;
     }
-    async execute(userId) {
+    async execute(userId, role) {
+        if (role && (role === client_1.Role.ADMIN || role === client_1.Role.VOLUNTEER)) {
+            throw new common_1.ForbiddenException('Tài khoản Quản trị viên và Tình nguyện viên không thể tạo yêu cầu tư vấn trên kênh sinh viên. Vui lòng sử dụng tài khoản Người dùng (USER) để thử nghiệm.');
+        }
         const existingSession = await this.chatRepository.findActiveOrWaitingSessionByUserId(userId);
         if (existingSession) {
             throw new common_1.ConflictException('Bạn đang có một phiên hỗ trợ chưa kết thúc. Vui lòng đợi hoặc kết thúc phiên hiện tại.');

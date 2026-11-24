@@ -61,8 +61,14 @@ let RequestPasswordResetUseCase = RequestPasswordResetUseCase_1 = class RequestP
         this.mailService = mailService;
     }
     async execute(dto) {
-        const user = await this.userRepository.findByEmail(dto.email);
+        const user = await this.userRepository.findByEmail(dto.email.trim());
         if (user) {
+            if (!user.emailVerified) {
+                this.logger.warn(`Yêu cầu đặt lại mật khẩu bị từ chối cho ${user.email} vì tài khoản chưa xác thực email`);
+                return {
+                    message: 'Nếu email tồn tại và đã được xác thực, hướng dẫn đặt lại mật khẩu đã được gửi đến hòm thư của bạn.',
+                };
+            }
             const resetToken = crypto.randomBytes(32).toString('hex');
             const resetTokenHash = await bcrypt.hash(resetToken, 10);
             const expiresAt = new Date();
@@ -77,7 +83,9 @@ let RequestPasswordResetUseCase = RequestPasswordResetUseCase_1 = class RequestP
                 this.logger.error(`Lỗi khi gửi email đặt lại mật khẩu đến ${user.email}: ${err?.message || err}`);
             });
         }
-        return { message: 'Nếu email tồn tại, hướng dẫn đặt lại mật khẩu đã được gửi' };
+        return {
+            message: 'Nếu email tồn tại và đã được xác thực, hướng dẫn đặt lại mật khẩu đã được gửi đến hòm thư của bạn.',
+        };
     }
 };
 exports.RequestPasswordResetUseCase = RequestPasswordResetUseCase;

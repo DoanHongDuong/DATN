@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Form, Input, Button, Alert } from 'antd';
 import { MailOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { KeyRound } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { authApi } from '../../api/auth.api';
@@ -47,7 +48,9 @@ export const ForgotPasswordPage: React.FC = () => {
       <div className="auth-card">
         {/* Header */}
         <div className="auth-card__header">
-          <div className="auth-card__icon">🔑</div>
+          <div className="auth-card__icon" aria-hidden="true">
+            <KeyRound size={22} />
+          </div>
           <h2 className="auth-card__title">Quên mật khẩu</h2>
           <p className="auth-card__subtitle">
             Nhập email tài khoản của bạn để nhận hướng dẫn khôi phục mật khẩu.
@@ -83,7 +86,7 @@ export const ForgotPasswordPage: React.FC = () => {
                   alignItems: 'center',
                   gap: '6px',
                   fontWeight: 600,
-                  color: 'var(--accent)',
+                  color: 'var(--color-primary)',
                 }}
               >
                 <ArrowLeftOutlined /> Quay lại đăng nhập

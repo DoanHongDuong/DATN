@@ -1,0 +1,352 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   PSYTHALIA — HOMEPAGE STYLING (WARM SANCTUARY REFINED EDITION)
+   WCAG 2.2 AA Compliant, Responsive, Gentle Visual Rhythm
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.home-container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 48px 20px 80px;
+}
+
+/* ─── Hero Section ─── */
+.home-hero {
+  text-align: center;
+  margin-bottom: 72px;
+}
+
+.home-hero__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: var(--tint-lavender);
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(103, 80, 164, 0.12);
+  transition: all 0.2s ease;
+}
+
+.home-hero__title {
+  font-family: var(--heading);
+  font-size: 44px;
+  font-weight: 700;
+  margin: 0 0 18px 0;
+  color: var(--text-primary);
+  line-height: 1.25;
+  letter-spacing: -0.6px;
+}
+
+.home-hero__subtitle {
+  font-size: 16px;
+  max-width: 660px;
+  margin: 0 auto 36px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+/* ─── CTA Buttons ─── */
+.home-cta-group {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.home-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  min-height: 46px;
+  cursor: pointer;
+}
+
+.home-btn--primary {
+  background: var(--color-primary);
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(103, 80, 164, 0.2);
+}
+
+.home-btn--primary:hover {
+  background: var(--color-primary-hover);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(103, 80, 164, 0.3);
+  transform: translateY(-1px);
+}
+
+.home-btn--primary:active {
+  background: var(--color-primary-active);
+  transform: translateY(0);
+}
+
+.home-btn--secondary {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+}
+
+.home-btn--secondary:hover {
+  background: var(--tint-lavender);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  transform: translateY(-1px);
+}
+
+/* ─── Pillar Features Section ─── */
+.home-features {
+  margin-bottom: 72px;
+}
+
+.home-features__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.home-card {
+  padding: 28px 24px;
+  border-radius: 16px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-card);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px rgba(45, 42, 50, 0.1);
+  border-color: var(--border-strong);
+}
+
+.home-card__icon-wrapper {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.home-card__icon-wrapper--lavender {
+  background: var(--tint-lavender);
+  color: var(--color-primary);
+}
+
+.home-card__icon-wrapper--sage {
+  background: var(--tint-sage);
+  color: var(--color-secondary);
+}
+
+.home-card__icon-wrapper--blue {
+  background: var(--tint-blue);
+  color: var(--color-info);
+}
+
+.home-card__title {
+  font-family: var(--heading);
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.home-card__desc {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+  flex-grow: 1;
+}
+
+.home-card__tag {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.home-card__tag--lavender {
+  background: var(--tint-lavender);
+  color: var(--color-primary);
+}
+
+.home-card__tag--sage {
+  background: var(--tint-sage);
+  color: var(--color-secondary);
+}
+
+.home-card__tag--blue {
+  background: var(--tint-blue);
+  color: var(--color-info);
+}
+
+/* ─── 3-Step Journey Section ─── */
+.home-journey {
+  margin-bottom: 72px;
+  padding: 40px 32px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  box-shadow: var(--shadow-card);
+}
+
+.home-journey__header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.home-journey__title {
+  font-family: var(--heading);
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.home-journey__subtitle {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin: 0;
+}
+
+.home-journey__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  position: relative;
+}
+
+.home-step {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background: var(--bg-surface);
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+}
+
+.home-step__num {
+  font-family: var(--heading);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 12px;
+}
+
+.home-step__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.home-step__desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ─── Crisis & Emergency Safety Notice ─── */
+.home-crisis {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 24px;
+  background: var(--tint-crimson);
+  border: 1px solid rgba(166, 50, 40, 0.2);
+  border-radius: 16px;
+}
+
+.home-crisis__icon {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 10px;
+  background: #FFFFFF;
+  color: var(--color-crisis);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(166, 50, 40, 0.12);
+}
+
+.home-crisis__content {
+  flex: 1;
+}
+
+.home-crisis__title {
+  font-family: var(--heading);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-crisis);
+  margin: 0 0 6px 0;
+}
+
+.home-crisis__desc {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-primary);
+  margin: 0 0 10px 0;
+}
+
+.home-crisis__hotlines {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+
+.home-crisis__hotline-item {
+  color: var(--color-crisis);
+  font-weight: 600;
+}
+
+/* ─── Responsive Breakpoints ─── */
+@media (max-width: 768px) {
+  .home-container {
+    padding: 32px 16px 60px;
+  }
+  .home-hero {
+    margin-bottom: 48px;
+  }
+  .home-hero__title {
+    font-size: 30px;
+  }
+  .home-hero__subtitle {
+    font-size: 15px;
+    margin-bottom: 28px;
+  }
+  .home-features {
+    margin-bottom: 48px;
+  }
+  .home-journey {
+    padding: 28px 18px;
+    margin-bottom: 48px;
+  }
+  .home-journey__title {
+    font-size: 22px;
+  }
+  .home-crisis {
+    flex-direction: column;
+    gap: 14px;
+    padding: 20px;
+  }
+}

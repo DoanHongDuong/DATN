@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Form, Input, Button, message } from 'antd';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
+import { Lock } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 import { authApi, type LoginPayload } from '../../api/auth.api';
@@ -70,9 +71,11 @@ export const LoginPage: React.FC = () => {
       <div className="auth-card">
         {/* Header */}
         <div className="auth-card__header">
-          <div className="auth-card__icon">🔐</div>
+          <div className="auth-card__icon" aria-hidden="true">
+            <Lock size={22} />
+          </div>
           <h2 className="auth-card__title">Đăng nhập</h2>
-          <p className="auth-card__subtitle">Chào mừng bạn đến với PSYTHALIA</p>
+          <p className="auth-card__subtitle">Chào mừng bạn quay lại với PSYTHALIA</p>
         </div>
 
         {/* Form */}
@@ -111,7 +114,15 @@ export const LoginPage: React.FC = () => {
           </Form.Item>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
-            <Link to="/forgot-password" style={{ fontSize: '13px', fontWeight: 500 }}>
+            <Link
+              to="/forgot-password"
+              style={{
+                fontSize: '13px',
+                fontWeight: 500,
+                color: 'var(--color-primary)',
+                textDecoration: 'none',
+              }}
+            >
               Quên mật khẩu?
             </Link>
           </div>

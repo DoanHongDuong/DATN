@@ -25,6 +25,7 @@ const reject_volunteer_use_case_1 = require("../application/use-cases/reject-vol
 const get_users_use_case_1 = require("../application/use-cases/get-users.use-case");
 const update_user_status_use_case_1 = require("../application/use-cases/update-user-status.use-case");
 const update_user_status_dto_1 = require("../application/dto/update-user-status.dto");
+const reject_volunteer_dto_1 = require("../application/dto/reject-volunteer.dto");
 const get_users_query_dto_1 = require("../application/dto/get-users-query.dto");
 const get_admin_resources_use_case_1 = require("../application/use-cases/get-admin-resources.use-case");
 const create_resource_use_case_1 = require("../application/use-cases/create-resource.use-case");
@@ -69,8 +70,8 @@ let AdminController = class AdminController {
     async approveVolunteer(req, profileId) {
         return this.approveVolunteerUseCase.execute(req.user.userId, profileId);
     }
-    async rejectVolunteer(req, profileId) {
-        return this.rejectVolunteerUseCase.execute(req.user.userId, profileId);
+    async rejectVolunteer(req, profileId, dto) {
+        return this.rejectVolunteerUseCase.execute(req.user.userId, profileId, dto?.reason);
     }
     async getUsers(query) {
         return this.getUsersUseCase.execute(query);
@@ -123,8 +124,9 @@ __decorate([
     (0, common_1.Post)('volunteers/:profileId/reject'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('profileId')),
+    __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:paramtypes", [Object, String, reject_volunteer_dto_1.RejectVolunteerDto]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "rejectVolunteer", null);
 __decorate([

@@ -23,18 +23,21 @@ let RejectVolunteerUseCase = class RejectVolunteerUseCase {
         this.adminRepo = adminRepo;
         this.createNotificationUseCase = createNotificationUseCase;
     }
-    async execute(actorId, profileId) {
+    async execute(actorId, profileId, reason) {
         const profile = await this.adminRepo.findVolunteerProfileById(profileId);
         if (!profile) {
             throw new common_1.NotFoundException('Không tìm thấy hồ sơ tình nguyện viên');
         }
         const targetUserId = profile.userId;
-        await this.adminRepo.rejectVolunteer(actorId, profile.id, targetUserId);
+        const cleanReason = reason?.trim();
+        await this.adminRepo.rejectVolunteer(actorId, profile.id, targetUserId, cleanReason);
         if (this.createNotificationUseCase) {
+            const reasonText = cleanReason || 'Chưa đáp ứng đủ tiêu chuẩn xét duyệt đợt này (vui lòng bổ sung chứng chỉ PFA hoặc cập nhật kinh nghiệm).';
+            const content = `Hồ sơ đăng ký làm Tình nguyện viên của bạn chưa được duyệt.\nLý do từ chối: ${reasonText}`;
             await this.createNotificationUseCase.execute({
                 userId: targetUserId,
                 title: 'Cập nhật hồ sơ tình nguyện viên',
-                content: 'Rất tiếc, hồ sơ đăng ký làm Tình nguyện viên của bạn chưa đáp ứng đủ tiêu chuẩn xét duyệt đợt này.',
+                content,
                 type: 'VOLUNTEER_REJECTED',
             }).catch(() => null);
         }

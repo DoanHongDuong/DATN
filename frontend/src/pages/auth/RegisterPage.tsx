@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Form, Input, Button, message } from 'antd';
 import { UserOutlined, MailOutlined, LockOutlined, PhoneOutlined } from '@ant-design/icons';
+import { UserPlus } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 import { authApi, type RegisterPayload } from '../../api/auth.api';
@@ -69,10 +70,12 @@ export const RegisterPage: React.FC = () => {
       <div className="auth-card">
         {/* Header */}
         <div className="auth-card__header">
-          <div className="auth-card__icon">🌱</div>
+          <div className="auth-card__icon" aria-hidden="true">
+            <UserPlus size={22} />
+          </div>
           <h2 className="auth-card__title">Đăng ký tài khoản</h2>
           <p className="auth-card__subtitle">
-            Tạo tài khoản để sử dụng dịch vụ hỗ trợ tâm lý
+            Tạo tài khoản để sử dụng dịch vụ hỗ trợ tâm lý PSYTHALIA
           </p>
         </div>
 

@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetTestHistoryUseCase = void 0;
 const common_1 = require("@nestjs/common");
+const severity_thresholds_constant_1 = require("../../infrastructure/constants/severity-thresholds.constant");
 let GetTestHistoryUseCase = class GetTestHistoryUseCase {
     repository;
     constructor(repository) {
@@ -25,8 +26,12 @@ let GetTestHistoryUseCase = class GetTestHistoryUseCase {
             this.repository.findTestHistoryByUserId(userId, skip, limit),
             this.repository.countTestHistoryByUserId(userId),
         ]);
+        const enrichedData = data.map((item) => ({
+            ...item,
+            recommendation: (0, severity_thresholds_constant_1.getRecommendation)(item.test?.code || '', item.severityLevel),
+        }));
         return {
-            data,
+            data: enrichedData,
             meta: {
                 total,
                 page,

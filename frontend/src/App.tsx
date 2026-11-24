@@ -53,6 +53,17 @@ export const App: React.FC = () => {
       colorTextSecondary: isDark ? '#A9A4B4' : '#595563',
       colorTextHeading: isDark ? '#EDEAF2' : '#2D2A32',
       colorTextDisabled: isDark ? '#696575' : '#8C8797',
+
+      /* Explicit harmonious alert & notification tints */
+      colorInfoBg: isDark ? '#1E252D' : '#EDF4F8',
+      colorInfoBorder: isDark ? '#2D3E4F' : '#CFDFEC',
+      colorErrorBg: isDark ? '#2B1C1D' : '#FDF2F0',
+      colorErrorBorder: isDark ? '#4D2B2C' : '#F7D0CC',
+      colorWarningBg: isDark ? '#2B221B' : '#FDF7EE',
+      colorWarningBorder: isDark ? '#4D3A2B' : '#F7E2CB',
+      colorSuccessBg: isDark ? '#1C2822' : '#EEF7F2',
+      colorSuccessBorder: isDark ? '#2C4437' : '#CFE7DA',
+
       fontFamily: "'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
       fontSize: 14,
       borderRadius: 8,
@@ -72,6 +83,7 @@ export const App: React.FC = () => {
       Input: {
         controlHeight: 40,
         borderRadius: 8,
+        colorBgContainer: isDark ? '#222228' : '#FFFFFF',
         colorBorder: isDark ? '#454352' : '#C7C1B8',
       },
       Select: {
@@ -101,7 +113,7 @@ export const App: React.FC = () => {
         colorPrimary: isDark ? '#BFA8F2' : '#6750A4',
       },
       Alert: {
-        borderRadiusLG: 8,
+        borderRadiusLG: 10,
       },
     },
   };

@@ -49,26 +49,41 @@ exports.VerifyEmailUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const user_repository_interface_1 = require("../../domain/repositories/user.repository.interface");
 const bcrypt = __importStar(require("bcrypt"));
+const crypto = __importStar(require("crypto"));
 let VerifyEmailUseCase = class VerifyEmailUseCase {
     userRepository;
     constructor(userRepository) {
         this.userRepository = userRepository;
     }
     async execute(dto) {
-        const user = await this.userRepository.findByEmail(dto.email);
+        const user = await this.userRepository.findByEmail(dto.email.trim());
         if (!user) {
             throw new common_1.BadRequestException('Token xác minh không hợp lệ hoặc đã hết hạn');
         }
         if (user.emailVerified) {
-            return { message: 'Email đã được xác minh trước đó' };
+            return {
+                message: 'Email đã được xác minh trước đó',
+                alreadyVerified: true,
+            };
         }
         if (!user.emailVerifyTokenHash || !user.emailVerifyTokenExpiresAt) {
             throw new common_1.BadRequestException('Token xác minh không hợp lệ hoặc đã hết hạn');
         }
         if (user.emailVerifyTokenExpiresAt < new Date()) {
-            throw new common_1.BadRequestException('Token xác minh đã hết hạn. Vui lòng đăng ký lại');
+            throw new common_1.BadRequestException('Token xác minh đã hết hạn. Vui lòng yêu cầu gửi lại email mới');
         }
-        const isTokenValid = await bcrypt.compare(dto.token, user.emailVerifyTokenHash);
+        let isTokenValid = false;
+        if (user.emailVerifyTokenHash.startsWith('$2b$') || user.emailVerifyTokenHash.startsWith('$2a$')) {
+            isTokenValid = await bcrypt.compare(dto.token.trim(), user.emailVerifyTokenHash);
+        }
+        else {
+            const incomingHash = crypto.createHash('sha256').update(dto.token.trim()).digest('hex');
+            const incomingBuf = Buffer.from(incomingHash, 'hex');
+            const storedBuf = Buffer.from(user.emailVerifyTokenHash, 'hex');
+            isTokenValid =
+                incomingBuf.length === storedBuf.length &&
+                    crypto.timingSafeEqual(incomingBuf, storedBuf);
+        }
         if (!isTokenValid) {
             throw new common_1.BadRequestException('Token xác minh không hợp lệ hoặc đã hết hạn');
         }
@@ -77,7 +92,10 @@ let VerifyEmailUseCase = class VerifyEmailUseCase {
             emailVerifyTokenHash: null,
             emailVerifyTokenExpiresAt: null,
         });
-        return { message: 'Email đã được xác minh thành công. Bạn có thể đăng nhập ngay bây giờ' };
+        return {
+            message: 'Email của bạn đã được xác minh thành công. Cảm ơn bạn!',
+            success: true,
+        };
     }
 };
 exports.VerifyEmailUseCase = VerifyEmailUseCase;

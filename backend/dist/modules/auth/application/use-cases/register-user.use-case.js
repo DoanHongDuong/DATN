@@ -44,20 +44,26 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var RegisterUserUseCase_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RegisterUserUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const user_repository_interface_1 = require("../../domain/repositories/user.repository.interface");
+const mail_service_1 = require("../../../../infrastructure/mail/mail.service");
 const bcrypt = __importStar(require("bcrypt"));
+const crypto = __importStar(require("crypto"));
 const client_1 = require("@prisma/client");
 const library_1 = require("@prisma/client/runtime/library");
-let RegisterUserUseCase = class RegisterUserUseCase {
+let RegisterUserUseCase = RegisterUserUseCase_1 = class RegisterUserUseCase {
     userRepository;
     jwtService;
-    constructor(userRepository, jwtService) {
+    mailService;
+    logger = new common_1.Logger(RegisterUserUseCase_1.name);
+    constructor(userRepository, jwtService, mailService) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
+        this.mailService = mailService;
     }
     async execute(dto) {
         if (dto.password !== dto.confirmPassword) {
@@ -65,6 +71,9 @@ let RegisterUserUseCase = class RegisterUserUseCase {
         }
         const saltRounds = 10;
         const passwordHash = await bcrypt.hash(dto.password, saltRounds);
+        const rawVerifyToken = crypto.randomBytes(32).toString('hex');
+        const verifyTokenHash = crypto.createHash('sha256').update(rawVerifyToken).digest('hex');
+        const verifyTokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
         try {
             const user = await this.userRepository.create({
                 fullName: dto.fullName,
@@ -73,7 +82,14 @@ let RegisterUserUseCase = class RegisterUserUseCase {
                 phone: dto.phone,
                 role: client_1.Role.USER,
                 status: client_1.AccountStatus.ACTIVE,
-                emailVerified: true,
+                emailVerified: false,
+                emailVerifyTokenHash: verifyTokenHash,
+                emailVerifyTokenExpiresAt: verifyTokenExpiresAt,
+            });
+            this.mailService
+                .sendVerificationEmail(user.email, user.fullName, rawVerifyToken)
+                .catch((err) => {
+                this.logger.warn(`Không thể gửi email xác thực đến ${user.email}: ${err instanceof Error ? err.message : String(err)}`);
             });
             const payload = { sub: user.id, role: user.role };
             const accessToken = await this.jwtService.signAsync(payload, { expiresIn: '7d' });
@@ -84,6 +100,7 @@ let RegisterUserUseCase = class RegisterUserUseCase {
                     email: user.email,
                     fullName: user.fullName,
                     role: user.role,
+                    emailVerified: user.emailVerified,
                 },
                 message: 'Đăng ký tài khoản thành công',
             };
@@ -97,9 +114,10 @@ let RegisterUserUseCase = class RegisterUserUseCase {
     }
 };
 exports.RegisterUserUseCase = RegisterUserUseCase;
-exports.RegisterUserUseCase = RegisterUserUseCase = __decorate([
+exports.RegisterUserUseCase = RegisterUserUseCase = RegisterUserUseCase_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(user_repository_interface_1.USER_REPOSITORY)),
-    __metadata("design:paramtypes", [Object, jwt_1.JwtService])
+    __param(2, (0, common_1.Inject)(mail_service_1.MAIL_SERVICE)),
+    __metadata("design:paramtypes", [Object, jwt_1.JwtService, Object])
 ], RegisterUserUseCase);
 //# sourceMappingURL=register-user.use-case.js.map
