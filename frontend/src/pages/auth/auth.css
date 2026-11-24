@@ -219,6 +219,21 @@
   color: var(--color-success) !important;
 }
 
+@media (prefers-color-scheme: dark) {
+  .auth-card .ant-alert-info {
+    border-color: #2D3E4F !important;
+  }
+  .auth-card .ant-alert-error {
+    border-color: #4D2B2C !important;
+  }
+  .auth-card .ant-alert-warning {
+    border-color: #4D3A2B !important;
+  }
+  .auth-card .ant-alert-success {
+    border-color: #2C4437 !important;
+  }
+}
+
 /* ─── Primary Submit Button ─── */
 .auth-card .ant-btn-primary {
   height: 44px;
