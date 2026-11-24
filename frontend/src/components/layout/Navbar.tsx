@@ -98,15 +98,7 @@ export const Navbar: React.FC = () => {
 
       {/* Desktop Capsule Navigation */}
       {!isAuthPage && isAuthenticated && (
-        <nav
-          className="desktop-nav"
-          style={{
-            background: 'rgba(255, 255, 255, 0.45)',
-            padding: '4px 6px',
-            borderRadius: '24px',
-            border: '1px solid var(--border-subtle)',
-          }}
-        >
+        <nav className="desktop-nav capsule-nav-container">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname.startsWith(item.path);
@@ -114,20 +106,7 @@ export const Navbar: React.FC = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '7px',
-                  padding: '7px 14px',
-                  borderRadius: '18px',
-                  textDecoration: 'none',
-                  fontSize: '13.5px',
-                  fontWeight: isActive ? 600 : 500,
-                  transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                  background: isActive ? 'var(--tint-lavender)' : 'transparent',
-                  color: isActive ? 'var(--color-primary)' : 'var(--text-secondary)',
-                  border: isActive ? '1px solid rgba(103, 80, 164, 0.2)' : '1px solid transparent',
-                }}
+                className={`capsule-nav-item ${isActive ? 'capsule-nav-item--active' : ''}`}
               >
                 <Icon size={16} />
                 <span>{item.label}</span>
@@ -137,7 +116,7 @@ export const Navbar: React.FC = () => {
                       width: '5px',
                       height: '5px',
                       borderRadius: '50%',
-                      background: 'var(--color-primary)',
+                      background: 'currentColor',
                       marginLeft: '2px',
                     }}
                   />

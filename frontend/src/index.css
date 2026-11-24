@@ -244,9 +244,9 @@ code {
   justify-content: space-between;
   padding: 12px 24px;
   border-bottom: 1px solid var(--border-subtle);
-  background: rgba(247, 245, 240, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(247, 245, 240, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -256,8 +256,76 @@ code {
 
 @media (prefers-color-scheme: dark) {
   .app-header {
-    background: rgba(24, 24, 28, 0.85);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    background: rgba(24, 24, 28, 0.96);
+    border-bottom: 1px solid #2F2E38;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  }
+}
+
+/* ─── Capsule Navigation (Warm Sanctuary Refined) ─── */
+.capsule-nav-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  border-radius: 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  .capsule-nav-container {
+    background: #1F1F25;
+    border-color: #383744;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  }
+}
+
+.capsule-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border-radius: 18px;
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.capsule-nav-item:hover {
+  color: var(--text-primary);
+  background: rgba(103, 80, 164, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  .capsule-nav-item {
+    color: #D3CFDE;
+  }
+  .capsule-nav-item:hover {
+    color: #FFFFFF;
+    background: rgba(191, 168, 242, 0.12);
+  }
+}
+
+.capsule-nav-item--active {
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--tint-lavender);
+  border-color: rgba(103, 80, 164, 0.25);
+}
+
+@media (prefers-color-scheme: dark) {
+  .capsule-nav-item--active {
+    color: #D5C4F7;
+    background: rgba(191, 168, 242, 0.2);
+    border-color: rgba(191, 168, 242, 0.45);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
   }
 }
 
