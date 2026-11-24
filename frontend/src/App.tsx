@@ -6,15 +6,15 @@ import { AuthProvider } from './store/AuthContext';
 import { SocketProvider } from './store/SocketProvider';
 import { AppRouter } from './router/AppRouter';
 
-// Configure Ant Design Message & Notification to always appear below the navbar with clean stacking
+// Configure Ant Design Message & Notification to always appear cleanly below the navbar
 message.config({
-  top: 80,
+  top: 72,
   duration: 3,
   maxCount: 2,
 });
 
 notification.config({
-  top: 80,
+  top: 72,
   duration: 4.5,
   maxCount: 2,
 });
