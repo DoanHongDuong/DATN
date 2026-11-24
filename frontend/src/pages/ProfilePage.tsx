@@ -1,14 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Card, Form, Input, Button, message, Tag, Typography, Divider, Space } from 'antd';
-import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined, SafetyCertificateOutlined, CalendarOutlined } from '@ant-design/icons';
+import { Card, Form, Input, Button, message } from 'antd';
+import {
+  User,
+  Lock,
+  Mail,
+  Phone,
+  ShieldCheck,
+  Calendar,
+  CheckCircle2,
+  KeyRound,
+  ExternalLink,
+} from 'lucide-react';
 import { userApi, type UserDetail } from '../api/user.api';
 import { authApi } from '../api/auth.api';
 import { useAuth } from '../hooks/useAuth';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
-
-const { Title, Text } = Typography;
+import './profile.css';
 
 export const ProfilePage: React.FC = () => {
   const { updateUser } = useAuth();
@@ -100,71 +109,119 @@ export const ProfilePage: React.FC = () => {
     return <LoadingSpinner message="Đang tải thông tin tài khoản..." />;
   }
 
-  const roleTagConfig = {
-    ADMIN: { color: 'purple', label: 'Quản trị viên (Admin)' },
-    VOLUNTEER: { color: 'green', label: 'Tình nguyện viên' },
-    USER: { color: 'blue', label: 'Người dùng' },
-  }[profile?.role || 'USER'] || { color: 'default', label: profile?.role };
+  // Calculate initials for Avatar
+  const getInitials = (name?: string): string => {
+    if (!name) return 'U';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  };
+
+  const roleConfig = {
+    ADMIN: { label: 'Quản trị viên', className: 'profile-role-tag--admin' },
+    VOLUNTEER: { label: 'Tình nguyện viên', className: 'profile-role-tag--volunteer' },
+    USER: { label: 'Sinh viên', className: 'profile-role-tag--user' },
+  }[profile?.role || 'USER'] || { label: profile?.role || 'Người dùng', className: 'profile-role-tag--user' };
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div>
-        <Title level={2} style={{ margin: 0, color: 'var(--text-h)' }}>
+    <div className="profile-page-container">
+      {/* Header */}
+      <div className="profile-header">
+        <h1 className="profile-header__title">
           Hồ sơ cá nhân & Bảo mật
-        </Title>
-        <Text type="secondary" style={{ fontSize: '15px' }}>
-          Quản lý thông tin tài khoản và thiết lập mật khẩu của bạn
-        </Text>
+        </h1>
+        <p className="profile-header__subtitle">
+          Quản lý thông tin tài khoản cá nhân, thông tin liên hệ và thiết lập bảo vệ mật khẩu của bạn.
+        </p>
       </div>
 
-      {/* Card 1: Thông tin hồ sơ */}
-      <Card
-        title={
-          <Space>
-            <UserOutlined style={{ color: 'var(--accent)' }} />
-            <span>Thông tin cá nhân (PB-05)</span>
-          </Space>
-        }
-        bordered
-        style={{
-          borderRadius: '12px',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
-        }}
-      >
-        <Form
-          form={profileForm}
-          layout="vertical"
-          onFinish={handleUpdateProfile}
-          initialValues={{
-            fullName: profile?.fullName,
-            phone: profile?.phone || '',
-          }}
+      {/* Hero Identity Card */}
+      <div className="profile-hero-card">
+        <div className="profile-hero-identity">
+          <div className="profile-avatar" aria-hidden="true">
+            {getInitials(profile?.fullName)}
+          </div>
+          <div className="profile-hero-info">
+            <h2 className="profile-hero-name">
+              {profile?.fullName || 'Người dùng'}
+            </h2>
+            <div className="profile-hero-meta">
+              <span className={`profile-role-tag ${roleConfig.className}`}>
+                <ShieldCheck size={14} />
+                {roleConfig.label}
+              </span>
+              <span className="profile-verified-badge">
+                <CheckCircle2 size={15} />
+                Email đã xác thực
+              </span>
+              {profile?.createdAt && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                  <Calendar size={14} />
+                  Thành viên từ: {new Date(profile.createdAt).toLocaleDateString('vi-VN')}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {profile?.role === 'VOLUNTEER' && (
+          <Link
+            to="/chat"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 16px',
+              borderRadius: '10px',
+              background: 'var(--tint-sage)',
+              color: 'var(--color-secondary)',
+              fontSize: '13.5px',
+              fontWeight: 600,
+              textDecoration: 'none',
+              border: '1px solid rgba(58, 117, 88, 0.2)',
+              transition: 'opacity 0.2s ease',
+            }}
+          >
+            Đến Hàng đợi Tư vấn <ExternalLink size={14} />
+          </Link>
+        )}
+      </div>
+
+      {/* Content Grid */}
+      <div className="profile-grid">
+        {/* Card 1: Thông tin cá nhân */}
+        <Card
+          className="profile-card"
+          title={
+            <div className="profile-card-header">
+              <div className="profile-card-header__icon profile-card-header__icon--personal">
+                <User size={18} />
+              </div>
+              <span>Thông tin cá nhân</span>
+            </div>
+          }
         >
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-            <Form.Item label="Địa chỉ Email (Chỉ đọc)">
+          <Form
+            form={profileForm}
+            layout="vertical"
+            onFinish={handleUpdateProfile}
+            initialValues={{
+              fullName: profile?.fullName,
+              phone: profile?.phone || '',
+            }}
+          >
+            <Form.Item label="Địa chỉ Email (Cố định)">
               <Input
-                prefix={<MailOutlined />}
+                prefix={<Mail size={16} style={{ color: 'var(--text-disabled)', marginRight: 4 }} />}
                 value={profile?.email}
                 disabled
-                style={{ backgroundColor: 'var(--code-bg, #f3f4f6)', color: 'var(--text)' }}
+                className="profile-readonly-input"
               />
+              <span style={{ display: 'block', fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                Email được dùng làm định danh bảo mật tài khoản và nhận liên kết khôi phục.
+              </span>
             </Form.Item>
 
-            <Form.Item label="Vai trò tài khoản">
-              <div style={{ display: 'flex', alignItems: 'center', height: '32px', gap: '10px' }}>
-                <Tag color={roleTagConfig.color} icon={<SafetyCertificateOutlined />}>
-                  {roleTagConfig.label}
-                </Tag>
-                {profile?.role === 'VOLUNTEER' && (
-                  <Link to="/dashboard" style={{ fontSize: '13px', color: 'var(--accent)', fontWeight: 500 }}>
-                    Hồ sơ chuyên môn & Bàn trực →
-                  </Link>
-                )}
-              </div>
-            </Form.Item>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
             <Form.Item
               name="fullName"
               label="Họ và tên"
@@ -173,7 +230,11 @@ export const ProfilePage: React.FC = () => {
                 { min: 2, max: 100, message: 'Họ và tên phải từ 2 đến 100 ký tự' },
               ]}
             >
-              <Input prefix={<UserOutlined />} placeholder="Nguyễn Văn A" maxLength={100} />
+              <Input
+                prefix={<User size={16} style={{ color: 'var(--text-disabled)', marginRight: 4 }} />}
+                placeholder="Nguyễn Văn A"
+                maxLength={100}
+              />
             </Form.Item>
 
             <Form.Item
@@ -186,72 +247,53 @@ export const ProfilePage: React.FC = () => {
                 },
               ]}
             >
-              <Input prefix={<PhoneOutlined />} placeholder="0912345678 (tùy chọn)" />
+              <Input
+                prefix={<Phone size={16} style={{ color: 'var(--text-disabled)', marginRight: 4 }} />}
+                placeholder="0912345678 (tùy chọn)"
+              />
             </Form.Item>
-          </div>
 
-          {profile?.createdAt && (
-            <div style={{ marginBottom: '16px', color: 'var(--text)', fontSize: '13px' }}>
-              <Space>
-                <CalendarOutlined />
-                <span>
-                  Ngày tham gia: <strong>{new Date(profile.createdAt).toLocaleDateString('vi-VN')}</strong>
-                </span>
-              </Space>
+            <Form.Item style={{ marginBottom: 0, marginTop: 12 }}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={updatingProfile}
+                className="profile-submit-btn"
+              >
+                Lưu thay đổi hồ sơ
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
+
+        {/* Card 2: Đổi mật khẩu */}
+        <Card
+          className="profile-card"
+          title={
+            <div className="profile-card-header">
+              <div className="profile-card-header__icon profile-card-header__icon--security">
+                <KeyRound size={18} />
+              </div>
+              <span>Bảo mật & Đổi mật khẩu</span>
             </div>
-          )}
-
-          <Form.Item style={{ marginBottom: 0 }}>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={updatingProfile}
-              style={{
-                borderRadius: '8px',
-                background: 'var(--accent, #9333ea)',
-                borderColor: 'var(--accent, #9333ea)',
-                fontWeight: 600,
-              }}
-            >
-              Lưu thay đổi hồ sơ
-            </Button>
-          </Form.Item>
-        </Form>
-      </Card>
-
-      {/* Card 2: Đổi mật khẩu */}
-      <Card
-        title={
-          <Space>
-            <LockOutlined style={{ color: '#e11d48' }} />
-            <span>Đổi mật khẩu (PB-06)</span>
-          </Space>
-        }
-        bordered
-        style={{
-          borderRadius: '12px',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
-        }}
-      >
-        <Form
-          form={passwordForm}
-          layout="vertical"
-          onFinish={handleChangePassword}
+          }
         >
-          <Form.Item
-            name="currentPassword"
-            label="Mật khẩu hiện tại"
-            rules={[{ required: true, message: 'Vui lòng nhập mật khẩu hiện tại' }]}
+          <Form
+            form={passwordForm}
+            layout="vertical"
+            onFinish={handleChangePassword}
           >
-            <Input.Password
-              prefix={<LockOutlined />}
-              placeholder="Nhập mật khẩu hiện tại của bạn"
-            />
-          </Form.Item>
+            <Form.Item
+              name="currentPassword"
+              label="Mật khẩu hiện tại"
+              rules={[{ required: true, message: 'Vui lòng nhập mật khẩu hiện tại' }]}
+            >
+              <Input.Password
+                prefix={<Lock size={16} style={{ color: 'var(--text-disabled)', marginRight: 4 }} />}
+                placeholder="Nhập mật khẩu hiện tại"
+              />
+            </Form.Item>
 
-          <Divider style={{ margin: '16px 0' }} />
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
             <Form.Item
               name="newPassword"
               label="Mật khẩu mới"
@@ -273,7 +315,7 @@ export const ProfilePage: React.FC = () => {
               ]}
             >
               <Input.Password
-                prefix={<LockOutlined />}
+                prefix={<Lock size={16} style={{ color: 'var(--text-disabled)', marginRight: 4 }} />}
                 placeholder="Tối thiểu 8 ký tự (chữ và số)"
               />
             </Form.Item>
@@ -295,28 +337,29 @@ export const ProfilePage: React.FC = () => {
               ]}
             >
               <Input.Password
-                prefix={<LockOutlined />}
+                prefix={<Lock size={16} style={{ color: 'var(--text-disabled)', marginRight: 4 }} />}
                 placeholder="Nhập lại mật khẩu mới"
               />
             </Form.Item>
-          </div>
 
-          <Form.Item style={{ marginBottom: 0 }}>
-            <Button
-              type="primary"
-              danger
-              htmlType="submit"
-              loading={changingPassword}
-              style={{
-                borderRadius: '8px',
-                fontWeight: 600,
-              }}
-            >
-              Cập nhật mật khẩu
-            </Button>
-          </Form.Item>
-        </Form>
-      </Card>
+            <Form.Item style={{ marginBottom: 0, marginTop: 12 }}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={changingPassword}
+                className="profile-submit-btn"
+                style={{
+                  background: 'var(--color-warning)',
+                  borderColor: 'var(--color-warning)',
+                  color: '#FFFFFF',
+                }}
+              >
+                Cập nhật mật khẩu
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
+      </div>
     </div>
   );
 };
