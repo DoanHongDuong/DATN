@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Drawer } from 'antd';
 import { useAuth } from '../../hooks/useAuth';
 import {
   HeartPulse,
@@ -11,7 +12,6 @@ import {
   ShieldCheck,
   Sparkles,
   Menu,
-  X,
 } from 'lucide-react';
 import { NotificationDropdown } from '../notification/NotificationDropdown';
 
@@ -50,36 +50,63 @@ export const Navbar: React.FC = () => {
         { label: user?.role === 'VOLUNTEER' ? 'Phòng tư vấn' : 'Tư vấn trực tiếp', path: '/chat', icon: MessageSquare },
       ];
 
+  const getRoleBadgeStyle = (role?: string) => {
+    switch (role) {
+      case 'ADMIN':
+        return { background: 'var(--color-primary)', color: '#FFFFFF' };
+      case 'VOLUNTEER':
+        return { background: 'var(--color-secondary)', color: '#FFFFFF' };
+      default:
+        return { background: 'var(--color-info)', color: '#FFFFFF' };
+    }
+  };
+
   return (
     <header className="app-header">
-      <Link to="/" style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        textDecoration: 'none',
-        fontWeight: 700,
-        fontSize: '18px',
-        color: 'var(--text-h)',
-        flexShrink: 0,
-      }}>
-        <div style={{
-          width: '32px',
-          height: '32px',
-          borderRadius: '8px',
-          background: 'linear-gradient(135deg, #aa3bff 0%, #6b21a8 100%)',
+      {/* Brand Logo & Name */}
+      <Link
+        to="/"
+        style={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          color: '#fff',
-          fontSize: '16px',
-        }}>
-          💜
+          gap: '10px',
+          textDecoration: 'none',
+          fontWeight: 700,
+          fontSize: '18px',
+          color: 'var(--text-primary)',
+          flexShrink: 0,
+        }}
+      >
+        <div
+          style={{
+            width: '34px',
+            height: '34px',
+            borderRadius: '10px',
+            background: 'var(--color-primary)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#FFFFFF',
+            boxShadow: 'var(--shadow-sm)',
+            transition: 'transform 0.2s ease',
+          }}
+        >
+          <HeartPulse size={19} />
         </div>
-        <span>PSYTHALIA</span>
+        <span style={{ letterSpacing: '-0.015em' }}>PSYTHALIA</span>
       </Link>
 
+      {/* Desktop Capsule Navigation */}
       {!isAuthPage && isAuthenticated && (
-        <nav className="desktop-nav">
+        <nav
+          className="desktop-nav"
+          style={{
+            background: 'rgba(255, 255, 255, 0.45)',
+            padding: '4px 6px',
+            borderRadius: '24px',
+            border: '1px solid var(--border-subtle)',
+          }}
+        >
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname.startsWith(item.path);
@@ -90,26 +117,39 @@ export const Navbar: React.FC = () => {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  padding: '8px 16px',
-                  borderRadius: '8px',
+                  gap: '7px',
+                  padding: '7px 14px',
+                  borderRadius: '18px',
                   textDecoration: 'none',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  transition: 'all 0.2s ease',
-                  background: isActive ? 'var(--accent-bg)' : 'transparent',
-                  color: isActive ? 'var(--accent)' : 'var(--text)',
+                  fontSize: '13.5px',
+                  fontWeight: isActive ? 600 : 500,
+                  transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+                  background: isActive ? 'var(--tint-lavender)' : 'transparent',
+                  color: isActive ? 'var(--color-primary)' : 'var(--text-secondary)',
+                  border: isActive ? '1px solid rgba(103, 80, 164, 0.2)' : '1px solid transparent',
                 }}
               >
                 <Icon size={16} />
                 <span>{item.label}</span>
+                {isActive && (
+                  <span
+                    style={{
+                      width: '5px',
+                      height: '5px',
+                      borderRadius: '50%',
+                      background: 'var(--color-primary)',
+                      marginLeft: '2px',
+                    }}
+                  />
+                )}
               </Link>
             );
           })}
         </nav>
       )}
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+      {/* Right Controls: Notifications, User Profile & Logout */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
         {isAuthPage ? (
           location.pathname === '/login' ? (
             <Link
@@ -118,10 +158,12 @@ export const Navbar: React.FC = () => {
                 padding: '8px 18px',
                 borderRadius: '8px',
                 textDecoration: 'none',
-                background: 'var(--accent)',
-                color: '#fff',
+                background: 'var(--color-primary)',
+                color: '#FFFFFF',
                 fontWeight: 600,
-                fontSize: '14px'
+                fontSize: '13.5px',
+                boxShadow: 'var(--shadow-sm)',
+                transition: 'opacity 0.2s ease',
               }}
             >
               Đăng ký
@@ -133,9 +175,9 @@ export const Navbar: React.FC = () => {
                 padding: '8px 16px',
                 borderRadius: '8px',
                 textDecoration: 'none',
-                color: 'var(--text-h)',
+                color: 'var(--text-primary)',
                 fontWeight: 500,
-                fontSize: '14px'
+                fontSize: '13.5px',
               }}
             >
               Đăng nhập
@@ -150,33 +192,46 @@ export const Navbar: React.FC = () => {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
-                padding: '5px 10px',
-                borderRadius: '20px',
-                background: location.pathname === '/profile' ? 'var(--accent-bg, #f3e8ff)' : 'var(--code-bg)',
-                border: location.pathname === '/profile' ? '1px solid var(--accent, #9333ea)' : '1px solid transparent',
+                gap: '8px',
+                padding: '4px 10px 4px 6px',
+                borderRadius: '24px',
+                background: location.pathname === '/profile' ? 'var(--tint-lavender)' : 'var(--bg-surface)',
+                border: location.pathname === '/profile' ? '1px solid var(--color-primary)' : '1px solid var(--border-subtle)',
                 fontSize: '13px',
-                color: location.pathname === '/profile' ? 'var(--accent, #9333ea)' : 'var(--text-h)',
+                color: location.pathname === '/profile' ? 'var(--color-primary)' : 'var(--text-primary)',
                 textDecoration: 'none',
                 transition: 'all 0.2s ease',
+                boxShadow: 'var(--shadow-sm)',
               }}
             >
-              <UserIcon size={15} />
-              <span className="user-name-text" style={{ fontWeight: 500 }}>{user?.fullName}</span>
-              <span style={{
-                fontSize: '11px',
-                padding: '2px 6px',
-                borderRadius: '4px',
-                background:
-                  user?.role === 'ADMIN'
-                    ? '#9333ea'
-                    : user?.role === 'VOLUNTEER'
-                      ? '#10b981'
-                      : '#3b82f6',
-                color: '#fff',
-                fontWeight: 600
-              }}>
-                {user?.role === 'ADMIN' ? 'Admin' : user?.role === 'VOLUNTEER' ? 'TNV' : 'User'}
+              <div
+                style={{
+                  width: '26px',
+                  height: '26px',
+                  borderRadius: '50%',
+                  background: 'var(--tint-lavender)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--color-primary)',
+                }}
+              >
+                <UserIcon size={14} />
+              </div>
+              <span className="user-name-text" style={{ fontWeight: 500 }}>
+                {user?.fullName}
+              </span>
+              <span
+                style={{
+                  fontSize: '10.5px',
+                  padding: '1px 6px',
+                  borderRadius: '10px',
+                  ...getRoleBadgeStyle(user?.role),
+                  fontWeight: 600,
+                  letterSpacing: '0.02em',
+                }}
+              >
+                {user?.role === 'ADMIN' ? 'Admin' : user?.role === 'VOLUNTEER' ? 'TNV' : 'Sinh viên'}
               </span>
             </Link>
 
@@ -184,17 +239,20 @@ export const Navbar: React.FC = () => {
             <button
               onClick={handleLogout}
               className="desktop-logout-btn"
+              title="Đăng xuất khỏi hệ thống"
               style={{
+                display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '7px 12px',
+                padding: '8px 12px',
                 borderRadius: '8px',
-                border: '1px solid var(--border)',
+                border: '1px solid var(--border-subtle)',
                 background: 'transparent',
-                color: 'var(--text)',
+                color: 'var(--text-secondary)',
                 cursor: 'pointer',
                 fontSize: '13px',
-                fontWeight: 500
+                fontWeight: 500,
+                transition: 'all 0.2s ease',
               }}
             >
               <LogOut size={15} />
@@ -205,22 +263,23 @@ export const Navbar: React.FC = () => {
             {!isAuthPage && (
               <button
                 className="mobile-menu-btn"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                aria-label="Menu danh mục"
+                onClick={() => setMobileMenuOpen(true)}
+                aria-label="Mở menu danh mục"
                 style={{
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '36px',
-                  height: '36px',
+                  width: '38px',
+                  height: '38px',
                   borderRadius: '8px',
-                  border: '1px solid var(--border)',
-                  background: mobileMenuOpen ? 'var(--accent-bg)' : 'transparent',
-                  color: mobileMenuOpen ? 'var(--accent)' : 'var(--text)',
+                  border: '1px solid var(--border-subtle)',
+                  background: 'var(--bg-surface)',
+                  color: 'var(--text-primary)',
                   cursor: 'pointer',
                   padding: 0,
+                  boxShadow: 'var(--shadow-sm)',
                 }}
               >
-                {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                <Menu size={20} />
               </button>
             )}
           </>
@@ -232,9 +291,9 @@ export const Navbar: React.FC = () => {
                 padding: '8px 16px',
                 borderRadius: '8px',
                 textDecoration: 'none',
-                color: 'var(--text-h)',
+                color: 'var(--text-primary)',
                 fontWeight: 500,
-                fontSize: '14px'
+                fontSize: '13.5px',
               }}
             >
               Đăng nhập
@@ -245,10 +304,11 @@ export const Navbar: React.FC = () => {
                 padding: '8px 18px',
                 borderRadius: '8px',
                 textDecoration: 'none',
-                background: 'var(--accent)',
-                color: '#fff',
+                background: 'var(--color-primary)',
+                color: '#FFFFFF',
                 fontWeight: 600,
-                fontSize: '14px'
+                fontSize: '13.5px',
+                boxShadow: 'var(--shadow-sm)',
               }}
             >
               Đăng ký
@@ -257,23 +317,92 @@ export const Navbar: React.FC = () => {
         )}
       </div>
 
-      {/* Mobile Navigation Drawer */}
-      {mobileMenuOpen && !isAuthPage && isAuthenticated && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '100%',
-            left: 0,
-            right: 0,
-            background: 'var(--bg)',
-            borderBottom: '1px solid var(--border)',
-            padding: '12px 16px 20px',
+      {/* Modern Accessible Mobile Drawer Navigation */}
+      <Drawer
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div
+              style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '8px',
+                background: 'var(--color-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#FFFFFF',
+              }}
+            >
+              <HeartPulse size={16} />
+            </div>
+            <span style={{ fontWeight: 700, fontSize: '16px', color: 'var(--text-primary)' }}>
+              PSYTHALIA
+            </span>
+          </div>
+        }
+        placement="right"
+        width={300}
+        onClose={() => setMobileMenuOpen(false)}
+        open={mobileMenuOpen}
+        styles={{
+          body: {
+            padding: '16px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '8px',
-            boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-          }}
-        >
+            justifyContent: 'space-between',
+            background: 'var(--bg-elevated)',
+          },
+          header: {
+            background: 'var(--bg-surface)',
+            borderBottom: '1px solid var(--border-subtle)',
+          },
+        }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {/* User Info Header in Mobile Drawer */}
+          {isAuthenticated && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '12px 14px',
+                borderRadius: '12px',
+                background: 'var(--tint-lavender)',
+                marginBottom: '12px',
+                border: '1px solid var(--border-subtle)',
+              }}
+            >
+              <div
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  background: 'var(--color-primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#FFFFFF',
+                }}
+              >
+                <UserIcon size={18} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-primary)' }}>
+                  {user?.fullName}
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                  {user?.role === 'ADMIN'
+                    ? 'Quản trị viên'
+                    : user?.role === 'VOLUNTEER'
+                      ? 'Tình nguyện viên PFA'
+                      : 'Sinh viên'}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Navigation Links with large touch targets */}
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname.startsWith(item.path);
@@ -285,51 +414,77 @@ export const Navbar: React.FC = () => {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '12px',
-                  padding: '10px 14px',
-                  borderRadius: '8px',
+                  gap: '14px',
+                  padding: '12px 16px',
+                  borderRadius: '10px',
                   textDecoration: 'none',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  background: isActive ? 'var(--accent-bg)' : 'transparent',
-                  color: isActive ? 'var(--accent)' : 'var(--text)',
+                  fontSize: '14.5px',
+                  fontWeight: isActive ? 600 : 500,
+                  minHeight: '44px',
+                  transition: 'background-color 0.15s ease',
+                  background: isActive ? 'var(--tint-lavender)' : 'transparent',
+                  color: isActive ? 'var(--color-primary)' : 'var(--text-primary)',
+                  border: isActive ? '1px solid rgba(103, 80, 164, 0.25)' : '1px solid transparent',
                 }}
               >
-                <Icon size={18} />
+                <Icon size={19} />
                 <span>{item.label}</span>
               </Link>
             );
           })}
 
-          {/* Đăng xuất trong menu 3 gạch mobile */}
-          <div style={{ borderTop: '1px solid var(--border)', marginTop: '8px', paddingTop: '10px' }}>
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                handleLogout();
-              }}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                width: '100%',
-                padding: '10px 14px',
-                borderRadius: '8px',
-                border: 'none',
-                background: 'rgba(239, 68, 68, 0.08)',
-                color: '#ef4444',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: 500,
-                textAlign: 'left',
-              }}
-            >
-              <LogOut size={18} />
-              <span>Đăng xuất</span>
-            </button>
-          </div>
+          <Link
+            to="/profile"
+            onClick={() => setMobileMenuOpen(false)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '14px',
+              padding: '12px 16px',
+              borderRadius: '10px',
+              textDecoration: 'none',
+              fontSize: '14.5px',
+              fontWeight: location.pathname === '/profile' ? 600 : 500,
+              minHeight: '44px',
+              background: location.pathname === '/profile' ? 'var(--tint-lavender)' : 'transparent',
+              color: location.pathname === '/profile' ? 'var(--color-primary)' : 'var(--text-primary)',
+            }}
+          >
+            <UserIcon size={19} />
+            <span>Hồ sơ cá nhân & Đổi mật khẩu</span>
+          </Link>
         </div>
-      )}
+
+        {/* Mobile Logout Button at Bottom */}
+        <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '16px', marginTop: '16px' }}>
+          <button
+            onClick={() => {
+              setMobileMenuOpen(false);
+              handleLogout();
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px',
+              width: '100%',
+              padding: '12px',
+              borderRadius: '10px',
+              border: 'none',
+              background: 'var(--tint-crimson)',
+              color: 'var(--color-crisis)',
+              cursor: 'pointer',
+              fontSize: '14.5px',
+              fontWeight: 600,
+              minHeight: '44px',
+              transition: 'opacity 0.2s ease',
+            }}
+          >
+            <LogOut size={18} />
+            <span>Đăng xuất</span>
+          </button>
+        </div>
+      </Drawer>
     </header>
   );
 };

@@ -69,16 +69,16 @@ export const EmailVerificationBanner: React.FC = () => {
       role="region"
       aria-label="Nhắc nhở xác nhận địa chỉ email"
       style={{
-        background: 'linear-gradient(90deg, rgba(139, 92, 246, 0.08) 0%, rgba(168, 85, 247, 0.05) 100%)',
-        borderBottom: '1px solid rgba(139, 92, 246, 0.18)',
-        padding: '10px 16px',
+        background: 'var(--tint-lavender)',
+        borderBottom: '1px solid var(--border-subtle)',
+        padding: '10px 20px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: '12px',
         fontSize: '13.5px',
-        color: 'var(--text)',
+        color: 'var(--text-primary)',
         transition: 'all 0.3s ease',
       }}
     >
@@ -99,8 +99,8 @@ export const EmailVerificationBanner: React.FC = () => {
             width: '28px',
             height: '28px',
             borderRadius: '50%',
-            background: 'rgba(139, 92, 246, 0.15)',
-            color: 'var(--accent, #8b5cf6)',
+            background: 'rgba(103, 80, 164, 0.15)',
+            color: 'var(--color-primary)',
             flexShrink: 0,
           }}
           aria-hidden="true"
@@ -109,7 +109,7 @@ export const EmailVerificationBanner: React.FC = () => {
         </span>
         <span style={{ lineHeight: 1.5 }}>
           Xác nhận email để bạn có thể khôi phục tài khoản khi cần nhé.{' '}
-          <span style={{ opacity: 0.85 }}>
+          <span style={{ color: 'var(--text-secondary)' }}>
             (Bạn vẫn sử dụng các tính năng hỗ trợ bình thường mà không bị gián đoạn).
           </span>
         </span>
@@ -129,15 +129,17 @@ export const EmailVerificationBanner: React.FC = () => {
           type="text"
           loading={isSending}
           disabled={cooldown > 0}
-          icon={isSent && cooldown > 0 ? <CheckCircleOutlined style={{ color: '#10b981' }} /> : undefined}
+          icon={isSent && cooldown > 0 ? <CheckCircleOutlined style={{ color: 'var(--color-success)' }} /> : undefined}
           onClick={handleResend}
           style={{
             fontWeight: 500,
-            color: cooldown > 0 ? 'var(--text)' : 'var(--accent, #8b5cf6)',
-            border: '1px solid rgba(139, 92, 246, 0.25)',
-            borderRadius: '6px',
-            padding: '2px 10px',
-            height: '28px',
+            color: cooldown > 0 ? 'var(--text-disabled)' : 'var(--color-primary)',
+            border: '1px solid rgba(103, 80, 164, 0.25)',
+            background: 'var(--bg-surface)',
+            borderRadius: '8px',
+            padding: '2px 12px',
+            height: '30px',
+            boxShadow: 'var(--shadow-sm)',
           }}
           aria-label={cooldown > 0 ? `Vui lòng đợi ${cooldown} giây để gửi lại` : 'Gửi lại email xác thực'}
         >
@@ -159,20 +161,19 @@ export const EmailVerificationBanner: React.FC = () => {
           style={{
             background: 'transparent',
             border: 'none',
-            color: 'var(--text)',
-            opacity: 0.6,
+            color: 'var(--text-secondary)',
             cursor: 'pointer',
             padding: '4px 6px',
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: '4px',
-            transition: 'opacity 0.2s',
+            transition: 'color 0.2s',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-          onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.6')}
+          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
         >
-          <CloseOutlined style={{ fontSize: '12px' }} />
+          <CloseOutlined style={{ fontSize: '13px' }} />
         </button>
       </div>
 

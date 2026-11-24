@@ -242,19 +242,30 @@ code {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 24px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg);
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(247, 245, 240, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   position: sticky;
   top: 0;
   z-index: 100;
+  box-shadow: 0 1px 3px rgba(45, 42, 50, 0.03);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  .app-header {
+    background: rgba(24, 24, 28, 0.85);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  }
 }
 
 .app-main-content {
   flex: 1;
-  padding: 24px;
+  padding: 28px 20px;
   width: 100%;
-  max-width: 1440px;
+  max-width: 1200px;
   margin: 0 auto;
   box-sizing: border-box;
 }
@@ -273,19 +284,32 @@ code {
 
 .notification-dropdown-panel {
   position: absolute;
-  top: 46px;
+  top: 48px;
   right: 0;
-  width: 360px;
+  width: 380px;
   max-width: calc(100vw - 24px);
-  max-height: 480px;
-  background: var(--card-bg, #1e1e2d);
+  max-height: 520px;
+  background: var(--bg-elevated);
   border-radius: 14px;
-  border: 1px solid var(--border);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-elevated);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   z-index: 1000;
+  color: var(--text-primary);
+  animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @media (max-width: 900px) {

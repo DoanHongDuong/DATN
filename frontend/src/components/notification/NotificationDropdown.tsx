@@ -167,19 +167,19 @@ export const NotificationDropdown: React.FC = () => {
   const renderIcon = (type: string) => {
     switch (type) {
       case 'VOLUNTEER_APPROVED':
-        return <ShieldCheck size={18} style={{ color: '#10b981', flexShrink: 0 }} />;
+        return <ShieldCheck size={18} style={{ color: 'var(--color-success)', flexShrink: 0 }} />;
       case 'VOLUNTEER_REJECTED':
-        return <UserX size={18} style={{ color: '#ef4444', flexShrink: 0 }} />;
+        return <UserX size={18} style={{ color: 'var(--color-crisis)', flexShrink: 0 }} />;
       case 'SESSION_ACCEPTED':
-        return <MessageSquare size={18} style={{ color: '#3b82f6', flexShrink: 0 }} />;
+        return <MessageSquare size={18} style={{ color: 'var(--color-info)', flexShrink: 0 }} />;
       case 'NEW_WAITING_SESSION':
-        return <Clock size={18} style={{ color: '#f59e0b', flexShrink: 0 }} />;
+        return <Clock size={18} style={{ color: 'var(--color-warning)', flexShrink: 0 }} />;
       case 'SESSION_ENDED':
-        return <CheckCircle size={18} style={{ color: '#8b5cf6', flexShrink: 0 }} />;
+        return <CheckCircle size={18} style={{ color: 'var(--color-secondary)', flexShrink: 0 }} />;
       case 'CRISIS_ALERT':
-        return <AlertTriangle size={18} style={{ color: '#f59e0b', flexShrink: 0 }} />;
+        return <AlertTriangle size={18} style={{ color: 'var(--color-crisis)', flexShrink: 0 }} />;
       default:
-        return <Sparkles size={18} style={{ color: '#a855f7', flexShrink: 0 }} />;
+        return <Sparkles size={18} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />;
     }
   };
 
@@ -196,9 +196,9 @@ export const NotificationDropdown: React.FC = () => {
           width: '38px',
           height: '38px',
           borderRadius: '50%',
-          border: '1px solid var(--border)',
-          background: isOpen ? 'var(--accent-bg, #f3e8ff)' : 'transparent',
-          color: isOpen ? 'var(--accent, #9333ea)' : 'var(--text)',
+          border: '1px solid var(--border-subtle)',
+          background: isOpen ? 'var(--tint-lavender)' : 'transparent',
+          color: isOpen ? 'var(--color-primary)' : 'var(--text-secondary)',
           cursor: 'pointer',
           transition: 'all 0.2s ease',
         }}
@@ -213,7 +213,7 @@ export const NotificationDropdown: React.FC = () => {
               minWidth: '18px',
               height: '18px',
               borderRadius: '9px',
-              background: '#ef4444',
+              background: 'var(--color-crisis)',
               color: '#ffffff',
               fontSize: '11px',
               fontWeight: 700,
@@ -221,7 +221,7 @@ export const NotificationDropdown: React.FC = () => {
               alignItems: 'center',
               justifyContent: 'center',
               padding: '0 4px',
-              boxShadow: '0 0 0 2px var(--bg)',
+              boxShadow: '0 0 0 2px var(--bg-canvas)',
             }}
           >
             {unreadCount > 99 ? '99+' : unreadCount}
@@ -230,25 +230,7 @@ export const NotificationDropdown: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div
-          className="notification-dropdown-panel"
-          style={{
-            position: 'absolute',
-            top: '46px',
-            right: 0,
-            width: '360px',
-            maxWidth: 'calc(100vw - 24px)',
-            maxHeight: '480px',
-            background: 'var(--card-bg, #1e1e2d)',
-            borderRadius: '14px',
-            border: '1px solid var(--border)',
-            boxShadow: '0 12px 32px rgba(0, 0, 0, 0.4)',
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            zIndex: 1000,
-          }}
-        >
+        <div className="notification-dropdown-panel">
           {/* Header */}
           <div
             style={{
@@ -256,12 +238,12 @@ export const NotificationDropdown: React.FC = () => {
               alignItems: 'center',
               justifyContent: 'space-between',
               padding: '14px 16px',
-              borderBottom: '1px solid var(--border)',
-              background: 'var(--code-bg, rgba(255, 255, 255, 0.03))',
+              borderBottom: '1px solid var(--border-subtle)',
+              background: 'var(--bg-surface)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontWeight: 600, fontSize: '15px', color: 'var(--text-h)' }}>
+              <span style={{ fontWeight: 600, fontSize: '15px', color: 'var(--text-primary)' }}>
                 Thông báo
               </span>
               {unreadCount > 0 && (
@@ -271,8 +253,8 @@ export const NotificationDropdown: React.FC = () => {
                     fontWeight: 600,
                     padding: '2px 8px',
                     borderRadius: '12px',
-                    background: 'var(--accent-bg, rgba(168, 85, 247, 0.15))',
-                    color: 'var(--accent, #a855f7)',
+                    background: 'var(--tint-lavender)',
+                    color: 'var(--color-primary)',
                   }}
                 >
                   {unreadCount} mới
@@ -289,12 +271,13 @@ export const NotificationDropdown: React.FC = () => {
                   gap: '4px',
                   background: 'transparent',
                   border: 'none',
-                  color: 'var(--accent, #a855f7)',
+                  color: 'var(--color-primary)',
                   cursor: 'pointer',
                   fontSize: '12px',
                   fontWeight: 500,
-                  padding: '4px 6px',
+                  padding: '4px 8px',
                   borderRadius: '6px',
+                  transition: 'background 0.2s ease',
                 }}
               >
                 <CheckCheck size={14} />
@@ -309,9 +292,9 @@ export const NotificationDropdown: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              padding: '6px 16px',
-              borderBottom: '1px solid var(--border)',
-              background: 'var(--bg)',
+              padding: '8px 16px',
+              borderBottom: '1px solid var(--border-subtle)',
+              background: 'var(--bg-canvas)',
               fontSize: '12px',
             }}
           >
@@ -319,13 +302,14 @@ export const NotificationDropdown: React.FC = () => {
               <button
                 onClick={() => setFilterTab('all')}
                 style={{
-                  background: filterTab === 'all' ? 'var(--accent-bg, rgba(168, 85, 247, 0.15))' : 'transparent',
-                  color: filterTab === 'all' ? 'var(--accent, #a855f7)' : 'var(--text)',
+                  background: filterTab === 'all' ? 'var(--tint-lavender)' : 'transparent',
+                  color: filterTab === 'all' ? 'var(--color-primary)' : 'var(--text-secondary)',
                   border: 'none',
                   borderRadius: '6px',
-                  padding: '3px 8px',
+                  padding: '4px 10px',
                   cursor: 'pointer',
                   fontWeight: filterTab === 'all' ? 600 : 500,
+                  transition: 'all 0.15s ease',
                 }}
               >
                 Tất cả ({notifications.length})
@@ -333,13 +317,14 @@ export const NotificationDropdown: React.FC = () => {
               <button
                 onClick={() => setFilterTab('unread')}
                 style={{
-                  background: filterTab === 'unread' ? 'var(--accent-bg, rgba(168, 85, 247, 0.15))' : 'transparent',
-                  color: filterTab === 'unread' ? 'var(--accent, #a855f7)' : 'var(--text)',
+                  background: filterTab === 'unread' ? 'var(--tint-lavender)' : 'transparent',
+                  color: filterTab === 'unread' ? 'var(--color-primary)' : 'var(--text-secondary)',
                   border: 'none',
                   borderRadius: '6px',
-                  padding: '3px 8px',
+                  padding: '4px 10px',
                   cursor: 'pointer',
                   fontWeight: filterTab === 'unread' ? 600 : 500,
+                  transition: 'all 0.15s ease',
                 }}
               >
                 Chưa đọc ({unreadCount})
@@ -357,11 +342,11 @@ export const NotificationDropdown: React.FC = () => {
                   gap: '4px',
                   border: 'none',
                   background: 'transparent',
-                  color: 'var(--text)',
+                  color: 'var(--text-secondary)',
                   cursor: 'pointer',
                   fontSize: '11px',
-                  opacity: 0.85,
-                  padding: '2px 4px',
+                  padding: '3px 6px',
+                  borderRadius: '4px',
                 }}
               >
                 <Volume2 size={12} />
@@ -377,120 +362,119 @@ export const NotificationDropdown: React.FC = () => {
               maxHeight: '400px',
               display: 'flex',
               flexDirection: 'column',
+              background: 'var(--bg-elevated)',
             }}
           >
             {isLoading ? (
               <div
                 style={{
-                  padding: '32px 16px',
+                  padding: '36px 16px',
                   textAlign: 'center',
-                  color: 'var(--text)',
+                  color: 'var(--text-secondary)',
                   fontSize: '13px',
                 }}
               >
                 Đang tải thông báo...
               </div>
-            ): (filterTab === 'unread' ? notifications.filter((n) => !n.isRead) : notifications).length === 0 ? (
-            <div
-              style={{
-                padding: '40px 16px',
-                textAlign: 'center',
-                color: 'var(--text)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '10px',
-              }}
-            >
-              <Bell size={28} style={{ opacity: 0.3 }} />
-              <span style={{ fontSize: '13px', opacity: 0.7 }}>
-                {filterTab === 'unread'
-                  ? 'Bạn không có thông báo chưa đọc nào 🎉'
-                  : 'Bạn chưa có thông báo nào'}
-              </span>
-            </div>
+            ) : (filterTab === 'unread' ? notifications.filter((n) => !n.isRead) : notifications).length === 0 ? (
+              <div
+                style={{
+                  padding: '44px 16px',
+                  textAlign: 'center',
+                  color: 'var(--text-secondary)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '10px',
+                }}
+              >
+                <Bell size={28} style={{ color: 'var(--text-disabled)' }} />
+                <span style={{ fontSize: '13px' }}>
+                  {filterTab === 'unread'
+                    ? 'Bạn không có thông báo chưa đọc nào 🎉'
+                    : 'Bạn chưa có thông báo nào'}
+                </span>
+              </div>
             ) : (
               (filterTab === 'unread' ? notifications.filter((n) => !n.isRead) : notifications).map((item) => (
-            <div
-              key={item.id}
-              onClick={() => handleNotificationClick(item)}
-              style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '12px',
-                padding: '12px 16px',
-                borderBottom: '1px solid var(--border)',
-                background: item.isRead
-                  ? 'transparent'
-                  : 'var(--accent-bg, rgba(168, 85, 247, 0.08))',
-                cursor: 'pointer',
-                transition: 'background 0.15s ease',
-              }}
-            >
-              <div style={{ marginTop: '2px' }}>{renderIcon(item.type)}</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
                 <div
+                  key={item.id}
+                  onClick={() => handleNotificationClick(item)}
                   style={{
                     display: 'flex',
-                    alignItems: 'baseline',
-                    justifyContent: 'space-between',
-                    gap: '8px',
-                    marginBottom: '3px',
+                    alignItems: 'flex-start',
+                    gap: '12px',
+                    padding: '12px 16px',
+                    borderBottom: '1px solid var(--border-subtle)',
+                    background: item.isRead
+                      ? 'transparent'
+                      : 'var(--tint-lavender)',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.15s ease',
                   }}
                 >
-                  <h4
-                    style={{
-                      margin: 0,
-                      fontSize: '13px',
-                      fontWeight: item.isRead ? 600 : 700,
-                      color: 'var(--text-h)',
-                      lineHeight: '1.4',
-                    }}
-                  >
-                    {item.title}
-                  </h4>
-                  <span
-                    style={{
-                      fontSize: '11px',
-                      color: 'var(--text)',
-                      opacity: 0.6,
-                      whiteSpace: 'nowrap',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {formatTime(item.createdAt)}
-                  </span>
+                  <div style={{ marginTop: '2px' }}>{renderIcon(item.type)}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'baseline',
+                        justifyContent: 'space-between',
+                        gap: '8px',
+                        marginBottom: '3px',
+                      }}
+                    >
+                      <h4
+                        style={{
+                          margin: 0,
+                          fontSize: '13px',
+                          fontWeight: item.isRead ? 500 : 600,
+                          color: 'var(--text-primary)',
+                          lineHeight: '1.4',
+                        }}
+                      >
+                        {item.title}
+                      </h4>
+                      <span
+                        style={{
+                          fontSize: '11px',
+                          color: 'var(--text-disabled)',
+                          whiteSpace: 'nowrap',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {formatTime(item.createdAt)}
+                      </span>
+                    </div>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: '12px',
+                        color: 'var(--text-secondary)',
+                        lineHeight: '1.45',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      {item.content}
+                    </p>
+                  </div>
+                  {!item.isRead && (
+                    <span
+                      style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        background: 'var(--color-primary)',
+                        marginTop: '6px',
+                        flexShrink: 0,
+                      }}
+                    />
+                  )}
                 </div>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: '12px',
-                    color: 'var(--text)',
-                    lineHeight: '1.4',
-                    opacity: item.isRead ? 0.75 : 0.95,
-                    display: '-webkit-box',
-                    WebkitLineClamp: 3,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
-                  }}
-                >
-                  {item.content}
-                </p>
-              </div>
-              {!item.isRead && (
-                <span
-                  style={{
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    background: 'var(--accent, #a855f7)',
-                    marginTop: '6px',
-                    flexShrink: 0,
-                  }}
-                />
-              )}
-            </div>
-            ))
+              ))
             )}
           </div>
         </div>
