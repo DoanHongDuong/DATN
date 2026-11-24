@@ -105,9 +105,9 @@ export const MoodTrendChart: React.FC<MoodTrendChartProps> = ({ className }) => 
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 0.25) return '#10b981'; // Green
-    if (score <= -0.25) return '#ef4444'; // Red
-    return '#8b5cf6'; // Purple / Neutral
+    if (score >= 0.25) return 'var(--color-success)'; // Green
+    if (score <= -0.25) return 'var(--color-crisis)'; // Red
+    return 'var(--color-primary)'; // Purple / Neutral
   };
 
   const getSentimentText = (label: string) => {
@@ -127,34 +127,34 @@ export const MoodTrendChart: React.FC<MoodTrendChartProps> = ({ className }) => 
     // Quy tắc an toàn & tin cậy: Có crisis thì ưu tiên trạng thái hỗ trợ cao nhất, không hiển thị tích cực/ổn định
     if (summary?.trend === 'crisis' || (summary && summary.crisisCount > 0)) {
       return (
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#ef4444', fontWeight: 600 }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: 'var(--color-crisis)', fontWeight: 600 }}>
           <AlertTriangle size={16} /> Cần hỗ trợ ưu tiên (Phát hiện dấu hiệu khủng hoảng)
         </span>
       );
     }
     if (!summary || summary.trend === 'insufficient_data') {
       return (
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: 'var(--text)' }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: 'var(--text-secondary)' }}>
           <Minus size={15} /> Chưa đủ dữ liệu để nhận xét xu hướng
         </span>
       );
     }
     if (summary.trend === 'improving') {
       return (
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#10b981', fontWeight: 600 }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: 'var(--color-success)', fontWeight: 600 }}>
           <TrendingUp size={16} /> Xu hướng tích cực (Đang cải thiện)
         </span>
       );
     }
     if (summary.trend === 'declining') {
       return (
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#f59e0b', fontWeight: 600 }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: 'var(--color-warning)', fontWeight: 600 }}>
           <TrendingDown size={16} /> Cần quan tâm (Có xu hướng đi xuống)
         </span>
       );
     }
     return (
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#8b5cf6', fontWeight: 600 }}>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: 'var(--color-primary)', fontWeight: 600 }}>
         <Activity size={16} /> Tương đối ổn định
       </span>
     );
@@ -166,8 +166,9 @@ export const MoodTrendChart: React.FC<MoodTrendChartProps> = ({ className }) => 
       style={{
         padding: '24px',
         borderRadius: '16px',
-        border: '1px solid var(--border)',
-        background: 'var(--bg)',
+        border: '1px solid var(--border-subtle)',
+        background: 'var(--bg-surface)',
+        boxShadow: 'var(--shadow-card)',
         display: 'flex',
         flexDirection: 'column',
         gap: '20px',
@@ -181,20 +182,20 @@ export const MoodTrendChart: React.FC<MoodTrendChartProps> = ({ className }) => 
             <div style={{
               width: '36px',
               height: '36px',
-              borderRadius: '8px',
-              background: 'rgba(170, 59, 255, 0.15)',
+              borderRadius: '10px',
+              background: 'var(--tint-lavender)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'var(--accent)',
+              color: 'var(--color-primary)',
             }}>
               <TrendingUp size={20} />
             </div>
             <div>
-              <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--text-h)' }}>
+              <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--text-primary)', fontFamily: 'var(--heading)' }}>
                 Biểu đồ Xu hướng Cảm xúc
               </h3>
-              <p style={{ margin: 0, fontSize: '13px', color: 'var(--text)' }}>
+              <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)' }}>
                 Theo dõi biến thiên tâm trạng & chỉ số cảm xúc qua nhật ký AI
               </p>
             </div>
@@ -202,7 +203,7 @@ export const MoodTrendChart: React.FC<MoodTrendChartProps> = ({ className }) => 
         </div>
 
         {/* Days Filter Buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--code-bg)', padding: '4px', borderRadius: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--bg-canvas)', padding: '4px', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
           {[7, 14, 30].map((d) => (
             <button
               key={d}
@@ -211,13 +212,13 @@ export const MoodTrendChart: React.FC<MoodTrendChartProps> = ({ className }) => 
                 fetchTrend(d);
               }}
               style={{
-                padding: '6px 12px',
+                padding: '6px 14px',
                 borderRadius: '6px',
                 border: 'none',
-                background: days === d ? 'var(--accent)' : 'transparent',
-                color: days === d ? '#fff' : 'var(--text)',
+                background: days === d ? 'var(--color-primary)' : 'transparent',
+                color: days === d ? '#FFFFFF' : 'var(--text-secondary)',
                 fontSize: '13px',
-                fontWeight: days === d ? 600 : 400,
+                fontWeight: days === d ? 600 : 500,
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
               }}
@@ -236,43 +237,43 @@ export const MoodTrendChart: React.FC<MoodTrendChartProps> = ({ className }) => 
           gap: '12px',
           padding: '16px',
           borderRadius: '12px',
-          background: 'var(--code-bg)',
-          border: '1px solid var(--border)',
+          background: 'var(--bg-canvas)',
+          border: '1px solid var(--border-subtle)',
         }}>
           <div>
-            <div style={{ fontSize: '12px', color: 'var(--text)', marginBottom: '4px' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
               Điểm cảm xúc TB
             </div>
             <div style={{ fontSize: '20px', fontWeight: 700, color: getScoreColor(summary.avgScore) }}>
               {summary.avgScore > 0 ? `+${summary.avgScore}` : summary.avgScore}
-              <span style={{ fontSize: '12px', fontWeight: 400, color: 'var(--text)', marginLeft: '6px' }}>
+              <span style={{ fontSize: '12px', fontWeight: 400, color: 'var(--text-secondary)', marginLeft: '6px' }}>
                 (-1.0 đến +1.0)
               </span>
             </div>
           </div>
 
           <div>
-            <div style={{ fontSize: '12px', color: 'var(--text)', marginBottom: '4px' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
               Tổng bài ghi nhật ký
             </div>
-            <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-h)' }}>
-              {summary.totalEntries} <span style={{ fontSize: '12px', fontWeight: 400, color: 'var(--text)' }}>bài</span>
+            <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)' }}>
+              {summary.totalEntries} <span style={{ fontSize: '12px', fontWeight: 400, color: 'var(--text-secondary)' }}>bài</span>
             </div>
           </div>
 
           <div>
-            <div style={{ fontSize: '12px', color: 'var(--text)', marginBottom: '4px' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
               Phân bổ cảm xúc
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
-              <span style={{ color: '#10b981', fontWeight: 600 }}>😊 {summary.positiveCount}</span>
-              <span style={{ color: '#8b5cf6', fontWeight: 600 }}>😐 {summary.neutralCount}</span>
-              <span style={{ color: '#ef4444', fontWeight: 600 }}>😔 {summary.negativeCount + summary.crisisCount}</span>
+              <span style={{ color: 'var(--color-success)', fontWeight: 600 }}>😊 {summary.positiveCount}</span>
+              <span style={{ color: 'var(--color-primary)', fontWeight: 600 }}>😐 {summary.neutralCount}</span>
+              <span style={{ color: 'var(--color-crisis)', fontWeight: 600 }}>😔 {summary.negativeCount + summary.crisisCount}</span>
             </div>
           </div>
 
           <div>
-            <div style={{ fontSize: '12px', color: 'var(--text)', marginBottom: '4px' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
               Đánh giá xu hướng
             </div>
             <div>{getTrendBadge()}</div>
@@ -285,8 +286,8 @@ export const MoodTrendChart: React.FC<MoodTrendChartProps> = ({ className }) => 
         <div style={{
           padding: '16px 20px',
           borderRadius: '12px',
-          background: 'rgba(239, 68, 68, 0.1)',
-          border: '1px solid rgba(239, 68, 68, 0.3)',
+          background: 'var(--tint-crimson)',
+          border: '1px solid rgba(166, 50, 40, 0.25)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -294,12 +295,12 @@ export const MoodTrendChart: React.FC<MoodTrendChartProps> = ({ className }) => 
           gap: '12px',
         }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', maxWidth: '600px' }}>
-            <AlertTriangle size={22} style={{ color: '#ef4444', flexShrink: 0, marginTop: '2px' }} />
+            <AlertTriangle size={22} style={{ color: 'var(--color-crisis)', flexShrink: 0, marginTop: '2px' }} />
             <div>
-              <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#ef4444' }}>
+              <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: 'var(--color-crisis)' }}>
                 Hệ thống ghi nhận dấu hiệu khủng hoảng cảm xúc
               </h4>
-              <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--text)', lineHeight: '1.4' }}>
+              <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--text-primary)', lineHeight: '1.45' }}>
                 Trong khoảng thời gian này ghi nhận cảm xúc bất ổn hoặc căng thẳng cao. Bạn không phải vượt qua điều này một mình, hãy kết nối với Tình nguyện viên hoặc liên hệ đường dây nóng hỗ trợ.
               </p>
             </div>
@@ -309,8 +310,8 @@ export const MoodTrendChart: React.FC<MoodTrendChartProps> = ({ className }) => 
             style={{
               padding: '8px 18px',
               borderRadius: '8px',
-              background: '#ef4444',
-              color: '#fff',
+              background: 'var(--color-crisis)',
+              color: '#FFFFFF',
               fontSize: '13px',
               fontWeight: 600,
               textDecoration: 'none',
@@ -334,28 +335,28 @@ export const MoodTrendChart: React.FC<MoodTrendChartProps> = ({ className }) => 
           padding: '40px 20px',
           textAlign: 'center',
           borderRadius: '12px',
-          background: 'var(--code-bg)',
-          border: '1px dashed var(--border)',
+          background: 'var(--bg-canvas)',
+          border: '1px dashed var(--border-subtle)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           gap: '12px',
         }}>
-          <Sparkles size={32} color="var(--accent)" />
-          <div style={{ color: 'var(--text-h)', fontWeight: 600, fontSize: '15px' }}>
+          <Sparkles size={32} color="var(--color-primary)" />
+          <div style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '15px' }}>
             Chưa có dữ liệu cảm xúc trong {days} ngày qua
           </div>
-          <p style={{ color: 'var(--text)', fontSize: '13px', margin: 0, maxWidth: '420px' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '13px', margin: 0, maxWidth: '420px' }}>
             Ghi chép nhật ký hàng ngày để AI nhận diện tâm trạng và trực quan hóa biểu đồ xu hướng cảm xúc của bạn.
           </p>
           <Link
             to="/journal"
             style={{
               marginTop: '4px',
-              padding: '8px 16px',
+              padding: '8px 18px',
               borderRadius: '8px',
-              background: 'var(--accent)',
-              color: '#fff',
+              background: 'var(--color-primary)',
+              color: '#FFFFFF',
               textDecoration: 'none',
               fontSize: '13px',
               fontWeight: 600,
@@ -375,8 +376,8 @@ export const MoodTrendChart: React.FC<MoodTrendChartProps> = ({ className }) => 
           >
             <defs>
               <linearGradient id="moodGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.4" />
-                <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.0" />
+                <stop offset="0%" stopColor="var(--color-primary)" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="var(--color-primary)" stopOpacity="0.0" />
               </linearGradient>
             </defs>
 
@@ -387,16 +388,16 @@ export const MoodTrendChart: React.FC<MoodTrendChartProps> = ({ className }) => 
               y1={padding.top}
               x2={svgWidth - padding.right}
               y2={padding.top}
-              stroke="var(--border)"
+              stroke="var(--border-subtle)"
               strokeDasharray="4 4"
-              strokeOpacity="0.5"
+              strokeOpacity="0.6"
             />
             <text
               x={padding.left - 10}
               y={padding.top + 4}
               textAnchor="end"
               fontSize="11"
-              fill="#10b981"
+              fill="var(--color-success)"
               fontWeight="600"
             >
               +1.0 😊
@@ -408,16 +409,16 @@ export const MoodTrendChart: React.FC<MoodTrendChartProps> = ({ className }) => 
               y1={padding.top + innerHeight / 2}
               x2={svgWidth - padding.right}
               y2={padding.top + innerHeight / 2}
-              stroke="var(--border)"
+              stroke="var(--border-subtle)"
               strokeDasharray="3 3"
-              strokeOpacity="0.7"
+              strokeOpacity="0.8"
             />
             <text
               x={padding.left - 10}
               y={padding.top + innerHeight / 2 + 4}
               textAnchor="end"
               fontSize="11"
-              fill="var(--text)"
+              fill="var(--text-secondary)"
             >
               0.0 😐
             </text>
@@ -428,16 +429,16 @@ export const MoodTrendChart: React.FC<MoodTrendChartProps> = ({ className }) => 
               y1={padding.top + innerHeight}
               x2={svgWidth - padding.right}
               y2={padding.top + innerHeight}
-              stroke="var(--border)"
+              stroke="var(--border-subtle)"
               strokeDasharray="4 4"
-              strokeOpacity="0.5"
+              strokeOpacity="0.6"
             />
             <text
               x={padding.left - 10}
               y={padding.top + innerHeight + 4}
               textAnchor="end"
               fontSize="11"
-              fill="#ef4444"
+              fill="var(--color-crisis)"
               fontWeight="600"
             >
               -1.0 😔
@@ -453,7 +454,7 @@ export const MoodTrendChart: React.FC<MoodTrendChartProps> = ({ className }) => 
               <path
                 d={buildLinePath()}
                 fill="none"
-                stroke="var(--accent)"
+                stroke="var(--color-primary)"
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -552,34 +553,34 @@ export const MoodTrendChart: React.FC<MoodTrendChartProps> = ({ className }) => 
                 top: hoverPos.y - 105,
                 left: hoverPos.x - 70,
                 zIndex: 1000,
-                background: '#1f1b2e',
-                border: '1px solid var(--accent)',
-                borderRadius: '8px',
-                padding: '8px 12px',
-                color: '#fff',
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: '10px',
+                padding: '10px 14px',
+                color: 'var(--text-primary)',
                 fontSize: '12px',
-                boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+                boxShadow: 'var(--shadow-elevated)',
                 pointerEvents: 'none',
-                minWidth: '140px',
+                minWidth: '150px',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600, marginBottom: '4px' }}>
-                <Calendar size={13} color="var(--accent)" />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontWeight: 600, marginBottom: '4px', color: 'var(--text-primary)' }}>
+                <Calendar size={13} color="var(--color-primary)" />
                 {new Date(hoveredPoint.date).toLocaleDateString('vi-VN')}
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
-                <span style={{ color: 'var(--text)' }}>Cảm xúc:</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px' }}>
+                <span style={{ color: 'var(--text-secondary)' }}>Cảm xúc:</span>
                 <span style={{ fontWeight: 600, color: getScoreColor(hoveredPoint.avgScore) }}>
                   {hoveredPoint.moodEmojis.join(' ')} {getSentimentText(hoveredPoint.dominantSentiment)}
                 </span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--text)' }}>Điểm số:</span>
-                <span style={{ fontWeight: 600 }}>
+                <span style={{ color: 'var(--text-secondary)' }}>Điểm số:</span>
+                <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
                   {hoveredPoint.avgScore > 0 ? `+${hoveredPoint.avgScore}` : hoveredPoint.avgScore}
                 </span>
               </div>
-              <div style={{ fontSize: '11px', color: 'var(--text)', marginTop: '4px' }}>
+              <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '4px', borderTop: '1px solid var(--border-subtle)', paddingTop: '4px' }}>
                 {hoveredPoint.entryCount} bài nhật ký
               </div>
             </div>
