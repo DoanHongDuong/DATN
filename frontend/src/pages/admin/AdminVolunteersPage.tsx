@@ -120,7 +120,7 @@ export const AdminVolunteersPage: React.FC = () => {
     {
       title: 'Ứng viên',
       key: 'fullName',
-      width: 220,
+      width: 200,
       render: (_: unknown, record: PendingVolunteer) => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
           <button
@@ -142,7 +142,7 @@ export const AdminVolunteersPage: React.FC = () => {
           <Text
             copyable={{ text: record.user?.email }}
             ellipsis={{ tooltip: record.user?.email }}
-            style={{ fontSize: '12.5px', color: 'var(--text-secondary)', maxWidth: 195 }}
+            style={{ fontSize: '12.5px', color: 'var(--text-secondary)', maxWidth: 175 }}
           >
             {record.user?.email}
           </Text>
@@ -155,7 +155,7 @@ export const AdminVolunteersPage: React.FC = () => {
     {
       title: 'Trạng thái',
       key: 'status',
-      width: 115,
+      width: 110,
       render: () => (
         <Tag color="warning" className="admin-status-tag">
           <Clock size={12} aria-hidden="true" /> Chờ duyệt
@@ -166,7 +166,7 @@ export const AdminVolunteersPage: React.FC = () => {
       title: 'Chuyên môn',
       dataIndex: 'specialization',
       key: 'specialization',
-      width: 190,
+      width: 155,
       render: (spec: string | null) => (
         <div
           style={{
@@ -188,7 +188,7 @@ export const AdminVolunteersPage: React.FC = () => {
       title: 'Giới thiệu / Kinh nghiệm',
       dataIndex: 'bio',
       key: 'bio',
-      width: 240,
+      width: 195,
       render: (bio: string | null) => (
         <div
           title={bio || ''}
@@ -210,7 +210,7 @@ export const AdminVolunteersPage: React.FC = () => {
       title: 'Chứng chỉ',
       dataIndex: 'certificateUrl',
       key: 'certificateUrl',
-      width: 130,
+      width: 100,
       render: (url: string | null) => {
         if (!url) {
           return <span style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>Không có</span>;
@@ -238,8 +238,7 @@ export const AdminVolunteersPage: React.FC = () => {
     {
       title: 'Thao tác',
       key: 'actions',
-      width: 245,
-      fixed: 'right' as const,
+      width: 290,
       render: (_: unknown, record: PendingVolunteer) => {
         const isBusy = actionId === record.id;
         return (
@@ -325,7 +324,7 @@ export const AdminVolunteersPage: React.FC = () => {
           columns={columns}
           rowKey="id"
           loading={loading}
-          scroll={{ x: 1140 }}
+          scroll={{ x: 1050 }}
           locale={{
             emptyText: 'Hiện không có hồ sơ tình nguyện viên nào đang chờ duyệt.',
           }}
