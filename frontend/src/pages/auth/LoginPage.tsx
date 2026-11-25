@@ -35,13 +35,11 @@ export const LoginPage: React.FC = () => {
   const loginMutation = useMutation({
     mutationFn: (payload: LoginPayload) => authApi.login(payload),
     onSuccess: (data) => {
+      // Chỉ cập nhật auth state, KHÔNG gọi navigate() ở đây.
+      // navigate sẽ được xử lý bởi useEffect([isAuthenticated]) để tránh race condition
+      // với PublicOnlyRoute (state async chưa flush khi navigate() chạy ngay).
       setAuthData(data);
       message.success('Đăng nhập thành công!');
-      if (data.user?.role === 'ADMIN') {
-        navigate('/admin', { replace: true });
-      } else {
-        navigate('/dashboard', { replace: true });
-      }
     },
     onError: (error: unknown) => {
       let msg = 'Đăng nhập thất bại. Vui lòng kiểm tra lại email/mật khẩu.';
