@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Table, Button, Space, Popconfirm, message, Card, Typography, Modal, Input, Alert, Tag } from 'antd';
-import { ExternalLink, Check, X, RefreshCw, UserCheck, Clock, AlertCircle } from 'lucide-react';
+import { Table, Button, Space, Popconfirm, message, Card, Typography, Modal, Input, Alert, Tag, Descriptions } from 'antd';
+import { ExternalLink, Check, X, RefreshCw, UserCheck, Clock, AlertCircle, Eye, Mail, Calendar, Award, FileText } from 'lucide-react';
 import { adminApi, type PendingVolunteer } from '../../api/admin.api';
 import { AdminHeaderNav } from './AdminHeaderNav';
 import axios, { AxiosError } from 'axios';
@@ -13,6 +13,9 @@ export const AdminVolunteersPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [actionId, setActionId] = useState<string | null>(null);
+
+  // State cho Modal xem chi tiết hồ sơ
+  const [detailVolunteer, setDetailVolunteer] = useState<PendingVolunteer | null>(null);
 
   // State cho Modal từ chối hồ sơ
   const [rejectModalOpen, setRejectModalOpen] = useState<boolean>(false);
@@ -71,6 +74,7 @@ export const AdminVolunteersPage: React.FC = () => {
     try {
       const res = await adminApi.approveVolunteer(profileId);
       message.success(res.message || 'Phê duyệt tình nguyện viên thành công!');
+      setDetailVolunteer((prev) => (prev?.id === profileId ? null : prev));
       fetchPendingVolunteers();
     } catch (err: unknown) {
       let msg = 'Phê duyệt thất bại';
@@ -116,31 +120,42 @@ export const AdminVolunteersPage: React.FC = () => {
     {
       title: 'Ứng viên',
       key: 'fullName',
-      width: 180,
+      width: 220,
       render: (_: unknown, record: PendingVolunteer) => (
-        <div>
-          <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{record.user?.fullName}</div>
-          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'var(--mono)' }}>
-            ID: {record.id.slice(0, 8)}...
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <button
+            type="button"
+            onClick={() => setDetailVolunteer(record)}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              textAlign: 'left',
+              fontWeight: 600,
+              color: 'var(--color-primary)',
+              cursor: 'pointer',
+              fontSize: '14px',
+            }}
+          >
+            {record.user?.fullName}
+          </button>
+          <Text
+            copyable={{ text: record.user?.email }}
+            ellipsis={{ tooltip: record.user?.email }}
+            style={{ fontSize: '12.5px', color: 'var(--text-secondary)', maxWidth: 195 }}
+          >
+            {record.user?.email}
+          </Text>
+          <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', opacity: 0.8 }}>
+            Nộp: {new Date(record.createdAt).toLocaleDateString('vi-VN')}
           </div>
         </div>
       ),
     },
     {
-      title: 'Email',
-      key: 'email',
-      width: 220,
-      ellipsis: true,
-      render: (_: unknown, record: PendingVolunteer) => (
-        <Text copyable={{ text: record.user?.email }} ellipsis={{ tooltip: record.user?.email }}>
-          {record.user?.email}
-        </Text>
-      ),
-    },
-    {
       title: 'Trạng thái',
       key: 'status',
-      width: 130,
+      width: 115,
       render: () => (
         <Tag color="warning" className="admin-status-tag">
           <Clock size={12} aria-hidden="true" /> Chờ duyệt
@@ -151,31 +166,51 @@ export const AdminVolunteersPage: React.FC = () => {
       title: 'Chuyên môn',
       dataIndex: 'specialization',
       key: 'specialization',
-      width: 180,
-      ellipsis: true,
+      width: 190,
       render: (spec: string | null) => (
-        <span style={{ fontWeight: 500, color: 'var(--text-primary)' }} title={spec || ''}>
+        <div
+          style={{
+            fontWeight: 500,
+            color: 'var(--text-primary)',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            lineHeight: 1.45,
+          }}
+          title={spec || ''}
+        >
           {spec || 'Chưa cập nhật'}
-        </span>
+        </div>
       ),
     },
     {
       title: 'Giới thiệu / Kinh nghiệm',
       dataIndex: 'bio',
       key: 'bio',
-      width: 220,
-      ellipsis: true,
+      width: 240,
       render: (bio: string | null) => (
-        <span title={bio || ''} style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+        <div
+          title={bio || ''}
+          style={{
+            fontSize: '13px',
+            color: 'var(--text-secondary)',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            lineHeight: 1.45,
+          }}
+        >
           {bio || 'Không có mô tả'}
-        </span>
+        </div>
       ),
     },
     {
-      title: 'Chứng chỉ / Bằng cấp',
+      title: 'Chứng chỉ',
       dataIndex: 'certificateUrl',
       key: 'certificateUrl',
-      width: 160,
+      width: 130,
       render: (url: string | null) => {
         if (!url) {
           return <span style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>Không có</span>;
@@ -194,32 +229,29 @@ export const AdminVolunteersPage: React.FC = () => {
               fontSize: '13px',
             }}
           >
-            <span>Xem chứng chỉ</span>
+            <span>Mở link</span>
             <ExternalLink size={14} aria-hidden="true" />
           </a>
         );
       },
     },
     {
-      title: 'Ngày nộp',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      width: 160,
-      render: (dateStr: string) => (
-        <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-          {new Date(dateStr).toLocaleString('vi-VN')}
-        </span>
-      ),
-    },
-    {
       title: 'Thao tác',
       key: 'actions',
-      width: 180,
+      width: 245,
       fixed: 'right' as const,
       render: (_: unknown, record: PendingVolunteer) => {
         const isBusy = actionId === record.id;
         return (
-          <Space>
+          <Space size={6}>
+            <Button
+              size="small"
+              icon={<Eye size={14} />}
+              onClick={() => setDetailVolunteer(record)}
+            >
+              Chi tiết
+            </Button>
+
             <Popconfirm
               title="Phê duyệt tình nguyện viên?"
               description={`Xác nhận phê duyệt cho ${record.user?.fullName} làm Tình nguyện viên?`}
@@ -293,13 +325,235 @@ export const AdminVolunteersPage: React.FC = () => {
           columns={columns}
           rowKey="id"
           loading={loading}
-          scroll={{ x: 1120 }}
+          scroll={{ x: 1140 }}
           locale={{
             emptyText: 'Hiện không có hồ sơ tình nguyện viên nào đang chờ duyệt.',
           }}
           pagination={{ pageSize: 10, showTotal: (tot) => `Tổng cộng ${tot} hồ sơ` }}
         />
       </Card>
+
+      {/* Modal xem chi tiết hồ sơ ứng viên TNV */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            <UserCheck size={20} color="var(--color-primary)" />
+            <span>Chi tiết hồ sơ Tình nguyện viên</span>
+            <Tag color="warning" className="admin-status-tag" style={{ marginLeft: 4 }}>
+              <Clock size={12} aria-hidden="true" /> Chờ duyệt
+            </Tag>
+          </div>
+        }
+        open={Boolean(detailVolunteer)}
+        onCancel={() => setDetailVolunteer(null)}
+        width={680}
+        footer={
+          detailVolunteer
+            ? [
+                <Button key="close" onClick={() => setDetailVolunteer(null)}>
+                  Đóng
+                </Button>,
+                <Button
+                  key="reject"
+                  danger
+                  icon={<X size={14} />}
+                  disabled={actionId === detailVolunteer.id}
+                  onClick={() => {
+                    const target = detailVolunteer;
+                    setDetailVolunteer(null);
+                    handleOpenRejectModal(target);
+                  }}
+                >
+                  Từ chối hồ sơ
+                </Button>,
+                <Popconfirm
+                  key="approve"
+                  title="Phê duyệt tình nguyện viên?"
+                  description={`Xác nhận phê duyệt cho ${detailVolunteer.user?.fullName} làm Tình nguyện viên?`}
+                  onConfirm={() => handleApprove(detailVolunteer.id)}
+                  okText="Đồng ý duyệt"
+                  cancelText="Huỷ"
+                  okButtonProps={{ loading: actionId === detailVolunteer.id }}
+                >
+                  <Button
+                    type="primary"
+                    icon={<Check size={14} />}
+                    loading={actionId === detailVolunteer.id}
+                    style={{ background: 'var(--color-success)', borderColor: 'var(--color-success)' }}
+                  >
+                    Phê duyệt hồ sơ
+                  </Button>
+                </Popconfirm>,
+              ]
+            : null
+        }
+      >
+        {detailVolunteer && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingTop: '8px' }}>
+            <Descriptions
+              bordered
+              column={{ xs: 1, sm: 2 }}
+              size="small"
+            >
+              <Descriptions.Item label="Họ và tên">
+                <strong style={{ color: 'var(--text-primary)' }}>
+                  {detailVolunteer.user?.fullName || 'Chưa cập nhật'}
+                </strong>
+              </Descriptions.Item>
+              <Descriptions.Item
+                label={
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                    <Mail size={13} /> Email
+                  </span>
+                }
+              >
+                <Text copyable={{ text: detailVolunteer.user?.email }}>
+                  {detailVolunteer.user?.email || 'Không có'}
+                </Text>
+              </Descriptions.Item>
+              <Descriptions.Item label="Mã hồ sơ">
+                <Text copyable={{ text: detailVolunteer.id }} style={{ fontFamily: 'var(--mono)', fontSize: '12.5px' }}>
+                  {detailVolunteer.id}
+                </Text>
+              </Descriptions.Item>
+              <Descriptions.Item
+                label={
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                    <Calendar size={13} /> Ngày nộp
+                  </span>
+                }
+              >
+                {new Date(detailVolunteer.createdAt).toLocaleString('vi-VN')}
+              </Descriptions.Item>
+            </Descriptions>
+
+            <div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontWeight: 600,
+                  fontSize: '13.5px',
+                  color: 'var(--text-primary)',
+                  marginBottom: '6px',
+                }}
+              >
+                <Award size={15} color="var(--color-primary)" />
+                <span>Chuyên môn / Bằng cấp</span>
+              </div>
+              <div
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: '10px',
+                  background: 'var(--bg-canvas)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-primary)',
+                  fontSize: '14px',
+                  lineHeight: 1.6,
+                  whiteSpace: 'pre-wrap',
+                }}
+              >
+                {detailVolunteer.specialization || 'Chưa cập nhật'}
+              </div>
+            </div>
+
+            <div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontWeight: 600,
+                  fontSize: '13.5px',
+                  color: 'var(--text-primary)',
+                  marginBottom: '6px',
+                }}
+              >
+                <FileText size={15} color="var(--color-primary)" />
+                <span>Giới thiệu & Kinh nghiệm hỗ trợ</span>
+              </div>
+              <div
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: '10px',
+                  background: 'var(--bg-canvas)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-primary)',
+                  fontSize: '14px',
+                  lineHeight: 1.65,
+                  whiteSpace: 'pre-wrap',
+                  maxHeight: '240px',
+                  overflowY: 'auto',
+                }}
+              >
+                {detailVolunteer.bio || 'Không có mô tả'}
+              </div>
+            </div>
+
+            <div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontWeight: 600,
+                  fontSize: '13.5px',
+                  color: 'var(--text-primary)',
+                  marginBottom: '6px',
+                }}
+              >
+                <ExternalLink size={15} color="var(--color-primary)" />
+                <span>Chứng chỉ / Tài liệu đính kèm</span>
+              </div>
+              {detailVolunteer.certificateUrl ? (
+                <div
+                  style={{
+                    padding: '10px 14px',
+                    borderRadius: '10px',
+                    background: 'var(--bg-canvas)',
+                    border: '1px solid var(--border-subtle)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '12px',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <Text
+                    copyable={{ text: detailVolunteer.certificateUrl }}
+                    ellipsis={{ tooltip: detailVolunteer.certificateUrl }}
+                    style={{ maxWidth: '460px', fontSize: '13px', color: 'var(--text-secondary)' }}
+                  >
+                    {detailVolunteer.certificateUrl}
+                  </Text>
+                  <a
+                    href={detailVolunteer.certificateUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      color: 'var(--color-primary)',
+                      fontWeight: 600,
+                      fontSize: '13.5px',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <span>Mở tài liệu</span>
+                    <ExternalLink size={14} aria-hidden="true" />
+                  </a>
+                </div>
+              ) : (
+                <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                  Ứng viên không đính kèm liên kết chứng chỉ.
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </Modal>
 
       {/* Modal từ chối hồ sơ TNV kèm nhập lý do */}
       <Modal
