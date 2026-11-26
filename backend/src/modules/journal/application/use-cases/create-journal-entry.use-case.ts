@@ -60,7 +60,7 @@ export class CreateJournalEntryUseCase {
 
     if (sentiment.sentimentLabel === 'crisis') {
       const rawHotline = this.configService.get<string>('EMERGENCY_HOTLINE')?.replace(/^["']|["']$/g, '').trim();
-      response.emergencyHotline = (rawHotline && rawHotline !== '1900 6789') ? rawHotline : '0979877220';
+      response.emergencyHotline = (rawHotline && rawHotline !== '1900 6789' && rawHotline !== '0979877220') ? rawHotline : '1900 6299';
 
       if (this.createNotificationUseCase) {
         await this.createNotificationUseCase.execute({
