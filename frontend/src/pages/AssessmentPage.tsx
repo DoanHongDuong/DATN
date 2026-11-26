@@ -8,6 +8,7 @@ import {
   type TestResultResponse,
 } from '../api/assessment.api';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { getEmergencyHotline } from '../utils/hotline';
 import {
   CheckCircle2,
   ArrowLeft,
@@ -282,8 +283,11 @@ export const AssessmentPage: React.FC = () => {
                 <span>Đường dây nóng hỗ trợ khẩn cấp 24/7</span>
               </div>
               <div className="assessment-result-crisis__links">
-                <a href="tel:19006299" className="assessment-result-crisis__hotline-link">
-                  <PhoneCall size={16} /> 1900 6299 – Hỗ trợ Khủng hoảng Tâm lý (24/7)
+                <a
+                  href={`tel:${getEmergencyHotline().replace(/\s+/g, '')}`}
+                  className="assessment-result-crisis__hotline-link"
+                >
+                  <PhoneCall size={16} /> {getEmergencyHotline()} – Đường dây nóng Ngày Mai (Hỗ trợ Tâm lý)
                 </a>
                 <a href="tel:111" className="assessment-result-crisis__hotline-link" style={{ background: '#7A241C' }}>
                   <PhoneCall size={16} /> 111 – Tổng đài Quốc gia Bảo vệ Trẻ em & Sinh viên

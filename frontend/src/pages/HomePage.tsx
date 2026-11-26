@@ -9,11 +9,13 @@ import {
   PhoneCall,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { getEmergencyHotline } from '../utils/hotline';
 import './home.css';
 
 export const HomePage: React.FC = () => {
   const { user } = useAuth();
   const isAuthenticated = !!user;
+  const emergencyHotline = getEmergencyHotline();
 
   return (
     <div className="home-container">
@@ -146,7 +148,7 @@ export const HomePage: React.FC = () => {
           </p>
           <div className="home-crisis__hotlines">
             <span className="home-crisis__hotline-item">📞 Tổng đài Quốc gia Bảo vệ Trẻ em & Sinh viên: <strong>111</strong></span>
-            <span className="home-crisis__hotline-item">📞 Đường dây nóng Khủng hoảng Tâm lý: <strong>1900 6299</strong></span>
+            <span className="home-crisis__hotline-item">📞 Đường dây nóng Ngày Mai (Hỗ trợ Tâm lý): <strong>{emergencyHotline}</strong></span>
             <span className="home-crisis__hotline-item">📞 Cấp cứu Y tế: <strong>115</strong></span>
           </div>
         </div>

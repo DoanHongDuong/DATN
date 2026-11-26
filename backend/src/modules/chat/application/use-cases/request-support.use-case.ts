@@ -53,7 +53,8 @@ export class RequestSupportUseCase {
     const hasVolunteer = await this.chatRepository.hasAvailableVolunteer();
     if (!hasVolunteer) {
       const rawHotline = this.configService.get<string>('EMERGENCY_HOTLINE')?.replace(/^["']|["']$/g, '').trim();
-      const hotline = (rawHotline && rawHotline !== '1900 6789' && rawHotline !== '0979877220') ? rawHotline : '1900 6299';
+      const legacyPlaceholders = ['1900 6789', '1900 6299', '0979877220'];
+      const hotline = (rawHotline && !legacyPlaceholders.includes(rawHotline)) ? rawHotline : '096 306 1414';
       return {
         noVolunteerAvailable: true,
         hotline,
